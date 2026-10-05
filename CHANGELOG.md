@@ -1,5 +1,9 @@
 # Mudanças
 
+## 0.1.2 — o raio-x já lê o código (out/2026)
+
+- **Documentação:** o Trilha-ads 0.8.0 agrupa o raio-x pelo código da célula no `utm_content` (`por_criativo`). README, contrato e exportação deixam de dizer que isso está no roadmap.
+
 ## 0.1.1 — organização do ecossistema (out/2026)
 
 - **Nome:** Trilha-copy (antes Trilha-copywritter).

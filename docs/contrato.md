@@ -35,7 +35,7 @@ Só saem peças **aprovadas** cujo texto não mudou depois da aprovação.
 | Coluna | Conteúdo |
 |---|---|
 | `codigo` | código da célula (`PT01`) |
-| `utm_content` | o mesmo código: vai no anúncio e é o que a Trilha-LP põe na mensagem do WhatsApp. O Trilha-ads ainda não agrupa o raio-x por ele (está no roadmap de lá) |
+| `utm_content` | o mesmo código: vai no anúncio e é o que a Trilha-LP põe na mensagem do WhatsApp. O raio-x do Trilha-ads agrupa os resultados por ele (`por_criativo`) |
 | `peca` | id da peça |
 | `formato` | `meta_feed`, `meta_reels` ou `google_rsa` |
 | `campo` | `texto_principal`, `titulo`, `descricao`, `botao` (Meta); `titulo`, `descricao`, `caminho` (Google) |
