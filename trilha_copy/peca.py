@@ -28,11 +28,22 @@ class _Base(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+class Arte(_Base):
+    """Briefing do criativo para a equipe de criação: o que a arte precisa comunicar, não como desenhar."""
+
+    tipo: Literal["imagem", "carrossel", "video"] = "imagem"
+    mostrar: str = ""  # o que precisa aparecer: a cena, a pessoa, o produto em uso, o antes e depois
+    texto_na_arte: list[str] = Field(default_factory=list)  # o texto por cima da imagem; curto, revisado como o resto
+    evitar: str = ""  # o que não pode aparecer (além do compliance do briefing, que vai junto)
+    referencias: list[str] = Field(default_factory=list)  # links ou ids do banco de referências
+
+
 class Meta(_Base):
     textos_principais: list[str] = Field(default_factory=list)
     titulos: list[str] = Field(default_factory=list)
     descricoes: list[str] = Field(default_factory=list)
     cta_botao: str = ""
+    arte: Arte | None = None
 
 
 class Google(_Base):
@@ -44,6 +55,7 @@ class Google(_Base):
 
 class Cena(_Base):
     tempo: str  # "0-3", "3-12" (segundos)
+    parte: str = ""  # a parte do modelo que a cena cumpre (gancho, o_que, mas…): python -m trilha_copy roteiros
     fala: str = ""
     visual: str = ""
     texto_tela: str = ""
@@ -56,9 +68,18 @@ class Cena(_Base):
 
 
 class Roteiro(_Base):
+    modelo: str | None = None  # educativo, historia, oferta_direta… (regras/roteiros.yaml)
     duracao_s: int | None = Field(default=None, ge=5, le=600)
     cenas: list[Cena] = Field(default_factory=list)
     cta: str = ""
+
+    @model_validator(mode="after")
+    def _modelo_existe(self) -> Roteiro:
+        from trilha_copy.roteiros import modelos
+
+        if self.modelo is not None and self.modelo not in modelos():
+            raise ValueError(f"modelo de roteiro '{self.modelo}' não existe (existem: {', '.join(modelos())})")
+        return self
 
 
 class Subtexto(_Base):
@@ -134,6 +155,8 @@ class Peca(_Base):
             saida += [(f"meta.textos_principais[{i}]", t) for i, t in enumerate(c.textos_principais)]
             saida += [(f"meta.titulos[{i}]", t) for i, t in enumerate(c.titulos)]
             saida += [(f"meta.descricoes[{i}]", t) for i, t in enumerate(c.descricoes)]
+            if c.arte:
+                saida += [(f"meta.arte.texto_na_arte[{i}]", t) for i, t in enumerate(c.arte.texto_na_arte)]
         elif isinstance(c, Google):
             saida += [(f"google.titulos[{i}]", t) for i, t in enumerate(c.titulos)]
             saida += [(f"google.descricoes[{i}]", t) for i, t in enumerate(c.descricoes)]
@@ -145,7 +168,7 @@ class Peca(_Base):
         return [(onde, t) for onde, t in saida if t and t.strip()]
 
     def assinatura_conteudo(self) -> str:
-        dados = self.conteudo().model_dump(mode="json")
+        dados = _sem_campos_novos_vazios(self.conteudo().model_dump(mode="json"))
         return hashlib.sha256(json.dumps(dados, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:16]
 
     def aprovacao_valida(self) -> bool:
@@ -158,6 +181,21 @@ class Peca(_Base):
 
 class ErroPeca(Exception):
     pass
+
+
+def _sem_campos_novos_vazios(dados: dict) -> dict:
+    """Campos que entraram depois da 0.1.3 (arte, modelo, parte) só pesam na assinatura quando preenchidos.
+
+    Assim uma peça aprovada antes deles continua aprovada; preencher depois exige aprovar de novo, como qualquer
+    mudança no conteúdo.
+    """
+    dados = dict(dados)
+    for chave in ("arte", "modelo"):
+        if dados.get(chave) is None:
+            dados.pop(chave, None)
+    if "cenas" in dados:
+        dados["cenas"] = [{k: v for k, v in cena.items() if not (k == "parte" and not v)} for cena in dados["cenas"]]
+    return dados
 
 
 def carregar_peca(caminho: str | Path) -> Peca:

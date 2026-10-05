@@ -20,6 +20,7 @@ from trilha_copy import texto as tx
 from trilha_copy.contrato import Contrato
 from trilha_copy.formatos import FORMATOS, GANCHO_SEGUNDOS, PALAVRAS_POR_SEGUNDO, TITULOS_GOOGLE_RECOMENDADOS
 from trilha_copy.peca import Google, Meta, Peca, Roteiro
+from trilha_copy.roteiros import modelos
 
 Nivel = Literal["bloqueia", "atencao", "sugestao"]
 NIVEIS: tuple[Nivel, ...] = ("bloqueia", "atencao", "sugestao")
@@ -232,6 +233,13 @@ def _roteiro(p: Peca, r: Roteiro, avisos: list[Aviso]) -> None:
         n = len(tx.palavras(cena.fala))
         if n > cabe + 2:
             avisos.append(Aviso("atencao", f"roteiro: a fala da cena {cena.tempo} tem {n} palavras; cabem cerca de {cabe:.0f}"))
+    if r.modelo:
+        modelo = modelos()[r.modelo]
+        for problema in modelo.conferir([cena.parte for cena in r.cenas]):
+            avisos.append(Aviso("atencao", f"roteiro ({modelo.nome}): {problema}"))
+    elif p.estado not in ("fundacao", "rascunho"):
+        avisos.append(Aviso("sugestao", "roteiro sem modelo de corpo: escolha um (python -m trilha_copy roteiros) para a "
+                                        "revisão conferir se cada parte está lá e na ordem"))
     if p.estado not in ("fundacao", "rascunho"):
         if not r.cta:
             avisos.append(Aviso("atencao", "roteiro sem chamada (cta): diga o que fazer depois de assistir"))

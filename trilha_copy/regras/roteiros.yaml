@@ -1,0 +1,57 @@
+# Modelos de corpo para roteiro de vídeo curto. Editável: a revisão e o `nova --modelo` leem daqui.
+#
+# Cada parte diz o que aquele trecho do vídeo precisa fazer. No roteiro, cada cena declara a parte que cumpre
+# (`parte`), e a revisão avisa parte que falta, fora de ordem ou que o modelo não tem.
+# - `opcional: true`: a parte pode não existir (ex.: prioridade, que só entra com urgência real).
+# - `ciclo`: partes que podem se repetir em sequência (o "mas… então…" da história).
+# A chamada não é parte do corpo de nenhum modelo: o texto fica no campo `cta` do roteiro (quem, o quê, até quando,
+# como), e a cena em que ela é falada usa `parte: cta`, sempre no fim.
+
+modelos:
+  educativo:
+    nome: "Educativo: o quê → por quê → como"
+    fonte: "aula de copy 3"
+    quando: "ensinar algo útil preso à dor da persona; bom para quem ainda não sabe que existe solução"
+    partes:
+      - id: gancho
+        faz: "prender nos 3 primeiros segundos com o benefício ou o problema, nas palavras de quem assiste"
+      - id: o_que
+        faz: "a ideia que o vídeo defende, numa frase"
+      - id: por_que
+        faz: "por que isso importa para quem assiste: a dor, o custo de não saber"
+      - id: como
+        faz: "como fazer, em passos simples, ou como a oferta faz isso pela pessoa"
+
+  historia:
+    nome: "História: mas… então…"
+    fonte: "aula de copy 3"
+    quando: "mostrar a mudança de alguém parecido com a persona; só com história autorizada no briefing"
+    ciclo: [mas, entao]
+    partes:
+      - id: gancho
+        faz: "começar no momento de tensão, não no começo da história"
+      - id: situacao
+        faz: "onde a pessoa estava, com um detalhe concreto que a persona reconhece"
+      - id: mas
+        faz: "o problema ou a virada (\"mas…\"): é o que cria tensão"
+      - id: entao
+        faz: "o que a pessoa fez por causa disso (\"então…\"); pode voltar a um novo \"mas…\""
+      - id: resultado
+        faz: "onde ela chegou, com um fato ou número que tenha prova"
+
+  oferta_direta:
+    nome: "Oferta direta: os 6 Ps em vídeo"
+    fonte: "aula dos 6 Ps"
+    quando: "público que já conhece o problema e compara soluções"
+    partes:
+      - id: gancho
+        faz: "a dor ou o desejo da persona, nas palavras dela (Pessoas)"
+      - id: promessa
+        faz: "o que a pessoa ganha, com prazo e condição (Promessa)"
+      - id: prova
+        faz: "por que acreditar: número com fonte ou depoimento autorizado (Prova)"
+      - id: processo
+        faz: "como funciona, em 2 ou 3 passos (Processo)"
+      - id: prioridade
+        faz: "por que agir agora, só com urgência ou escassez reais (Prioridade)"
+        opcional: true

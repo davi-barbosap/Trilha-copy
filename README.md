@@ -26,19 +26,20 @@ O código da célula da grade (`PT01`, `GB01`…) amarra as etapas. Ele nasce na
 | `importar <copy.yaml>` | Traz o contrato gerado pelo Trilha-briefing (só é preciso fora do Trilha-clientes, onde o briefing já grava direto). |
 | `validar <pasta>` | Confere se o contrato e as peças estão no formato certo. Não julga o texto. |
 | `pacote <pasta> <codigo>` | **Antes de escrever:** os 6 Ps da célula, o que falta no briefing, a voz e os limites. Os 6 Ps são Pessoas, Posicionamento, Promessa, Prova, Prioridade e Processo. |
-| `nova <pasta> <codigo> --formato F` | Cria a peça a partir da célula, já com persona, oferta, macro-ação, hipótese e intensidade preenchidas. |
+| `nova <pasta> <codigo> --formato F [--modelo M]` | Cria a peça a partir da célula, já com persona, oferta, macro-ação, hipótese, intensidade e a próxima `versao`. Para roteiro, `--modelo` cria as cenas do modelo de corpo com tempos sugeridos. |
 | `checklist <peca>` | Mostra o que falta para a peça sair do estado atual. |
 | `avancar <peca>` | Passa a peça ao próximo estado, se nada faltar. |
 | `revisar <peça ou pasta>` | Dá avisos em três gravidades e sai com erro se algo bloqueia. |
 | `aprovar <peca> --por NOME --teste-do-vendedor` | Aprova a peça final (regras abaixo). |
-| `exportar <pasta>` | Gera, só das peças aprovadas: `anuncios.csv` (os textos de Meta e Google), `subida.csv` (um anúncio por linha, com campanha, conjunto, nome do anúncio e parâmetros de URL vindos do plano de campanhas do briefing) e os roteiros em Markdown. |
+| `exportar <pasta>` | Gera, só das peças aprovadas: `anuncios.csv` (os textos de Meta e Google), `subida.csv` (um anúncio por linha, com campanha, conjunto, nome do anúncio e parâmetros de URL vindos do plano de campanhas do briefing), o **briefing do criativo** de cada anúncio do Meta e os roteiros, para a equipe de criação. |
 | `ganchos` | Catálogo de 15 tipos de gancho, com exemplos de segmentos diferentes. |
+| `roteiros` | Modelos de corpo para roteiro: educativo (o quê → por quê → como), história (mas… então…) e oferta direta (os 6 Ps). Ficam em `trilha_copy/regras/roteiros.yaml`, editáveis. |
 | `referencias` | Banco de peças boas, decupadas trecho a trecho, com o porquê. |
 
 Formatos:
 - anúncio do Meta: feed, Reels e Stories;
 - anúncio responsivo de pesquisa do Google;
-- roteiro de vídeo curto, em versão básica (cenas com tempo, fala, visual e texto na tela).
+- roteiro de vídeo curto: cenas com tempo, parte do modelo de corpo, fala, visual e texto na tela.
 
 ## Como faz
 
@@ -47,8 +48,8 @@ Formatos:
 | Estado | Para sair dele |
 |---|---|
 | **fundação** | persona, micro-ação (o que esta peça provoca), macro-ação (o que o sistema precisa), a ideia grande em uma frase e um briefing sem buraco crítico: persona com dores, promessa e ao menos uma prova |
-| **rascunho** | 10 rascunhos de título ou gancho ou mais, emoção principal (novo, fácil, seguro ou grande), ângulo, tipo de gancho e o mínimo de textos que a plataforma pede |
-| **refinado** | subtexto anotado (ao menos 3 trechos, cada um com o que deve fazer sentir ou pensar), a prova usada e nenhum aviso que bloqueie |
+| **rascunho** | 10 rascunhos de título ou gancho ou mais, emoção principal (novo, fácil, seguro ou grande), ângulo, tipo de gancho e o mínimo de textos que a plataforma pede; roteiro com modelo de corpo |
+| **refinado** | subtexto anotado (ao menos 3 trechos, cada um com o que deve fazer sentir ou pensar), a prova usada, o briefing do criativo nos anúncios do Meta (`meta.arte.mostrar`) e nenhum aviso que bloqueie |
 | **final** | só o comando `aprovar`, que exige o **teste do vendedor** ("um bom vendedor diria isso com o cliente na frente dele?") e que a peça tenha virado final em outro dia (`--mesmo-dia` para pular, de propósito) |
 | **aprovado** | a aprovação guarda uma assinatura do texto: mudou uma vírgula depois de aprovar, a peça não exporta até ser aprovada de novo |
 
@@ -75,7 +76,8 @@ Formatos:
   - leitura difícil;
   - gancho cortado pelo "ver mais";
   - fala que não cabe no tempo da cena;
-  - vídeo que não prende nos 3 primeiros segundos.
+  - vídeo que não prende nos 3 primeiros segundos;
+  - roteiro fora do modelo de corpo: parte que falta, fora de ordem ou desconhecida.
 - **Sugestão:**
   - frases todas do mesmo tamanho;
   - nenhuma palavra das frases literais da persona;
@@ -83,7 +85,8 @@ Formatos:
   - chamada sem "quando";
   - menos de 10 títulos no Google;
   - título que não repete a busca;
-  - vídeo sem texto na tela.
+  - vídeo sem texto na tela;
+  - roteiro sem modelo de corpo.
 
 A revisão aponta e não reescreve. Os limites de cada formato estão em [`trilha_copy/formatos.py`](trilha_copy/formatos.py).
 
@@ -91,7 +94,16 @@ A revisão aponta e não reescreve. Os limites de cada formato estão em [`trilh
 - `copy.yaml`, o contrato com o Trilha-briefing: personas, voz, ofertas, provas utilizáveis, compliance, grade, hipóteses e onde cada célula vira anúncio (`veiculacao`, do plano de campanhas);
 - as peças, em `pecas/<codigo>/<peca>.yaml`.
 
-**Saídas:** `dist/<id>/anuncios.csv`, com uma linha por texto, o código da célula e o `utm_content`; `dist/<id>/subida.csv`, com uma linha por anúncio (campanha, conjunto, nome e parâmetros de URL); e `dist/<id>/roteiros/<peca>.md`. Detalhes em [contrato](docs/contrato.md).
+**Saídas:** `dist/<id>/anuncios.csv`, com uma linha por texto, o código da célula e o `utm_content`; `dist/<id>/subida.csv`, com uma linha por anúncio (campanha, conjunto, nome e parâmetros de URL); `dist/<id>/criativos/<peca>.md`, o briefing do criativo de cada anúncio do Meta; e `dist/<id>/roteiros/<peca>.md`. Detalhes em [contrato](docs/contrato.md).
+
+**O briefing do criativo** é o que a equipe de criação recebe. Não é design: diz o que a arte precisa comunicar.
+- **Para que serve a peça:** a micro e a macro-ação, e o que varia no teste, para não mudar outra coisa.
+- **Para quem:** a persona e as frases dela.
+- **A ideia, o tom, as provas** que podem aparecer.
+- **O que não pode e o que é obrigatório:** compliance, palavras proibidas inclusive na arte, avisos legais.
+- **A arte:** o que precisa mostrar, o texto na arte (já revisado), o que evitar e as referências.
+- **A identidade da marca e as medidas** do formato.
+- **O texto que acompanha a arte.**
 
 ## Arquivos
 
@@ -105,16 +117,15 @@ referencias/<id>.yaml          peças boas de qualquer segmento, decupadas trech
 ## O que não faz
 
 - **Não gera texto.** Não há IA escrevendo: a ferramenta organiza, confere e registra.
-- **Não faz o criativo visual.** O design é da equipe de criação. O roteiro só descreve o visual de cada cena.
+- **Não faz o criativo visual.** O design é da equipe de criação. O briefing do criativo e o roteiro dizem o que comunicar, não como desenhar.
 - **Não sobe anúncio.** O CSV é para copiar ou importar no gerenciador; não foi testado na importação em massa do Meta ou do Google.
 - **Não substitui a política das plataformas.** As listas de termos sensíveis pegam os casos comuns, não todos, e os limites de caracteres mudam de tempos em tempos.
 - **Não mede resultado.** Quem mede é o Trilha-ads: o raio-x agrupa leads, qualificados e vendas pelo código da célula.
 
 ## Situação atual
 
-Versão 0.1.1, sem cliente real ainda. Próximos passos:
-- os roteiros completos, com os modelos de corpo educativo e de história;
-- o briefing de criativo de cada peça para a equipe de criação: formatos, direção visual e identidade;
+Versão 0.1.4, sem cliente real ainda. Próximos passos:
+- o padrão de texto da Trilha num arquivo só, aplicado também às páginas;
 - as peças vencedoras voltando como referência.
 
 ## Como usar
@@ -136,6 +147,7 @@ python -m trilha_copy aprovar   copy/minha-cliente/pecas/PT01/pt01-meta-feed.yam
 python -m trilha_copy exportar  copy/minha-cliente        # dist/minha-cliente/anuncios.csv e subida.csv (não versionar)
 
 python -m trilha_copy ganchos
+python -m trilha_copy roteiros
 python -m trilha_copy referencias
 ```
 
