@@ -4,7 +4,7 @@ Os repositórios não dependem um do outro, então este teste só roda com o Tri
 
     PYTHONPATH=../Trilha-briefing python -m unittest tests.test_contrato -v
 
-Sem ele, os testes são pulados (a CI deste repositório não tem acesso ao outro).
+Sem ele, os testes são pulados. A CI clona o Trilha-briefing (é público) e roda o teste a cada push.
 """
 
 import shutil

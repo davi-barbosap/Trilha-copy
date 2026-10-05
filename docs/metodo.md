@@ -68,12 +68,12 @@ Os estados seguem o checklist do curso:
 ## 5. Onde fomos críticos com as fontes
 
 - **Curiosidade solta traz clique de quem não compra.** O gancho precisa estar preso à dor ou ao desejo da persona. A ferramenta não consegue conferir isso sozinha. Por isso a peça declara micro e macro-ação, e o subtexto diz o que cada trecho deve fazer.
-- **Ângulo positivo ou negativo é variável de teste, não regra.** As aulas divergem; quem decide é o resultado medido no Trilha.
+- **Ângulo positivo ou negativo é variável de teste, não regra.** As aulas divergem; quem decide é o resultado medido no Trilha-ads.
 - **A "fórmula do gancho"** (benefício × relevância × credibilidade ÷ esforço) é útil para comparar variações, mas não é medida. Não virou nota automática.
 - **Autoridade por associação** ("fulano recomenda") sem autorização sugere um endosso que não existe. Esbarra no CONAR e no direito de imagem. Aqui, prova só entra pelo contrato, com fonte.
 - **Ganchos de identidade e promessa de renda** ("só para mulheres", "de barista a milionária") são pontos de reprovação no Meta. Anúncio de oportunidade de trabalho pode cair em categoria especial. Promessa de ganho precisa dizer que o resultado não é típico.
 - **Transcrever ligações de vendas com IA** é a dica mais forte da aula 3 e também a mais sensível. São dados de clientes do seu cliente (LGPD): anonimize antes de colar em qualquer ferramenta. As frases chegam aqui sem nome, pelo briefing.
-- **"Não troque o anúncio que funciona"** (Hopkins, Ogilvy). O cansaço de um anúncio se mede por frequência e CTR no Trilha, não pelo cansaço de quem o vê todo dia.
+- **"Não troque o anúncio que funciona"** (Hopkins, Ogilvy). O cansaço de um anúncio se mede por frequência e CTR no Trilha-ads, não pelo cansaço de quem o vê todo dia.
 - **Urgência falsa não é técnica, é publicidade enganosa (CDC).** Por isso bloqueia, e não só alerta.
 
 ## 6. O que ficou de fora nesta versão
@@ -83,4 +83,4 @@ Os estados seguem o checklist do curso:
 - **Lista de jargões por público:** depende do segmento. Hoje entra pelos termos proibidos do briefing.
 - **Chamada única:** avisar peça com duas chamadas.
 - **Modelos de corpo para roteiro** (educativo: o quê → por quê → como; história: "mas… então…"). O roteiro desta versão é básico.
-- **Aprendizados dos testes voltando como referência:** quando o Trilha tiver o vencedor de uma hipótese, a peça pode virar referência decupada.
+- **Aprendizados dos testes voltando como referência:** quando o Trilha-ads tiver o vencedor de uma hipótese, a peça pode virar referência decupada.

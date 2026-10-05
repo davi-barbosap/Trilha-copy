@@ -4,7 +4,7 @@ Os repositórios não dependem um do outro em código. Eles combinam um arquivo.
 
 ## Entrada: `copy.yaml`
 
-Gerado no Trilha-briefing com `python -m trilha_briefing exportar clientes/<id> --para copy` e trazido com `python -m trilha_copy importar <arquivo>`.
+Gerado no Trilha-briefing. Com os clientes no Trilha-clientes, a exportação grava direto na pasta desta ferramenta: `python -m trilha_briefing exportar briefing/<id> --para copy --saida copy` cria `copy/<id>/copy.yaml`. Fora dele, `python -m trilha_copy importar <arquivo>` copia o contrato para `clientes/<id>/`.
 
 O campo `contrato` diz a versão. Esta ferramenta aceita as versões em `VERSOES_SUPORTADAS` (`trilha_copy/contrato.py`), hoje `{1}`, e recusa as outras com a mensagem "atualize o trilha-copy". Campos que ela ainda não conhece são ignorados. Assim o briefing pode acrescentar campos sem quebrar nada; mudar ou remover um campo exige uma versão nova.
 
@@ -35,7 +35,7 @@ Só saem peças **aprovadas** cujo texto não mudou depois da aprovação.
 | Coluna | Conteúdo |
 |---|---|
 | `codigo` | código da célula (`PT01`) |
-| `utm_content` | o mesmo código: é o que o Trilha lê no raio-x e o que a Trilha-LP põe na mensagem do WhatsApp |
+| `utm_content` | o mesmo código: vai no anúncio e é o que a Trilha-LP põe na mensagem do WhatsApp. O Trilha-ads ainda não agrupa o raio-x por ele (está no roadmap de lá) |
 | `peca` | id da peça |
 | `formato` | `meta_feed`, `meta_reels` ou `google_rsa` |
 | `campo` | `texto_principal`, `titulo`, `descricao`, `botao` (Meta); `titulo`, `descricao`, `caminho` (Google) |
