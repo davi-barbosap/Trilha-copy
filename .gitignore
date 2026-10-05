@@ -1,0 +1,10 @@
+__pycache__/
+*.egg-info/
+dist/
+.venv/
+.env
+
+# Peças e contratos de clientes reais têm estratégia e dados do cliente. Por padrão ficam fora do Git;
+# só o exemplo fictício é versionado. Se o repositório for privado e você quiser versionar, apague as duas linhas.
+clientes/*
+!clientes/_exemplo/

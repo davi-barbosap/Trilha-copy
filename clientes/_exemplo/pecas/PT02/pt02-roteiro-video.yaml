@@ -1,0 +1,51 @@
+# Peça pt02-roteiro-video da célula PT02 (Profissional travado (Meta) — "Turma de até 6: você fala em todas as aulas").
+# Antes de escrever: python -m trilha_copy pacote clientes/_exemplo PT02 --formato roteiro_video
+id: pt02-roteiro-video
+codigo: PT02
+formato: roteiro_video
+estado: refinado
+
+persona: profissional-travado
+oferta: aula-experimental
+nivel_consciencia: consciente_da_solucao
+micro_acao: "assistir até a chamada e agir"
+macro_acao: "lead"
+hipotese: "h01-gancho-travar"
+ideia: "Travar não é falta de vocabulário, é falta de treino falando: na turma de até 6 você treina"
+
+rascunhos:
+  - "A frase não sai?"
+  - "Você entende tudo e não fala nada"
+  - "O que fazer quando a frase trava na call"
+  - "Ensaiei a frase e o assunto mudou"
+  - "Inglês de reunião não se aprende ouvindo"
+  - "3 segundos de silêncio na call"
+  - "Seu inglês não é o problema"
+  - "Por que você trava no inglês"
+  - "Você fala mais em 60 minutos do que em um mês"
+  - "A reunião de segunda"
+emocao: novo
+angulo: positivo
+gancho_tipo: pergunta
+intensidade: 2
+provas: [turma-6]
+
+roteiro:
+  duracao_s: 30
+  cenas:                       # { tempo: "0-3", fala, visual, texto_tela }; gancho nos 3 primeiros segundos
+    - { tempo: "0-3", fala: "Entende tudo, mas a frase não sai?", visual: "Close de alguém numa call, abrindo a boca e desistindo", texto_tela: "A frase não sai?" }
+    - { tempo: "3-12", fala: "Isso não é falta de vocabulário. É falta de treino falando. Numa turma de até 6, você fala a maior parte da aula.", visual: "Aula real, aluno falando, professor ouvindo", texto_tela: "Turma de até 6" }
+    - { tempo: "12-22", fala: "Na aula experimental são 60 minutos de conversa, no seu nível, com situações do seu trabalho.", visual: "Aluno simulando uma apresentação", texto_tela: "60 minutos de conversa" }
+    - { tempo: "22-30", fala: "Escolha o horário hoje e fale com a consultora pelo WhatsApp. É gratuita.", visual: "Celular com a conversa no WhatsApp", texto_tela: "Aula experimental gratuita" }
+  cta: "Agende a aula experimental hoje pelo botão abaixo."
+
+subtexto:
+  - { trecho: "Entende tudo, mas a frase não sai?", funcao: "espelho, em pergunta: prende nos 3 primeiros segundos" }
+  - { trecho: "Isso não é falta de vocabulário. É falta de treino falando.", funcao: "novo: muda a explicação do problema" }
+  - { trecho: "Numa turma de até 6, você fala a maior parte da aula.", funcao: "mecanismo + número" }
+  - { trecho: "É gratuita.", funcao: "fácil: tira o risco" }
+
+# 'historico' é a última chave: a ferramenta acrescenta os estados aqui.
+historico:
+  - {data: '2026-10-05', estado: rascunho}
+  - {data: '2026-10-05', estado: refinado}

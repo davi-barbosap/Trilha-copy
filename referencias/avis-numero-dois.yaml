@@ -1,0 +1,15 @@
+id: avis-numero-dois
+titulo: "Avis: somos o número 2, por isso nos esforçamos mais"
+fonte: "DDB para a Avis (EUA, 1962); assinatura original 'We try harder'"
+formato: impresso
+segmento: aluguel de carros
+gancho_tipo: contradicao
+texto: "A Avis é só a número 2 em aluguel de carros. Então por que alugar com a gente? Porque nos esforçamos mais."
+decupagem:
+  - { trecho: "é só a número 2", funcao: "novo: admite a fraqueza que todo concorrente esconderia" }
+  - { trecho: "Então por que alugar com a gente?", funcao: "pergunta que o leitor faria, feita antes dele" }
+  - { trecho: "Porque nos esforçamos mais.", funcao: "seguro: transforma a fraqueza em motivo para confiar" }
+por_que_funciona: >-
+  Assume a posição real no mercado em vez de disputar "o melhor". A fraqueza admitida dá credibilidade à
+  promessa seguinte. Funciona porque era verdade e a empresa sustentava no atendimento: sem isso vira slogan.
+resultado_conhecido: ""

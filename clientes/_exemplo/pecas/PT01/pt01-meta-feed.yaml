@@ -1,0 +1,66 @@
+# Peça pt01-meta-feed da célula PT01 (Profissional travado (Meta) — "Você entende, mas a frase não sai").
+# Antes de escrever: python -m trilha_copy pacote clientes/_exemplo PT01 --formato meta_feed
+id: pt01-meta-feed
+codigo: PT01
+formato: meta_feed
+estado: aprovado
+
+persona: profissional-travado
+oferta: aula-experimental
+nivel_consciencia: consciente_da_solucao
+micro_acao: "parar de rolar e clicar no botão"
+macro_acao: "lead"
+hipotese: "h01-gancho-travar"
+ideia: "Quem já entende inglês não precisa de mais aula: precisa falar, e na aula experimental fala desde o primeiro minuto"
+
+rascunhos:                       # títulos e ganchos em volume: escreva muitos (10+), descarte a maioria
+  - "Você entende a reunião inteira, mas a frase não sai"
+  - "A reunião em inglês em que você deixou alguém falar por você"
+  - "Ensaiou a frase e o assunto mudou?"
+  - "Não é falta de vocabulário. É falta de treino falando"
+  - "60 minutos falando inglês, no seu nível"
+  - "Fale mais inglês em uma aula do que no último mês de reuniões"
+  - "Turma de até 6: você fala, não só escuta"
+  - "Aula experimental de verdade, sem demonstração de vendas"
+  - "Você não precisa de mais gramática"
+  - "O curso que você largou não era para quem já entende inglês"
+  - "Segunda tem reunião em inglês?"
+emocao: facil
+angulo: positivo
+gancho_tipo: espelho
+intensidade: 2
+provas: [turma-6]
+
+meta:
+  textos_principais:            # até 5; o gancho antes de 125 caracteres
+    - |-
+      Você entende a reunião inteira, mas na hora de falar a frase não sai.
+
+      Isso não é falta de vocabulário. É falta de treino falando. Na aula experimental você fala desde o primeiro minuto, numa turma de até 6 adultos do seu nível.
+
+      Sem demonstração de vendas: a conversa com a coordenação só acontece se você pedir. Escolha o horário hoje e a consultora confirma pelo WhatsApp.
+    - |-
+      Fica ensaiando a frase e, quando vai falar, o assunto já mudou?
+
+      Em 60 minutos de aula experimental, com turma de até 6, você fala mais inglês do que no último mês de reuniões. É gratuita e sem compromisso. Agende hoje.
+  titulos:                     # até 5; até 40 caracteres aparecem inteiros
+    - "Aula experimental gratuita"
+    - "Fale inglês desde o primeiro minuto"
+    - "Turma de até 6 adultos"
+  descricoes:
+    - "60 minutos, no seu nível"
+  cta_botao: "Agendar"                # Saiba mais, Cadastre-se, Inscreva-se, Enviar mensagem, Enviar mensagem pelo WhatsApp…
+
+subtexto:                        # { trecho, funcao }: o que cada trecho deve fazer sentir ou pensar
+  - { trecho: "Você entende a reunião inteira, mas na hora de falar a frase não sai.", funcao: "espelho: ele se reconhece com as próprias palavras" }
+  - { trecho: "Isso não é falta de vocabulário. É falta de treino falando.", funcao: "derruba a crença interna ('não levo jeito')" }
+  - { trecho: "turma de até 6 adultos do seu nível", funcao: "seguro: não vai passar vergonha" }
+  - { trecho: "Sem demonstração de vendas", funcao: "derruba a objeção 'vão me empurrar matrícula'" }
+
+aprovacao: {assinatura: 17dc8a9950f5c232, data: '2026-10-05', por: assessor, teste_do_vendedor: true}
+# 'historico' é a última chave: a ferramenta acrescenta os estados aqui.
+historico:
+  - {data: '2026-10-05', estado: rascunho}
+  - {data: '2026-10-05', estado: refinado}
+  - {data: '2026-10-05', estado: final}
+  - {data: '2026-10-05', estado: aprovado, nota: exemplo montado num dia só}

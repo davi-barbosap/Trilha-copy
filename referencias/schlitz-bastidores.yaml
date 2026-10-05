@@ -1,0 +1,19 @@
+id: schlitz-bastidores
+titulo: "Cerveja Schlitz: o processo que todo mundo fazia e ninguém contava"
+fonte: "Claude Hopkins para a Schlitz (EUA, década de 1910), contado por ele em 'My Life in Advertising' (1927)"
+formato: impresso
+segmento: bebidas
+gancho_tipo: bastidores
+# Resumo da campanha, não o texto original.
+texto: >-
+  Em vez de dizer "cerveja pura", como todas as concorrentes, os anúncios mostravam como a pureza era feita:
+  a água vinha de poços artesianos profundos, o fermento descendia de uma cultura original guardada e o vapor
+  limpava cada garrafa antes do envase.
+decupagem:
+  - { trecho: "poços artesianos profundos", funcao: "grande: detalhe concreto no lugar do adjetivo 'pura'" }
+  - { trecho: "fermento descendia de uma cultura original", funcao: "novo: ninguém tinha contado isso ao leitor" }
+  - { trecho: "o vapor limpava cada garrafa", funcao: "seguro: cuidado que o leitor consegue imaginar" }
+por_que_funciona: >-
+  Todas as cervejarias faziam o mesmo processo, mas nenhuma contava. Quem conta primeiro fica dono do processo
+  na cabeça de quem lê. É a pergunta "o que você faz que o cliente não vê?" do briefing (oferta.bastidores).
+resultado_conhecido: "Segundo o próprio Hopkins, a Schlitz saiu do 5º lugar em vendas para a disputa do 1º em poucos meses."

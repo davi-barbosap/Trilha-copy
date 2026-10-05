@@ -1,0 +1,655 @@
+# Contrato com o Trilha-copywritter, gerado pelo trilha-briefing a partir de clientes/_exemplo/.
+# Edite lá, não aqui. Importe com: python -m trilha_copy importar <este arquivo>
+contrato: 1
+gerado_em: '2026-10-05'
+cliente:
+  id: _exemplo
+  nome: Escola Exemplo de Inglês
+  segmento: escola de idiomas
+  playbook: padrao
+  whatsapp: '5541900000000'
+  area: Curitiba/PR, São José dos Pinhais/PR · raio de 15 km · turmas online atendem todo o Brasil
+voz:
+  assinatura: marca_pessoa
+  nome_pessoa: Marina (fundadora)
+  abordagem: conversacional
+  tom:
+  - próximo
+  - direto
+  - encorajador
+  assim_sim:
+  - Você entende a reunião inteira. Falta a frase sair na hora — é isso que a aula treina.
+  - 'Turma de até 6: você fala em todas as aulas.'
+  - Perdeu a aula? Repõe em qualquer horário da grade.
+  assim_nao:
+  - 'Fluência garantida em 3 meses!  # promessa que não dá para cumprir'
+  - 'O melhor curso de inglês da cidade  # adjetivo sem fato'
+  - 'Imperdível: matrícula grátis!  # atrai quem desiste no 2º mês'
+  termos_obrigatorios: []
+  termos_proibidos:
+  - imperdível
+  - fluência garantida
+  - método revolucionário
+  intensidade: 2
+posicionamento:
+  para_quem: adultos que entendem inglês mas travam para falar
+  categoria: uma escola de conversação em turmas pequenas
+  diferenca: faz cada aluno falar a maior parte da aula, com reposição em qualquer horário
+  razoes_para_acreditar:
+  - texto: Turmas de até 6 alunos
+    fonte: empresa
+    status: validada
+    evidencia: grade de turmas
+    mencoes: null
+  - texto: Nota 4,9 com 87 avaliações no Google
+    fonte: dados
+    status: validada
+    evidencia: perfil do Google
+    mencoes: null
+  percepcao_atual: uma escola de bairro simpática
+  percepcao_desejada: a referência para adulto que precisa falar inglês no trabalho
+compliance:
+  termos_proibidos:
+  - imperdível
+  - fluência garantida
+  - método revolucionário
+  promessas_proibidas:
+  - fluência garantida
+  - aprenda em 30 dias
+  registros_profissionais: []
+  avisos_legais:
+  - Resultados variam conforme frequência e dedicação.
+  regras_legais:
+  - 'LGPD: consentimento para contato'
+  nao_pode:
+  - prometer fluência em prazo fixo
+  - comparar nominalmente com outras escolas
+unicidade: turmas de até 6 com reposição de aula em qualquer horário da grade
+concorrentes:
+- Rede Nacional A
+- Escola Local B
+- Aplicativos
+personas:
+- id: profissional-travado
+  nome: Profissional travado
+  quem_e: 28–40 anos, analista ou coordenador, entende inglês escrito mas trava para falar em reunião
+  dores:
+  - texto: Fico calado na reunião com o time de fora mesmo sabendo o assunto
+    fonte: consumidor
+    status: validada
+    evidencia: 8 de 12 entrevistas
+    mencoes: 8
+  - texto: Já fiz curso e larguei no meio
+    fonte: dados
+    status: validada
+    evidencia: motivo mais citado nas conversas do Kommo
+    mencoes: null
+  desejos:
+  - texto: Conseguir falar numa reunião sem ensaiar antes
+    fonte: consumidor
+    status: hipotese
+    evidencia: entrevistas com alunos
+    mencoes: null
+  - texto: Ser considerado para a vaga que pede inglês
+    fonte: consumidor
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+  objecoes:
+  - texto: Não tenho tempo fixo na semana
+    fonte: dados
+    status: validada
+    evidencia: conversas do Kommo, set/2026
+    mencoes: null
+  - texto: Já tentei e não funcionou comigo
+    fonte: consumidor
+    status: validada
+    evidencia: 5 de 12 entrevistas
+    mencoes: 5
+  - texto: Aplicativo é mais barato
+    fonte: mercado
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+  ganchos:
+  - texto: Você entende tudo, mas a frase não sai na hora
+    fonte: assessor
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+  - texto: A reunião em inglês que você deixou alguém falar por você
+    fonte: assessor
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+  medos:
+  - texto: Perder a promoção para alguém que fala inglês pior, mas fala
+    fonte: consumidor
+    status: hipotese
+    evidencia: entrevistas com alunos
+    mencoes: 4
+  - texto: Ser chamado para apresentar em inglês sem aviso
+    fonte: consumidor
+    status: hipotese
+    evidencia: ''
+    mencoes: 3
+  crencas:
+  - texto: Curso de inglês não funciona para adulto, só para criança
+    tipo: metodo
+    quebra: +1.200 adultos formados; depoimento da Renata
+    fonte: dados
+    status: hipotese
+    evidencia: conversas do Kommo
+    mencoes: null
+  - texto: Eu já tentei e não levo jeito para idioma
+    tipo: interna
+    quebra: 'o problema era o método (ouvir o professor), não você: na turma de 6 você fala'
+    fonte: consumidor
+    status: hipotese
+    evidencia: ''
+    mencoes: 5
+  - texto: Com a rotina que eu tenho, não dá para ter horário fixo
+    tipo: externa
+    quebra: reposição em qualquer horário da grade; depoimento do Carlos
+    fonte: dados
+    status: hipotese
+    evidencia: ''
+    mencoes: 14
+  micro_problemas:
+  - texto: Como responder rápido sem pensar em português antes
+    fonte: nao_informada
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+  - texto: Como entender sotaques diferentes numa call
+    fonte: nao_informada
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+  - texto: Como apresentar números em inglês
+    fonte: nao_informada
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+  frases:
+  - texto: Eu entendo tudo, mas na hora de falar a frase não sai
+    origem: entrevista com aluno
+    sobre: dor
+  - texto: Fico ensaiando a frase e quando vou falar o assunto já mudou
+    origem: entrevista com aluno
+    sobre: dor
+  - texto: Já comecei três cursos e larguei todos no segundo mês
+    origem: conversa no WhatsApp
+    sobre: crenca
+  - texto: Queria só não passar vergonha na reunião de segunda
+    origem: ligação de vendas
+    sobre: desejo
+  nivel_consciencia: consciente_da_solucao
+  sofisticacao: media
+  onde_esta:
+  - Instagram
+  - LinkedIn
+  - Google
+  gatilho_compra: reunião com equipe estrangeira, processo seletivo ou promoção à vista
+- id: viajante
+  nome: Viajante adiado
+  quem_e: 35–55 anos, quer viajar sozinho ou visitar filho fora e tem vergonha de depender de alguém
+  dores:
+  - texto: Na última viagem dependi do meu filho para tudo
+    fonte: empresa
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+  desejos:
+  - texto: Pedir, perguntar e resolver sozinho na viagem
+    fonte: empresa
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+  objecoes:
+  - texto: Na minha idade é difícil aprender
+    fonte: empresa
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+  ganchos:
+  - texto: A viagem em que você vai pedir o próprio café
+    fonte: assessor
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+  medos: []
+  crencas: []
+  micro_problemas: []
+  frases: []
+  nivel_consciencia: consciente_do_problema
+  sofisticacao: baixa
+  onde_esta:
+  - Instagram
+  - Facebook
+  gatilho_compra: viagem marcada para os próximos 6 meses
+nao_atender:
+- perfil: Crianças e adolescentes
+  motivo: a escola só tem turmas de adultos
+  como_filtrar: idade mínima 22 no Meta; negativar 'infantil', 'kids'
+- perfil: Quem quer certificado (TOEFL, IELTS) em poucas semanas
+  motivo: não há preparatório; vira matrícula que cancela
+  como_filtrar: negativar 'toefl', 'ielts', 'intensivo'
+- perfil: Quem procura o mais barato
+  motivo: aplicativo resolve melhor; desiste no 2º mês
+  como_filtrar: pergunta de qualificação 'Para que você precisa do inglês?'
+ofertas:
+- id: aula-experimental
+  nome: Aula experimental
+  tipo: aula gratuita
+  degrau: isca
+  personas:
+  - profissional-travado
+  - viajante
+  problema: Não sabe se aguenta o ritmo nem se a turma é do seu nível
+  big_idea:
+    oportunidade: ''
+    inimigo: ''
+    mecanismo_unico: Uma aula de verdade, com turma, em vez de uma demonstração de vendas
+    crenca_comum: ''
+    por_que_falha: ''
+  promessa:
+    texto: Saia da primeira aula tendo falado mais inglês do que no último mês
+    resultado: falar ao menos 20 minutos na aula
+    prazo: 1 aula de 60 minutos
+    condicao: para adultos que já entendem o básico
+  antes_depois: []
+  diferenciais:
+  - texto: Aula real, com turma
+    fonte: nao_informada
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+    e_dai: []
+  - texto: Sem compromisso
+    fonte: nao_informada
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+    e_dai: []
+  - texto: Presencial ou online
+    fonte: nao_informada
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+    e_dai: []
+  raridade: ''
+  bastidores: []
+  alternativas: []
+  como_funciona:
+  - titulo: Escolha o horário
+    texto: A consultora confirma pelo WhatsApp.
+  - titulo: Participe da aula
+    texto: Turma real, do seu nível.
+  - titulo: Converse com a coordenação
+    texto: Só se quiser seguir.
+  subtitulo: ''
+  beneficios: []
+  objecoes:
+  - eixo: confianca
+    objecao: Vão me empurrar matrícula
+    resposta: A conversa com a coordenação só acontece se você pedir.
+    fonte: assessor
+    status: hipotese
+  - eixo: nivel
+    objecao: Meu inglês é muito ruim
+    resposta: O nivelamento coloca você numa turma do seu ritmo.
+    fonte: assessor
+    status: hipotese
+  - eixo: tempo
+    objecao: Não tenho tempo agora
+    resposta: São 60 minutos, no horário que você escolher.
+    fonte: assessor
+    status: hipotese
+  inversao_risco: Gratuita e sem compromisso
+  escassez: null
+  urgencia: null
+  custo_inacao: ''
+  condicoes:
+    faixa_preco: ''
+    ticket_medio: null
+    pagamento: ''
+    condicao_excepcional: ''
+    validade: ''
+    posicionamento_preco: ''
+  aderencia:
+    perfil_compradores: ''
+    reputacao: nao_avaliado
+    reputacao_nota: ''
+    vendas_fora_do_digital:
+      canais: []
+      ritmo: ''
+      avaliacao: nao_avaliado
+    aderencia_digital: alta
+    justificativa: isca já usada com conversão de 1 em 3 que comparecem
+  cta: Quero minha aula experimental
+  qualificacao: null
+  estagio: ''
+  localizacao: {}
+- id: conversacao-adultos
+  nome: Inglês para falar no trabalho
+  tipo: curso
+  degrau: principal
+  personas:
+  - profissional-travado
+  problema: Adulto que entende inglês, mas trava para falar em reunião e entrevista
+  big_idea:
+    oportunidade: Vagas de nível médio pedindo inglês para reuniões, não só leitura
+    inimigo: Aula em que o professor fala e o aluno só escuta
+    mecanismo_unico: Turma de até 6 em que você fala a maior parte da aula, treinando as situações do seu trabalho
+    crenca_comum: Para falar inglês é preciso estudar mais gramática e vocabulário
+    por_que_falha: 'Quem já entende inglês não trava por falta de palavra: trava porque nunca treinou falar sob pressão'
+  promessa:
+    texto: Fale nas reuniões em inglês em 4 meses, treinando com as situações do seu trabalho
+    resultado: conduzir uma reunião de 15 minutos em inglês
+    prazo: 4 meses
+    condicao: para quem já entende inglês escrito e frequenta 2 aulas por semana
+  antes_depois:
+  - dimensao: dia_a_dia
+    antes: Prepara o que vai falar e mesmo assim trava
+    depois: Responde na hora, sem roteiro
+  - dimensao: sentir
+    antes: Vergonha de deixar o colega falar por você
+    depois: Confiança para pedir a palavra
+  - dimensao: status
+    antes: Fica de fora das reuniões com a matriz
+    depois: É chamado para as reuniões que importam
+  diferenciais:
+  - texto: Turmas de até 6 alunos
+    fonte: empresa
+    status: validada
+    evidencia: grade de turmas
+    mencoes: null
+    e_dai:
+    - você fala na maior parte da aula
+    - a frase sai sem ensaio
+    - você pede a palavra na reunião
+    - é chamado para as reuniões que importam
+  - texto: Reposição em qualquer horário da grade
+    fonte: empresa
+    status: validada
+    evidencia: regulamento
+    mencoes: null
+    e_dai:
+    - viagem ou plantão não fazem perder aula
+    - você não larga no segundo mês
+    - chega ao fim do curso
+  - texto: 'Aulas com situações do seu trabalho: reunião, apresentação, entrevista'
+    fonte: empresa
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+    e_dai: []
+  - texto: Presencial ou online, na mesma turma
+    fonte: nao_informada
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+    e_dai: []
+  raridade: única escola da região com turma de até 6 e reposição livre
+  bastidores:
+  - texto: Antes de cada mês, o professor monta a aula com as reuniões e apresentações reais dos alunos da turma
+    fonte: empresa
+    status: hipotese
+    evidencia: ''
+    mencoes: null
+  - texto: A coordenação grava 1 aula por mês e mede quanto tempo cada aluno falou
+    fonte: empresa
+    status: validada
+    evidencia: planilha da coordenação
+    mencoes: null
+  alternativas:
+  - alternativa: Aplicativo
+    por_que_nao: treina vocabulário, não conversa ao vivo sob pressão
+  - alternativa: Aula particular
+    por_que_nao: custa 2 a 3 vezes mais e não treina conversa em grupo, como numa reunião
+  - alternativa: Escola de rede
+    por_que_nao: 'turmas de 15: você fala poucos minutos por aula'
+  como_funciona:
+  - titulo: Aula experimental
+    texto: Uma aula de verdade, com turma, para você ver se o ritmo serve.
+  - titulo: Nivelamento
+    texto: 15 minutos de conversa para achar a turma certa.
+  - titulo: Turma de até 6
+    texto: Duas aulas por semana, presencial ou online.
+  - titulo: Revisão a cada mês
+    texto: O professor mostra o que você já fala e o próximo passo.
+  subtitulo: Você entende inglês, mas trava para falar. Em turmas de até 6, você fala a maior parte da aula e repõe em qualquer
+    horário.
+  beneficios:
+  - titulo: Responda na hora, sem roteiro
+    texto: A aula treina as frases das suas reuniões, até elas saírem sem ensaio.
+  - titulo: Fale em todas as aulas, numa turma de até 6
+    texto: Com poucos alunos, você fala a maior parte do tempo, não só escuta.
+  - titulo: Reponha em qualquer horário da grade
+    texto: Viagem, reunião ou plantão não fazem você perder conteúdo.
+  - titulo: Treine com as situações do seu trabalho
+    texto: 'Reunião, apresentação e entrevista: o conteúdo parte do que você vive.'
+  - titulo: Veja sua evolução todo mês
+    texto: O professor mostra o que você já fala e qual é o próximo passo.
+  objecoes:
+  - eixo: tempo
+    objecao: Não tenho horário fixo
+    resposta: Você repõe em qualquer horário da grade, presencial ou online.
+    fonte: dados
+    status: validada
+  - eixo: confianca
+    objecao: Já tentei e larguei
+    resposta: 'Turma de até 6: você fala em todas as aulas e o professor acompanha a sua evolução todo mês.'
+    fonte: consumidor
+    status: hipotese
+  - eixo: preco
+    objecao: Aplicativo é mais barato
+    resposta: Aplicativo treina vocabulário; a reunião pede conversa ao vivo. Aqui é isso que você treina.
+    fonte: mercado
+    status: hipotese
+  inversao_risco: Se depois do primeiro mês não fizer sentido, você cancela sem multa
+  escassez:
+    texto: Turmas com 6 alunos fecham quando lotam
+    real: true
+    evidencia: limite pedagógico da escola
+  urgencia:
+    tipo: prazo
+    texto: A próxima turma noturna começa em 3 de novembro
+    motivo: turma nova só abre a cada 2 meses
+    data: '2026-11-03'
+    real: true
+    evidencia: calendário de turmas
+  custo_inacao: Cada reunião em que você fica calado é uma chance de mostrar trabalho que vai para outra pessoa
+  condicoes:
+    faixa_preco: R$ 420 a R$ 520 por mês
+    ticket_medio: 460.0
+    pagamento: mensalidade no cartão ou boleto
+    condicao_excepcional: ''
+    validade: ''
+    posicionamento_preco: acima de aplicativo, na média das escolas de rede
+  aderencia:
+    perfil_compradores: analistas e coordenadores 28–40 anos, empresas com time fora do Brasil
+    reputacao: ativo
+    reputacao_nota: nota 4,9 no Google
+    vendas_fora_do_digital:
+      canais:
+      - indicação
+      - Google Meu Negócio
+      ritmo: ~20 matrículas/mês
+      avaliacao: boa
+    aderencia_digital: alta
+    justificativa: público ativo no digital, decisão em menos de 2 semanas, aula experimental como degrau
+  cta: Agendar aula experimental
+  qualificacao:
+    rotulo: Para que você precisa do inglês?
+    opcoes:
+    - Trabalho
+    - Viagem
+    - Ainda estou vendo
+  estagio: ''
+  localizacao: {}
+provas:
+- id: nota-google
+  tipo: numero
+  texto: de nota com 87 avaliações no Google
+  numero: 4,9
+  autor: ''
+  fonte: perfil do Google, 25/09/2026
+  autorizado: false
+  formato: texto
+  link: ''
+  personas: []
+  perfil: ''
+- id: turma-6
+  tipo: numero
+  texto: alunos no máximo por turma
+  numero: '6'
+  autor: ''
+  fonte: grade de turmas
+  autorizado: false
+  formato: texto
+  link: ''
+  personas: []
+  perfil: ''
+- id: formados
+  tipo: numero
+  texto: adultos formados desde 2017
+  numero: '+1.200'
+  autor: ''
+  fonte: sistema acadêmico
+  autorizado: false
+  formato: texto
+  link: ''
+  personas: []
+  perfil: ''
+- id: renata
+  tipo: depoimento
+  texto: Em quatro meses eu apresentei o resultado do trimestre em inglês, sem ler.
+  numero: ''
+  autor: Renata, analista de dados
+  fonte: ''
+  autorizado: true
+  formato: video
+  link: drive/depoimentos/renata.mp4
+  personas:
+  - profissional-travado
+  perfil: 32 anos, analista de dados, travava nas reuniões com o time dos EUA
+- id: carlos
+  tipo: depoimento
+  texto: 'A reposição salvou: viajo a trabalho e nunca perdi conteúdo.'
+  numero: ''
+  autor: Carlos, gerente comercial
+  fonte: ''
+  autorizado: true
+  formato: texto
+  link: ''
+  personas:
+  - profissional-travado
+  perfil: 41 anos, gerente comercial, viaja a trabalho toda semana
+historias:
+- titulo: Da reunião em silêncio à apresentação do trimestre
+  antes: Renata entendia tudo nas reuniões com o time dos EUA e não abria a boca
+  virada: Treinou, em turma de 5, as frases das próprias reuniões
+  resultado: Em 4 meses apresentou o fechamento do trimestre em inglês
+  autorizado: true
+  personas:
+  - profissional-travado
+  perfil: 32 anos, analista de dados
+grade:
+- codigo: PT01
+  publico: Profissional travado (Meta)
+  argumento: Você entende, mas a frase não sai
+  persona: profissional-travado
+  oferta: aula-experimental
+  nivel_consciencia: consciente_da_solucao
+  formato: reels com aluno
+  prioridade: 1
+  promessa: Na primeira aula você já fala mais inglês do que no último mês de reuniões
+- codigo: PT02
+  publico: Profissional travado (Meta)
+  argumento: 'Turma de até 6: você fala em todas as aulas'
+  persona: profissional-travado
+  oferta: aula-experimental
+  nivel_consciencia: null
+  formato: vídeo da turma
+  prioridade: 1
+  promessa: ''
+- codigo: PT03
+  publico: Profissional travado (Meta)
+  argumento: Repõe em qualquer horário
+  persona: profissional-travado
+  oferta: conversacao-adultos
+  nivel_consciencia: null
+  formato: carrossel
+  prioridade: 2
+  promessa: ''
+- codigo: GB01
+  publico: Busca 'inglês para adultos' (Google)
+  argumento: 'Turma de até 6: você fala em todas as aulas'
+  persona: profissional-travado
+  oferta: aula-experimental
+  nivel_consciencia: null
+  formato: ''
+  prioridade: 1
+  promessa: ''
+- codigo: VA01
+  publico: Viajante (Meta)
+  argumento: Resolva sozinho na próxima viagem
+  persona: viajante
+  oferta: aula-experimental
+  nivel_consciencia: consciente_do_problema
+  formato: reels
+  prioridade: 3
+  promessa: ''
+hipoteses:
+- id: h01-gancho-travar
+  hipotese: O gancho 'você entende, mas a frase não sai' (PT01) gera lead mais barato que 'turma de até 6' (PT02)
+  variavel: criativo
+  codigos:
+  - PT01
+  - PT02
+  metrica: custo por lead
+  criterio_sucesso: PT01 ao menos 20% mais barato, com 50 leads ou mais em cada
+  evento: lead
+  minimo_conversoes: 50
+  variacoes: 2
+  horizonte: nucleo
+  inicio: '2026-10-20'
+  fim: null
+  resultado: planejada
+  conversoes_obtidas: null
+  aprendizado: ''
+- id: h02-pagina-vs-whatsapp
+  hipotese: Landing page com formulário traz mais lead qualificado por real investido do que o clique direto para WhatsApp
+  variavel: pagina
+  codigos:
+  - PT02
+  metrica: custo por lead qualificado
+  criterio_sucesso: custo por qualificado 15% menor pela página, com 30 qualificados em cada
+  evento: lead_qualificado
+  minimo_conversoes: 30
+  variacoes: 2
+  horizonte: nucleo
+  inicio: null
+  fim: null
+  resultado: planejada
+  conversoes_obtidas: null
+  aprendizado: ''
+- id: h03-empresas
+  hipotese: Empresas pagam o curso para o time quando a oferta é apresentada ao RH
+  variavel: oferta
+  codigos: []
+  metrica: reuniões com RH
+  criterio_sucesso: 3 reuniões com RH em 2 meses
+  evento: null
+  minimo_conversoes: 3
+  variacoes: 1
+  horizonte: adjacente
+  inicio: null
+  fim: null
+  resultado: planejada
+  conversoes_obtidas: null
+  aprendizado: ''
+metrica_principal: agendamento
+evento_otimizacao: lead
