@@ -1,0 +1,63 @@
+# Peça gb01-google-rsa da célula GB01 (Busca 'inglês para adultos' (Google) — "Turma de até 6: você fala em todas as aulas").
+# Antes de escrever: python -m trilha_copy pacote clientes/_exemplo GB01 --formato google_rsa
+id: gb01-google-rsa
+codigo: GB01
+formato: google_rsa
+estado: final
+
+persona: profissional-travado
+oferta: aula-experimental
+nivel_consciencia: consciente_da_solucao
+micro_acao: "clicar, entre os anúncios da busca, quem procura exatamente isso"
+macro_acao: "lead"
+hipotese: ""
+ideia: "Para quem busca inglês para adultos: conversação em turma de até 6, com aula experimental gratuita"
+
+rascunhos:                       # títulos e ganchos em volume: escreva muitos (10+), descarte a maioria
+  - "Inglês para Adultos"
+  - "Aula Experimental Gratuita"
+  - "Turmas de Até 6 Alunos"
+  - "Fale Inglês nas Reuniões"
+  - "Fale Desde a Primeira Aula"
+  - "Reposição em Qualquer Horário"
+  - "Presencial ou Online"
+  - "Nota 4,9 no Google"
+  - "Conversação para Adultos"
+  - "Agende Sua Aula Hoje"
+  - "Inglês para o Trabalho"
+  - "Curso de Inglês Curitiba"
+emocao: seguro
+angulo: positivo
+gancho_tipo: identidade
+intensidade: 2
+provas: [nota-google, turma-6]
+
+google:
+  titulos:                     # 3 a 15, até 30 caracteres; 10 ou mais dão o que combinar
+    - "Inglês para Adultos"
+    - "Aula Experimental Gratuita"
+    - "Turmas de Até 6 Alunos"
+    - "Fale Inglês nas Reuniões"
+    - "Fale Desde a Primeira Aula"
+    - "Reposição em Qualquer Horário"
+    - "Presencial ou Online"
+    - "Nota 4,9 no Google"
+    - "Conversação para Adultos"
+    - "Agende Sua Aula Hoje"
+    - "Inglês para o Trabalho"
+  descricoes:                  # 2 a 4, até 90 caracteres
+    - "Você entende inglês, mas a frase não sai? Treine falando, numa turma de até 6 adultos."
+    - "Aula experimental gratuita de 60 minutos, no seu nível. Agende hoje pelo WhatsApp."
+  caminhos: [ingles-adultos, aula-gratis]  # até 2, até 15 caracteres
+  palavras_chave: ["inglês para adultos", "curso de conversação em inglês"]
+
+subtexto:
+  - { trecho: "Inglês para Adultos", funcao: "relevância: repete o que a pessoa buscou" }
+  - { trecho: "Turmas de Até 6 Alunos", funcao: "número no lugar de adjetivo; seguro" }
+  - { trecho: "Nota 4,9 no Google", funcao: "prova de quem já estudou" }
+
+# 'historico' é a última chave: a ferramenta acrescenta os estados aqui.
+historico:
+  - {data: '2026-10-05', estado: rascunho}
+  - {data: '2026-10-05', estado: refinado}
+  - {data: '2026-10-05', estado: final}
