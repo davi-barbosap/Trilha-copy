@@ -8,7 +8,7 @@
     python -m trilha_copy avancar <peca.yaml>                         passa ao próximo estado, se nada faltar
     python -m trilha_copy revisar <peca.yaml | pasta>                 avisos por gravidade; sai com erro se algo bloqueia
     python -m trilha_copy aprovar <peca.yaml> --por NOME --teste-do-vendedor [--mesmo-dia]
-    python -m trilha_copy exportar <pasta> [--codigo X] [--saida dist]   anúncios.csv e roteiros das peças aprovadas
+    python -m trilha_copy exportar <pasta> [--codigo X] [--saida dist]   anuncios.csv, subida.csv e roteiros das aprovadas
     python -m trilha_copy ganchos                                     catálogo de tipos de gancho
     python -m trilha_copy referencias [pasta]                         banco de referências decupadas
 
@@ -30,7 +30,8 @@ from trilha_copy.fluxo import avancar, pendencias, preparar_aprovacao
 from trilha_copy.formatos import CTA_META, FORMATOS
 from trilha_copy.ganchos import GANCHOS
 from trilha_copy.pacote import em_markdown, montar
-from trilha_copy.peca import ErroPeca, carregar_peca, pecas_da_pasta, registrar_estado
+from trilha_copy.peca import (ErroPeca, carregar_peca, pecas_da_pasta, proxima_versao, registrar_estado,
+                             versoes_repetidas)
 from trilha_copy.referencias import carregar_referencias
 from trilha_copy.revisao import NIVEIS, revisar
 
@@ -108,7 +109,8 @@ def cmd_nova(a) -> int:
     if celula is None:
         print(f"✗ célula {a.codigo} não existe na grade do briefing")
         return 1
-    pid = a.id or f"{a.codigo.lower()}-{a.formato.replace('_', '-')}"
+    versao = proxima_versao(pasta, a.codigo, a.formato)
+    pid = a.id or f"{a.codigo.lower()}-{a.formato.replace('_', '-')}" + (f"-v{versao}" if versao > 1 else "")
     destino = pasta / "pecas" / a.codigo / f"{pid}.yaml"
     if destino.exists():
         print(f"✗ {destino} já existe")
@@ -131,7 +133,9 @@ def cmd_nova(a) -> int:
     texto = (
         f"# Peça {pid} da célula {a.codigo} ({celula.publico} — \"{celula.argumento}\").\n"
         f"# Antes de escrever: python -m trilha_copy pacote {pasta} {a.codigo} --formato {a.formato}\n"
-        f"id: {pid}\ncodigo: {a.codigo}\nformato: {a.formato}\nestado: fundacao\n\n"
+        f"id: {pid}\ncodigo: {a.codigo}\nformato: {a.formato}\n"
+        f"versao: {versao}                       # 1, 2, 3… por célula e plataforma; vai no nome do anúncio\n"
+        "estado: fundacao\n\n"
         f"persona: {celula.persona}\noferta: {celula.oferta}\n"
         f"nivel_consciencia: {celula.nivel_consciencia or (persona.nivel_consciencia if persona else '') or 'null'}\n"
         f"micro_acao: \"{MICRO[a.formato]}\"\n"
@@ -190,13 +194,16 @@ def cmd_avancar(a) -> int:
 def cmd_validar(a) -> int:
     pasta = Path(a.pasta)
     c = _contrato_da_pasta(pasta)
-    erros = 0
+    erros, pecas = 0, []
     for caminho in pecas_da_pasta(pasta):
         try:
-            carregar_peca(caminho)
+            pecas.append(carregar_peca(caminho))
         except ErroPeca as e:
             print(f"✗ {e}")
             erros += 1
+    for problema in versoes_repetidas(pecas):
+        print(f"✗ {problema}")
+        erros += 1
     n = len(pecas_da_pasta(pasta))
     print(f"{'✓' if not erros else '✗'} {pasta}: contrato {c.contrato} de {c.cliente.id}; {n - erros} de {n} peça(s) válidas")
     return 1 if erros else 0
@@ -240,11 +247,13 @@ def cmd_aprovar(a) -> int:
 def cmd_exportar(a) -> int:
     pasta = Path(a.pasta)
     c = _contrato_da_pasta(pasta)
-    escritos, recusadas = exportar(pasta, c, a.saida, a.codigo)
+    escritos, recusadas, avisos = exportar(pasta, c, a.saida, a.codigo)
     for r in recusadas:
         print(f"✗ {r}")
     for e in escritos:
         print(f"✓ {e}")
+    for x in avisos:
+        print(f"⚠ {x}")
     if not escritos:
         print("nenhuma peça aprovada para exportar")
     return 1 if recusadas else 0

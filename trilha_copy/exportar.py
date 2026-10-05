@@ -3,6 +3,12 @@
 Só sai o que está aprovado e não mudou depois da aprovação. O código da célula vai junto em cada linha:
 é o `utm_content` do anúncio e o mesmo código que a Trilha-LP põe na mensagem do WhatsApp. O raio-x do
 Trilha-ads agrupa leads, qualificados e vendas por ele (`por_criativo`).
+
+- `anuncios.csv`: os textos, um por linha (campo e ordem), para colar na plataforma.
+- `subida.csv`: um anúncio por linha: em que campanha e conjunto ele entra, com que nome e com que parâmetros
+  de URL. Vem do plano de campanhas do briefing (`veiculacao` no contrato); a mesma peça pode entrar em mais de
+  um conjunto, com `utm_campaign` diferente, por isso não cabe no CSV dos textos.
+- `roteiros/<peca>.md`: o roteiro de cada vídeo, para quem grava e edita.
 """
 
 from __future__ import annotations
@@ -11,7 +17,9 @@ import csv
 from pathlib import Path
 
 from trilha_copy.contrato import Contrato
-from trilha_copy.peca import Google, Meta, Peca, Roteiro, carregar_peca, pecas_da_pasta
+from trilha_copy.peca import Google, Meta, Peca, Roteiro, carregar_peca, pecas_da_pasta, plataforma_da
+
+CAMPOS_SUBIDA = ["plataforma", "campanha", "conjunto", "nome_anuncio", "parametros_url", "codigo", "peca", "formato"]
 
 
 def aprovadas(pasta: str | Path, codigo: str | None = None) -> tuple[list[Peca], list[str]]:
@@ -46,6 +54,25 @@ def _linhas(p: Peca) -> list[dict]:
     return linhas
 
 
+def subida(pecas: list[Peca], contrato: Contrato) -> tuple[list[dict], list[str]]:
+    """Uma linha por anúncio a criar e os avisos das peças que o plano não diz onde rodam."""
+    linhas, avisos = [], []
+    for p in pecas:
+        plataforma = plataforma_da(p)
+        if plataforma == "video":
+            continue  # o roteiro vira anúncio pela peça meta_reels que usa o vídeo
+        locais = contrato.locais_de(p.codigo, plataforma)
+        if not locais:
+            avisos.append(f"{p.id}: a célula {p.codigo} não está em nenhum conjunto de {plataforma} no plano de campanhas; "
+                          "fica fora da subida.csv (ponha no plano do briefing e exporte de novo)")
+        for l in locais:
+            linhas.append({"plataforma": plataforma, "campanha": l.campanha, "conjunto": l.conjunto,
+                           "nome_anuncio": l.preencher(l.anuncio, p.codigo, p.versao),
+                           "parametros_url": l.preencher(l.parametros_url, p.codigo, p.versao),
+                           "codigo": p.codigo, "peca": p.id, "formato": p.formato})
+    return linhas, avisos
+
+
 def roteiro_md(p: Peca, contrato: Contrato) -> str:
     r: Roteiro = p.roteiro
     linhas = [f"# Roteiro {p.id} ({p.codigo}) — {contrato.cliente.nome}", "",
@@ -56,8 +83,11 @@ def roteiro_md(p: Peca, contrato: Contrato) -> str:
     return "\n".join(linhas) + "\n"
 
 
-def exportar(pasta: str | Path, contrato: Contrato, saida: str | Path, codigo: str | None = None) -> tuple[list[Path], list[str]]:
+def exportar(pasta: str | Path, contrato: Contrato, saida: str | Path,
+             codigo: str | None = None) -> tuple[list[Path], list[str], list[str]]:
+    """(arquivos escritos, peças recusadas, avisos)."""
     pecas, recusadas = aprovadas(pasta, codigo)
+    avisos: list[str] = []
     destino = Path(saida) / contrato.cliente.id
     destino.mkdir(parents=True, exist_ok=True)
     escritos: list[Path] = []
@@ -69,10 +99,22 @@ def exportar(pasta: str | Path, contrato: Contrato, saida: str | Path, codigo: s
             w.writeheader()
             w.writerows(linhas)
         escritos.append(arquivo)
+    if contrato.veiculacao:
+        anuncios, avisos = subida(pecas, contrato)
+        if anuncios:
+            arquivo = destino / "subida.csv"
+            with open(arquivo, "w", newline="", encoding="utf-8") as f:
+                w = csv.DictWriter(f, fieldnames=CAMPOS_SUBIDA)
+                w.writeheader()
+                w.writerows(anuncios)
+            escritos.append(arquivo)
+    elif linhas:
+        avisos.append("o contrato não tem plano de campanhas (veiculacao): subida.csv não foi gerado, e o nome e os "
+                      "parâmetros de URL de cada anúncio ficam por conta de quem sobe")
     for p in pecas:
         if p.formato == "roteiro_video":
             arquivo = destino / "roteiros" / f"{p.id}.md"
             arquivo.parent.mkdir(exist_ok=True)
             arquivo.write_text(roteiro_md(p, contrato), encoding="utf-8")
             escritos.append(arquivo)
-    return escritos, recusadas
+    return escritos, recusadas, avisos

@@ -42,6 +42,20 @@ Só saem peças **aprovadas** cujo texto não mudou depois da aprovação.
 | `ordem` | posição do texto no campo, a partir de 1 |
 | `texto`, `caracteres` | o texto e o tamanho dele |
 
+**`subida.csv`**, uma linha por anúncio a criar na plataforma. Sai quando o contrato traz o plano de campanhas (`veiculacao`):
+
+| Coluna | Conteúdo |
+|---|---|
+| `plataforma` | `meta` ou `google` |
+| `campanha`, `conjunto` | os nomes do plano, já com as regras de nomes do cliente |
+| `nome_anuncio` | o molde do plano (padrão `{codigo} \| v{versao}`) com o código e a `versao` da peça: `PT01 \| v2` |
+| `parametros_url` | o molde de UTM do plano, com o código: vai no campo "parâmetros de URL" do anúncio |
+| `codigo`, `peca`, `formato` | para achar os textos da peça no `anuncios.csv` |
+
+A mesma peça aparece em uma linha por conjunto em que a célula está no plano, porque cada campanha tem o seu `utm_campaign`. Peça aprovada cuja célula não está em nenhum conjunto daquela plataforma fica fora e gera um aviso: o lugar dela se decide no plano do briefing, não na hora de subir. Roteiro de vídeo não entra: ele vira anúncio pela peça `meta_reels` que usa o vídeo.
+
+`versao` (1, 2, 3…) numera as peças da mesma célula na mesma plataforma. O `nova` dá o próximo número sozinho, e o `validar` recusa duas peças com o mesmo, porque os anúncios teriam o mesmo nome.
+
 **`roteiros/<peca>.md`**, um por roteiro aprovado: tabela de cenas (tempo, fala, visual, texto na tela), chamada e o código para a UTM.
 
 ## Mudou algo?
