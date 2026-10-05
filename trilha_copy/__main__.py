@@ -1,6 +1,7 @@
 """Linha de comando do trilha-copy.
 
     python -m trilha_copy importar <copy.yaml> [--pasta clientes]     traz o contrato do Trilha-briefing
+    python -m trilha_copy validar <pasta>                             contrato e peças no formato certo (não julga o texto)
     python -m trilha_copy pacote <pasta> <codigo> [--formato F]       os 6 Ps da célula, antes de escrever
     python -m trilha_copy nova <pasta> <codigo> --formato F [--id X]  cria a peça a partir da célula
     python -m trilha_copy checklist <peca.yaml>                       o que falta para sair do estado atual
@@ -186,6 +187,21 @@ def cmd_avancar(a) -> int:
     return 0
 
 
+def cmd_validar(a) -> int:
+    pasta = Path(a.pasta)
+    c = _contrato_da_pasta(pasta)
+    erros = 0
+    for caminho in pecas_da_pasta(pasta):
+        try:
+            carregar_peca(caminho)
+        except ErroPeca as e:
+            print(f"✗ {e}")
+            erros += 1
+    n = len(pecas_da_pasta(pasta))
+    print(f"{'✓' if not erros else '✗'} {pasta}: contrato {c.contrato} de {c.cliente.id}; {n - erros} de {n} peça(s) válidas")
+    return 1 if erros else 0
+
+
 def cmd_revisar(a) -> int:
     alvo = Path(a.alvo)
     caminhos = pecas_da_pasta(alvo) if alvo.is_dir() else [alvo]
@@ -259,6 +275,7 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--id"); s.set_defaults(f=cmd_nova)
     s = sub.add_parser("checklist"); s.add_argument("peca"); s.set_defaults(f=cmd_checklist)
     s = sub.add_parser("avancar"); s.add_argument("peca"); s.add_argument("--nota", default=""); s.set_defaults(f=cmd_avancar)
+    s = sub.add_parser("validar"); s.add_argument("pasta"); s.set_defaults(f=cmd_validar)
     s = sub.add_parser("revisar"); s.add_argument("alvo"); s.set_defaults(f=cmd_revisar)
     s = sub.add_parser("aprovar"); s.add_argument("peca"); s.add_argument("--por", required=True)
     s.add_argument("--teste-do-vendedor", action="store_true", help="um bom vendedor diria isso com o cliente na frente dele?")

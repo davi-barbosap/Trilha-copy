@@ -499,6 +499,18 @@ class TestCLI(Base):
         self.assertEqual(rc, 0)
         self.assertEqual(sum(1 for nome in GANCHOS if nome in saida), len(GANCHOS))
 
+    def test_validar_so_confere_o_formato(self):
+        caminho = self.arquivo("PT02", "pt02-roteiro-video")
+        caminho.write_text(caminho.read_text(encoding="utf-8").replace("É gratuita.", "É imperdível."), encoding="utf-8")
+        rc, saida = rodar("validar", self.pasta)
+        self.assertEqual(rc, 0, saida)  # termo proibido é da revisão, não do formato
+        self.assertIn("3 de 3 peça(s) válidas", saida)
+        caminho.write_text(caminho.read_text(encoding="utf-8").replace("estado: refinado", "estado: pronto"),
+                           encoding="utf-8")
+        rc, saida = rodar("validar", self.pasta)
+        self.assertEqual(rc, 1)
+        self.assertIn("2 de 3", saida)
+
     def test_sem_contrato(self):
         (self.pasta / "copy.yaml").unlink()
         rc, saida = rodar("revisar", self.pasta)
