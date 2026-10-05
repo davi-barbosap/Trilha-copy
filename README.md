@@ -108,7 +108,7 @@ referencias/<id>.yaml          peças boas de qualquer segmento, decupadas trech
 - **Não faz o criativo visual.** O design é da equipe de criação. O roteiro só descreve o visual de cada cena.
 - **Não sobe anúncio.** O CSV é para copiar ou importar no gerenciador; não foi testado na importação em massa do Meta ou do Google.
 - **Não substitui a política das plataformas.** As listas de termos sensíveis pegam os casos comuns, não todos, e os limites de caracteres mudam de tempos em tempos.
-- **Não mede resultado.** Quem mede é o Trilha-ads, pelo código da célula, e o agrupamento por código ainda está no roadmap de lá.
+- **Não mede resultado.** Quem mede é o Trilha-ads: o raio-x agrupa leads, qualificados e vendas pelo código da célula.
 
 ## Situação atual
 

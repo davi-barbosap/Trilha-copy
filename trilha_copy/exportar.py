@@ -1,8 +1,8 @@
 """Saída das peças aprovadas, prontas para subir nas plataformas e para o editor de vídeo.
 
 Só sai o que está aprovado e não mudou depois da aprovação. O código da célula vai junto em cada linha:
-é o `utm_content` do anúncio e o mesmo código que a Trilha-LP põe na mensagem do WhatsApp. O Trilha-ads
-ainda não agrupa o raio-x por ele (está no roadmap de lá).
+é o `utm_content` do anúncio e o mesmo código que a Trilha-LP põe na mensagem do WhatsApp. O raio-x do
+Trilha-ads agrupa leads, qualificados e vendas por ele (`por_criativo`).
 """
 
 from __future__ import annotations
