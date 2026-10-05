@@ -1,0 +1,15 @@
+id: rolls-royce-relogio
+titulo: "Rolls-Royce: o barulho mais alto é o do relógio"
+fonte: "David Ogilvy para a Rolls-Royce (EUA, 1958); título original 'At 60 miles an hour the loudest noise in this new Rolls-Royce comes from the electric clock'"
+formato: impresso
+segmento: automóveis
+gancho_tipo: numero_especifico
+texto: "A 60 milhas por hora, o barulho mais alto neste novo Rolls-Royce vem do relógio elétrico."
+decupagem:
+  - { trecho: "A 60 milhas por hora", funcao: "número exato: torna a cena verificável" }
+  - { trecho: "o barulho mais alto", funcao: "laço aberto: a pessoa quer saber qual é" }
+  - { trecho: "vem do relógio elétrico", funcao: "grande: prova o silêncio sem usar a palavra 'silencioso'" }
+por_que_funciona: >-
+  Não diz "o carro mais silencioso". Mostra uma situação em que o leitor sente o silêncio. A frase veio de um
+  relatório técnico sobre o carro: o fato estava no bastidor, alguém precisou procurar.
+resultado_conhecido: ""

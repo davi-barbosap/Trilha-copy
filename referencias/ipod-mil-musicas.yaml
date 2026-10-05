@@ -1,0 +1,14 @@
+id: ipod-mil-musicas
+titulo: "iPod: mil músicas no seu bolso"
+fonte: "Apple, lançamento do iPod (2001); original '1,000 songs in your pocket'"
+formato: outro
+segmento: eletrônicos
+gancho_tipo: promessa
+texto: "1.000 músicas no seu bolso."
+decupagem:
+  - { trecho: "1.000 músicas", funcao: "grande: o benefício em número, não a capacidade técnica (5 GB)" }
+  - { trecho: "no seu bolso", funcao: "fácil: a pessoa vê o uso na hora" }
+por_que_funciona: >-
+  Traduz a especificação (gigabytes) no que a pessoa ganha. É a escada do "e daí?" do briefing feita até o fim:
+  5 GB → cabem 1.000 músicas → a sua coleção inteira vai com você.
+resultado_conhecido: ""
