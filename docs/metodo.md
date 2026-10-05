@@ -54,6 +54,7 @@ Os estados seguem o checklist do curso:
 | Políticas das plataformas | nosso | atributos pessoais e promessa de ganho no Meta; limites de caracteres; mínimo e máximo de textos |
 | Concorrente pelo nome | CONAR | nome de concorrente do briefing no texto |
 | Gancho em 3 segundos; fala que cabe no tempo | nosso | primeira cena até 3 s; 2,5 palavras por segundo |
+| Corpo do roteiro segue o modelo | aula de copy 3, 6 Ps | cada cena declara a parte; falta, ordem e parte desconhecida viram atenção |
 
 ## 4. Medidas de texto
 
@@ -76,11 +77,30 @@ Os estados seguem o checklist do curso:
 - **"Não troque o anúncio que funciona"** (Hopkins, Ogilvy). O cansaço de um anúncio se mede por frequência e CTR no Trilha-ads, não pelo cansaço de quem o vê todo dia.
 - **Urgência falsa não é técnica, é publicidade enganosa (CDC).** Por isso bloqueia, e não só alerta.
 
-## 6. O que ficou de fora nesta versão
+## 6. Roteiro e briefing do criativo
+
+**Modelos de corpo** (`trilha_copy/regras/roteiros.yaml`, editável). Cada cena declara a parte do modelo que cumpre, e a revisão avisa parte que falta, fora de ordem ou desconhecida.
+
+| Modelo | Partes | Origem | Quando |
+|---|---|---|---|
+| educativo | gancho → o quê → por quê → como | aula de copy 3 | ensinar algo útil preso à dor; público que ainda não conhece a solução |
+| história | gancho → situação → mas… → então… (repete) → resultado | aula de copy 3 ("but, therefore") | a mudança de alguém parecido com a persona; só com história autorizada |
+| oferta direta | gancho → promessa → prova → processo → prioridade (opcional) | aula dos 6 Ps | público que já conhece o problema e compara soluções |
+
+- **Chamada:** fica no fim, em qualquer modelo (`parte: cta`), e o texto dela vai no campo `cta` (quem, o quê, até quando, como).
+- **Ponto crítico:** o modelo organiza, não garante. Um roteiro educativo que ensina algo sem ligação com a oferta atrai quem quer conteúdo grátis. Por isso o "como" pede a oferta fazendo pela pessoa, e a macro-ação continua na peça.
+
+**Briefing do criativo.** Não fazemos o design: ele é da equipe de criação. A copy entrega o que a arte precisa comunicar, num arquivo por peça aprovada:
+- para que serve e o que varia no teste;
+- para quem, a ideia, as provas, o que não pode;
+- o que mostrar, o texto na arte e as medidas.
+
+O texto na arte passa pela mesma revisão do resto, porque é texto que o público lê. A arte entra na assinatura da aprovação: mudou a arte, aprove de novo.
+
+## 7. O que ficou de fora nesta versão
 
 - **Uma ideia grande por peça:** conferir que não há duas promessas exige ler o sentido. Ficou como campo (`ideia`), não como regra.
 - **Nada inacreditável:** comparar a promessa com a sofisticação do público. O pacote mostra a sofisticação; a revisão não julga.
 - **Lista de jargões por público:** depende do segmento. Hoje entra pelos termos proibidos do briefing.
 - **Chamada única:** avisar peça com duas chamadas.
-- **Modelos de corpo para roteiro** (educativo: o quê → por quê → como; história: "mas… então…"). O roteiro desta versão é básico.
 - **Aprendizados dos testes voltando como referência:** quando o Trilha-ads tiver o vencedor de uma hipótese, a peça pode virar referência decupada.

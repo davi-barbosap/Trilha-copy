@@ -1,5 +1,22 @@
 # Mudanças
 
+## 0.1.4 — roteiros com modelo de corpo e briefing do criativo (out/2026)
+
+- **Modelos de corpo para roteiro** em `trilha_copy/regras/roteiros.yaml` (editável):
+  - educativo: o quê → por quê → como;
+  - história: mas… então…;
+  - oferta direta: os 6 Ps.
+
+  Cada cena declara a `parte` que cumpre. A revisão avisa parte que falta, fora de ordem ou que o modelo não tem. `nova --modelo` cria as cenas com tempos sugeridos, e `roteiros` lista os modelos. Para sair de rascunho, o roteiro precisa de um modelo.
+- **Briefing do criativo** (`dist/<id>/criativos/<peca>.md`) para a equipe de criação. Não é design: diz o que a arte precisa comunicar.
+  - **O que traz:** para que serve, o que varia no teste, para quem, a ideia, as provas, o que não pode, o que mostrar, o texto na arte, a identidade da marca e as medidas.
+  - **Bloco novo:** o anúncio do Meta ganha `meta.arte` (tipo, mostrar, texto na arte, evitar, referências).
+  - **Fluxo:** para ir a final, o anúncio precisa de `arte.mostrar`.
+- **Texto na arte** passa pela revisão e entra na assinatura da aprovação. Os campos novos vazios não mudam a assinatura, então peças aprovadas antes continuam aprovadas.
+- **O roteiro exportado** ganha o mesmo cabeçalho e a parte de cada cena.
+- **Contrato:** lê `identidade_visual` (cores, tipografia, logo, estilo de imagem) vinda do briefing.
+- **Exemplo:** o PT02 segue o modelo educativo, e o PT01 traz o briefing da arte (aprovação assinada de novo).
+
 ## 0.1.3 — lista de subida a partir do plano de campanhas (out/2026)
 
 - **`subida.csv`:** um anúncio por linha, com a campanha, o conjunto, o nome do anúncio e os parâmetros de URL. Os nomes e a UTM vêm do plano de campanhas do briefing (`veiculacao` no contrato); a copy só põe o código e a versão da peça. Antes, quem subia montava o nome e a UTM à mão.

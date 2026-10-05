@@ -218,6 +218,16 @@ class Hipotese(_Base):
     resultado: str = "planejada"
 
 
+class IdentidadeVisual(_Base):
+    cores: dict[str, Any] = Field(default_factory=dict)  # primaria, secundaria, fundo, texto (#RRGGBB), apoio
+    tipografia: dict[str, str] = Field(default_factory=dict)  # titulos, texto
+    logo: str = ""
+    estilo_imagem: str = ""
+
+    def vazia(self) -> bool:
+        return not (self.cores or self.tipografia or self.logo or self.estilo_imagem)
+
+
 class Local(_Base):
     """Onde uma célula vira anúncio, vindo do plano de campanhas do briefing com os nomes já resolvidos.
 
@@ -249,6 +259,7 @@ class Contrato(_Base):
     cliente: Cliente
     voz: Voz = Field(default_factory=Voz)
     posicionamento: dict[str, Any] = Field(default_factory=dict)
+    identidade_visual: IdentidadeVisual = Field(default_factory=IdentidadeVisual)
     compliance: Compliance = Field(default_factory=Compliance)
     unicidade: str = ""
     concorrentes: list[str] = Field(default_factory=list)

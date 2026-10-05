@@ -4,10 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "trilha-copy"
-version = "0.1.3"
+version = "0.1.4"
 description = "Estrutura e revisão de copy a partir do briefing do cliente"
 requires-python = ">=3.11"
 dependencies = ["pydantic>=2.5", "pyyaml>=6"]
 
 [tool.setuptools]
 packages = ["trilha_copy"]
+
+[tool.setuptools.package-data]
+trilha_copy = ["regras/*.yaml"]

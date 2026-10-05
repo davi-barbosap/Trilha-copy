@@ -2,8 +2,8 @@
 
     fundação → rascunho   para quem, o que a peça e o sistema precisam provocar, a ideia grande, um pacote sem buraco
     rascunho → refinado   volume (escreva muitos títulos e ganchos, descarte a maioria), emoção, ângulo, gancho,
-                          conteúdo do formato no mínimo da plataforma
-    refinado → final      subtexto anotado, prova escolhida, nada que bloqueie na revisão
+                          conteúdo do formato no mínimo da plataforma; roteiro com modelo de corpo
+    refinado → final      subtexto anotado, prova escolhida, briefing do criativo (Meta), nada que bloqueie na revisão
     final → aprovado      só pelo comando aprovar: sem bloqueio, teste do vendedor e um dia depois do final
 """
 
@@ -15,7 +15,7 @@ from trilha_copy.contrato import Contrato
 from trilha_copy.formatos import FORMATOS
 from trilha_copy.ganchos import GANCHOS
 from trilha_copy.pacote import montar
-from trilha_copy.peca import ESTADOS, Aprovacao, Estado, Peca, Roteiro
+from trilha_copy.peca import ESTADOS, Aprovacao, Estado, Meta, Peca, Roteiro
 from trilha_copy.revisao import bloqueantes
 
 MINIMO_RASCUNHOS = 10
@@ -60,11 +60,15 @@ def pendencias(p: Peca, c: Contrato) -> list[str]:
                 falta.append(f"{campo.nome}: ao menos {campo.minimo}")
         if isinstance(conteudo, Roteiro) and not conteudo.cenas:
             falta.append("cenas do roteiro")
+        if isinstance(conteudo, Roteiro) and not conteudo.modelo:
+            falta.append("modelo de corpo do roteiro (python -m trilha_copy roteiros): diz o que cada cena precisa fazer")
     elif p.estado == "refinado":
         if len(p.subtexto) < 3:
             falta.append("subtexto: anote ao menos 3 trechos com o que cada um deve fazer sentir ou pensar")
         if not p.provas:
             falta.append("prova usada na peça (ids do contrato)")
+        if isinstance(p.conteudo(), Meta) and not (p.meta.arte and p.meta.arte.mostrar):
+            falta.append("briefing do criativo (meta.arte.mostrar): o que a arte precisa mostrar, para a equipe de criação")
         falta += [f"revisão: {a.texto}" for a in bloqueantes(p, c)]
     elif p.estado == "final":
         falta.append("só o comando aprovar leva a peça a aprovado")

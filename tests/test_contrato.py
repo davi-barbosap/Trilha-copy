@@ -29,7 +29,7 @@ except ImportError:
 
 EXEMPLO = Path(__file__).parent.parent / "clientes" / "_exemplo"
 # Blocos opcionais que o exemplo já tem e um Trilha-briefing mais antigo ainda não exporta.
-BLOCOS_NOVOS = {"veiculacao"}
+BLOCOS_NOVOS = {"veiculacao", "identidade_visual"}
 
 
 @unittest.skipUnless(TEM_BRIEFING, "Trilha-briefing fora do PYTHONPATH")

@@ -48,6 +48,17 @@ posicionamento:
     mencoes: null
   percepcao_atual: uma escola de bairro simpática
   percepcao_desejada: a referência para adulto que precisa falar inglês no trabalho
+identidade_visual:
+  cores:
+    primaria: '#123C69'
+    secundaria: '#F2B33D'
+    fundo: '#FFFFFF'
+    texto: '#1A1A1A'
+  tipografia:
+    titulos: Poppins
+    texto: Inter
+  logo: assets/logo.svg
+  estilo_imagem: alunos reais em aula, sem banco de imagem
 compliance:
   termos_proibidos:
   - imperdível

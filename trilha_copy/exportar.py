@@ -8,7 +8,9 @@ Trilha-ads agrupa leads, qualificados e vendas por ele (`por_criativo`).
 - `subida.csv`: um anúncio por linha: em que campanha e conjunto ele entra, com que nome e com que parâmetros
   de URL. Vem do plano de campanhas do briefing (`veiculacao` no contrato); a mesma peça pode entrar em mais de
   um conjunto, com `utm_campaign` diferente, por isso não cabe no CSV dos textos.
-- `roteiros/<peca>.md`: o roteiro de cada vídeo, para quem grava e edita.
+- `criativos/<peca>.md`: o briefing do criativo de cada anúncio do Meta, para a equipe de criação: para que serve,
+  para quem, a ideia, o que a arte mostra, o texto na arte, as provas, o que não pode e as medidas. Não é design.
+- `roteiros/<peca>.md`: o roteiro de cada vídeo, com o mesmo cabeçalho e a parte do modelo de cada cena.
 """
 
 from __future__ import annotations
@@ -17,7 +19,9 @@ import csv
 from pathlib import Path
 
 from trilha_copy.contrato import Contrato
+from trilha_copy.formatos import FORMATOS
 from trilha_copy.peca import Google, Meta, Peca, Roteiro, carregar_peca, pecas_da_pasta, plataforma_da
+from trilha_copy.roteiros import modelos
 
 CAMPOS_SUBIDA = ["plataforma", "campanha", "conjunto", "nome_anuncio", "parametros_url", "codigo", "peca", "formato"]
 
@@ -73,12 +77,120 @@ def subida(pecas: list[Peca], contrato: Contrato) -> tuple[list[dict], list[str]
     return linhas, avisos
 
 
+EMOCAO = {"novo": "novo", "facil": "fácil", "seguro": "seguro", "grande": "grande"}
+
+
+def _item(rotulo: str, texto: str) -> str:
+    """Item de lista que aguenta texto com parágrafos (as linhas seguintes ficam dentro do item)."""
+    return f"- {rotulo}: " + texto.replace("\n", "\n  ")
+
+
+def _cabecalho(p: Peca, c: Contrato) -> list[str]:
+    """O que a equipe de criação precisa saber antes de produzir: para que serve, para quem, a ideia e o que não pode."""
+    persona = c.persona(p.persona)
+    hipotese = next((h for h in c.hipoteses if h.id == p.hipotese), None)
+    locais = c.locais_de(p.codigo, plataforma_da(p))
+    linhas = [f"Cliente: {c.cliente.nome} · {FORMATOS[p.formato].descricao} · versão {p.versao}"]
+    for l in locais:
+        linhas.append(f"Anúncio: **{l.preencher(l.anuncio, p.codigo, p.versao)}** (campanha {l.campanha}, conjunto {l.conjunto})")
+    linhas += ["", "## Para que serve", "",
+               f"- Esta peça precisa fazer a pessoa: {p.micro_acao or '—'}",
+               f"- O que o sistema precisa no fim: {p.macro_acao or '—'}"]
+    if hipotese:
+        linhas.append(f"- Teste: {hipotese.hipotese or hipotese.id}"
+                      + (f". O que varia entre as versões é **{hipotese.variavel}**: mantenha o resto igual, senão o "
+                         "teste não diz nada." if hipotese.variavel else ""))
+    linhas += ["", "## Para quem", ""]
+    if persona:
+        linhas.append(f"- {persona.nome}" + (f": {persona.quem_e}" if persona.quem_e else ""))
+        frases = [f.texto for f in persona.frases[:3]]
+        if frases:
+            linhas.append("- Do jeito que essa pessoa fala: " + " · ".join(f"\"{x}\"" for x in frases))
+    else:
+        linhas.append(f"- {p.persona or '—'}")
+    linhas += ["", "## A ideia", "", f"- {p.ideia or '—'}"]
+    tom = [x for x in (f"emoção: {EMOCAO.get(p.emocao, p.emocao)}" if p.emocao else "", f"ângulo: {p.angulo}" if p.angulo else "",
+                       f"intensidade {p.intensidade} de 5" if p.intensidade else "") if x]
+    if tom:
+        linhas.append(f"- {' · '.join(tom)}")
+    if c.voz.tom:
+        linhas.append(f"- Tom da marca: {', '.join(c.voz.tom)}")
+    provas = [c.prova(x) for x in p.provas]
+    if any(provas):
+        linhas += ["", "## Provas que podem aparecer", ""]
+        linhas += [f"- {x.rotulo()}" + (f" ({x.fonte})" if x.fonte else "") for x in provas if x]
+    nao = list(dict.fromkeys([*c.compliance.nao_pode, *c.compliance.promessas_proibidas]))
+    proibidos = sorted({*c.compliance.termos_proibidos, *c.voz.termos_proibidos})
+    obrigatorio = [*c.compliance.avisos_legais, *c.compliance.registros_profissionais]
+    if nao or proibidos or obrigatorio:
+        linhas += ["", "## O que não pode e o que é obrigatório", ""]
+        linhas += [f"- Não: {x}" for x in nao]
+        if proibidos:
+            linhas.append(f"- Palavras proibidas, inclusive na arte: {', '.join(proibidos)}")
+        linhas += [f"- Obrigatório quando a regra pedir: {x}" for x in obrigatorio]
+    return linhas
+
+
+def _identidade(c: Contrato) -> list[str]:
+    iv = c.identidade_visual
+    if iv.vazia():
+        return ["", "## Identidade da marca", "", "- Não preenchida no briefing (plataforma.yaml, identidade_visual): "
+                "peça o manual de marca ao cliente antes de produzir."]
+    linhas = ["", "## Identidade da marca", ""]
+    if iv.cores:
+        linhas.append("- Cores: " + ", ".join(f"{k} {', '.join(v) if isinstance(v, list) else v}" for k, v in iv.cores.items()))
+    if iv.tipografia:
+        linhas.append("- Tipografia: " + ", ".join(f"{k} {v}" for k, v in iv.tipografia.items()))
+    if iv.logo:
+        linhas.append(f"- Logo: {iv.logo}")
+    if iv.estilo_imagem:
+        linhas.append(f"- Estilo de imagem: {iv.estilo_imagem}")
+    return linhas
+
+
+def briefing_md(p: Peca, contrato: Contrato) -> str:
+    """Briefing do criativo de um anúncio do Meta, para a equipe de criação. Diz o que comunicar, não como desenhar."""
+    m: Meta = p.meta
+    arte = m.arte
+    linhas = [f"# Briefing do criativo — {p.codigo} v{p.versao} ({p.id})", "", *_cabecalho(p, contrato),
+              "", "## O que a arte precisa mostrar", "", arte.mostrar if arte and arte.mostrar else "— (não preenchido)"]
+    if arte and arte.texto_na_arte:
+        linhas += ["", "Texto na arte, exatamente assim (já revisado):", ""] + [f"- {t}" for t in arte.texto_na_arte]
+    if arte and arte.evitar:
+        linhas += ["", f"Evitar: {arte.evitar}"]
+    if arte and arte.referencias:
+        linhas += ["", "Referências:", ""] + [f"- {r}" for r in arte.referencias]
+    linhas += _identidade(contrato)
+    linhas += ["", "## Especificações", "", f"- {(arte.tipo if arte else 'imagem').capitalize()}: {FORMATOS[p.formato].arte}",
+               "- Medidas mudam: confira a documentação da plataforma antes de exportar.",
+               "", "## O texto que acompanha a arte", "",
+               "A arte não precisa repetir o texto: ela prende o olho, o texto explica.", ""]
+    linhas += [_item("Texto principal", t) for t in m.textos_principais]
+    linhas += [_item("Título", t) for t in m.titulos]
+    linhas += [_item("Descrição", t) for t in m.descricoes]
+    if m.cta_botao:
+        linhas.append(f"- Botão: {m.cta_botao}")
+    linhas += ["", f"Código para a UTM e a mensagem do WhatsApp: `{p.codigo}`"]
+    return "\n".join(linhas) + "\n"
+
+
 def roteiro_md(p: Peca, contrato: Contrato) -> str:
     r: Roteiro = p.roteiro
-    linhas = [f"# Roteiro {p.id} ({p.codigo}) — {contrato.cliente.nome}", "",
-              f"Duração: {r.duracao_s or '—'}s · Ideia: {p.ideia}", "",
-              "| Tempo | Fala | Visual | Texto na tela |", "|---|---|---|---|"]
-    linhas += [f"| {c.tempo} | {c.fala} | {c.visual} | {c.texto_tela} |" for c in r.cenas]
+    modelo = modelos().get(r.modelo) if r.modelo else None
+    linhas = [f"# Roteiro {p.id} ({p.codigo}) — {contrato.cliente.nome}", "", *_cabecalho(p, contrato),
+              *_identidade(contrato), "",
+              "## Roteiro", "",
+              f"Duração: {r.duracao_s or '—'}s · Modelo: {modelo.nome if modelo else '—'} · "
+              f"{FORMATOS[p.formato].arte}", ""]
+    if modelo:
+        nomes = {x.id: x.faz for x in modelo.partes} | {"cta": "a chamada"}
+        linhas += ["| Tempo | Parte | Fala | Visual | Texto na tela |", "|---|---|---|---|---|"]
+        linhas += [f"| {c.tempo} | {c.parte or '—'} | {c.fala} | {c.visual} | {c.texto_tela} |" for c in r.cenas]
+        usadas = [x for x in dict.fromkeys(c.parte for c in r.cenas) if x in nomes]
+        linhas += ["", "O que cada parte faz:", ""] + [f"- **{x}**: {nomes[x]}" for x in usadas]
+    else:
+        linhas += ["| Tempo | Fala | Visual | Texto na tela |", "|---|---|---|---|"]
+        linhas += [f"| {c.tempo} | {c.fala} | {c.visual} | {c.texto_tela} |" for c in r.cenas]
     linhas += ["", f"**Chamada:** {r.cta}", "", f"Código para a UTM e a mensagem do WhatsApp: `{p.codigo}`"]
     return "\n".join(linhas) + "\n"
 
@@ -116,5 +228,10 @@ def exportar(pasta: str | Path, contrato: Contrato, saida: str | Path,
             arquivo = destino / "roteiros" / f"{p.id}.md"
             arquivo.parent.mkdir(exist_ok=True)
             arquivo.write_text(roteiro_md(p, contrato), encoding="utf-8")
+            escritos.append(arquivo)
+        elif isinstance(p.conteudo(), Meta):
+            arquivo = destino / "criativos" / f"{p.id}.md"
+            arquivo.parent.mkdir(exist_ok=True)
+            arquivo.write_text(briefing_md(p, contrato), encoding="utf-8")
             escritos.append(arquivo)
     return escritos, recusadas, avisos

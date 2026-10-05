@@ -31,14 +31,15 @@ intensidade: 2
 provas: [turma-6]
 
 roteiro:
+  modelo: educativo            # o quê → por quê → como (python -m trilha_copy roteiros)
   duracao_s: 30
-  cenas:                       # { tempo: "0-3", fala, visual, texto_tela }; gancho nos 3 primeiros segundos
-    - { tempo: "0-3", fala: "Entende tudo, mas a frase não sai?", visual: "Close de alguém numa call, abrindo a boca e desistindo", texto_tela: "A frase não sai?" }
-    - { tempo: "3-12", fala: "Isso não é falta de vocabulário. É falta de treino falando. Numa turma de até 6, você fala a maior parte da aula.", visual: "Aula real, aluno falando, professor ouvindo", texto_tela: "Turma de até 6" }
-    - { tempo: "12-22", fala: "Na aula experimental são 60 minutos de conversa, no seu nível, com situações do seu trabalho.", visual: "Aluno simulando uma apresentação", texto_tela: "60 minutos de conversa" }
-    - { tempo: "22-30", fala: "Escolha o horário hoje e fale com a consultora pelo WhatsApp. É gratuita.", visual: "Celular com a conversa no WhatsApp", texto_tela: "Aula experimental gratuita" }
+  cenas:                       # { tempo: "0-3", parte, fala, visual, texto_tela }; gancho nos 3 primeiros segundos
+    - { tempo: "0-3", parte: gancho, fala: "Entende tudo, mas a frase não sai?", visual: "Close de alguém numa call, abrindo a boca e desistindo", texto_tela: "A frase não sai?" }
+    - { tempo: "3-8", parte: o_que, fala: "Isso não é falta de vocabulário. É falta de treino falando.", visual: "A mesma pessoa, agora pensativa, fone no pescoço", texto_tela: "Falta treino, não vocabulário" }
+    - { tempo: "8-14", parte: por_que, fala: "Na reunião ninguém espera você montar a frase. Quem só ouve, trava na hora de falar.", visual: "Reunião em vídeo, todos esperando a resposta", texto_tela: "Na reunião, não dá tempo" }
+    - { tempo: "14-22", parte: como, fala: "Numa turma de até 6, você fala a maior parte da aula. São 60 minutos de conversa, no seu nível.", visual: "Aula real, aluno falando, professor ouvindo", texto_tela: "Turma de até 6" }
+    - { tempo: "22-30", parte: cta, fala: "Escolha o horário hoje e fale com a consultora pelo WhatsApp. É gratuita.", visual: "Celular com a conversa no WhatsApp", texto_tela: "Aula experimental gratuita" }
   cta: "Agende a aula experimental hoje pelo botão abaixo."
-
 subtexto:
   - { trecho: "Entende tudo, mas a frase não sai?", funcao: "espelho, em pergunta: prende nos 3 primeiros segundos" }
   - { trecho: "Isso não é falta de vocabulário. É falta de treino falando.", funcao: "novo: muda a explicação do problema" }

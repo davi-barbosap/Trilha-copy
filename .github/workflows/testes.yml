@@ -20,3 +20,8 @@ jobs:
       - run: python -m trilha_copy pacote clientes/_exemplo PT01 --formato meta_feed
       - run: python -m trilha_copy exportar clientes/_exemplo
       - run: python -m trilha_copy referencias
+      - run: python -m trilha_copy roteiros
+      - name: O pacote instalado leva os modelos de roteiro
+        run: |
+          pip install --no-deps --target /tmp/instalado .
+          cd /tmp && PYTHONPATH=/tmp/instalado python -c "import trilha_copy.roteiros as r; assert '/tmp/instalado' in r.__file__, r.__file__; assert r.modelos()"

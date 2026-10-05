@@ -3,13 +3,14 @@
     python -m trilha_copy importar <copy.yaml> [--pasta clientes]     traz o contrato do Trilha-briefing
     python -m trilha_copy validar <pasta>                             contrato e peças no formato certo (não julga o texto)
     python -m trilha_copy pacote <pasta> <codigo> [--formato F]       os 6 Ps da célula, antes de escrever
-    python -m trilha_copy nova <pasta> <codigo> --formato F [--id X]  cria a peça a partir da célula
+    python -m trilha_copy nova <pasta> <codigo> --formato F [--id X] [--modelo M]   cria a peça a partir da célula
     python -m trilha_copy checklist <peca.yaml>                       o que falta para sair do estado atual
     python -m trilha_copy avancar <peca.yaml>                         passa ao próximo estado, se nada faltar
     python -m trilha_copy revisar <peca.yaml | pasta>                 avisos por gravidade; sai com erro se algo bloqueia
     python -m trilha_copy aprovar <peca.yaml> --por NOME --teste-do-vendedor [--mesmo-dia]
     python -m trilha_copy exportar <pasta> [--codigo X] [--saida dist]   anuncios.csv, subida.csv e roteiros das aprovadas
     python -m trilha_copy ganchos                                     catálogo de tipos de gancho
+    python -m trilha_copy roteiros                                    modelos de corpo para roteiro (editáveis)
     python -m trilha_copy referencias [pasta]                         banco de referências decupadas
 
 Formatos: meta_feed, meta_reels, google_rsa, roteiro_video.
@@ -33,6 +34,8 @@ from trilha_copy.pacote import em_markdown, montar
 from trilha_copy.peca import (ErroPeca, carregar_peca, pecas_da_pasta, proxima_versao, registrar_estado,
                              versoes_repetidas)
 from trilha_copy.referencias import carregar_referencias
+from trilha_copy.roteiros import ARQUIVO as ARQUIVO_ROTEIROS
+from trilha_copy.roteiros import esqueleto, modelos
 from trilha_copy.revisao import NIVEIS, revisar
 
 ICONE = {"bloqueia": "✗", "atencao": "⚠", "sugestao": "·"}
@@ -102,6 +105,23 @@ def cmd_pacote(a) -> int:
     return 0
 
 
+def _roteiro_novo(modelo: str | None, duracao: int = 30) -> str:
+    if not modelo:
+        return ("roteiro:\n  modelo: null                 # educativo, historia, oferta_direta… (python -m trilha_copy roteiros)\n"
+                f"  duracao_s: {duracao}\n"
+                "  cenas: []                    # { tempo: \"0-3\", parte, fala, visual, texto_tela }; gancho nos 3 primeiros segundos\n"
+                "  cta: \"\"\n")
+    m = modelos()[modelo]
+    faz = {x.id: x.faz for x in m.partes} | {"cta": "a chamada falada: quem, o quê, até quando, como"}
+    cenas = "".join(f"    - {{ tempo: \"{c['tempo']}\", parte: {c['parte']}, fala: \"\", visual: \"\", texto_tela: \"\" }}"
+                    f"   # {faz[c['parte']]}\n" for c in esqueleto(modelo, duracao))
+    opcionais = [x.id for x in m.partes if x.opcional]
+    return (f"roteiro:\n  modelo: {modelo}                 # {m.nome}\n  duracao_s: {duracao}\n"
+            "  cenas:                       # tempos sugeridos: ajuste à fala (cerca de 2,5 palavras por segundo)\n"
+            f"{cenas}" + (f"  # partes opcionais deste modelo: {', '.join(opcionais)}\n" if opcionais else "")
+            + "  cta: \"\"\n")
+
+
 def cmd_nova(a) -> int:
     pasta = Path(a.pasta)
     c = _contrato_da_pasta(pasta)
@@ -122,14 +142,22 @@ def cmd_nova(a) -> int:
         "meta": ("meta:\n  textos_principais: []        # até 5; o gancho antes de 125 caracteres\n"
                  "  titulos: []                  # até 5; até 40 caracteres aparecem inteiros\n"
                  "  descricoes: []\n"
-                 f"  cta_botao: \"\"                # {', '.join(CTA_META[:5])}…\n"),
+                 f"  cta_botao: \"\"                # {', '.join(CTA_META[:5])}…\n"
+                 "  arte:                        # briefing do criativo: o que a arte precisa comunicar (a equipe de criação desenha)\n"
+                 "    tipo: imagem               # imagem | carrossel | video\n"
+                 "    mostrar: \"\"                # a cena, a pessoa, o produto em uso; exigido para ir a final\n"
+                 "    texto_na_arte: []          # curto; passa pela mesma revisão do texto\n"
+                 "    evitar: \"\"\n"
+                 "    referencias: []            # links ou ids do banco de referências\n"),
         "google": ("google:\n  titulos: []                  # 3 a 15, até 30 caracteres; 10 ou mais dão o que combinar\n"
                    "  descricoes: []               # 2 a 4, até 90 caracteres\n"
                    "  caminhos: []                 # até 2, até 15 caracteres\n"
                    "  palavras_chave: []           # as buscas do grupo, para conferir a relevância\n"),
-        "roteiro": ("roteiro:\n  duracao_s: 30\n  cenas: []                    # { tempo: \"0-3\", fala, visual, texto_tela }; gancho nos 3 primeiros segundos\n"
-                    "  cta: \"\"\n"),
+        "roteiro": _roteiro_novo(a.modelo),
     }[bloco]
+    if a.modelo and bloco != "roteiro":
+        print("✗ --modelo é só para roteiro_video")
+        return 1
     texto = (
         f"# Peça {pid} da célula {a.codigo} ({celula.publico} — \"{celula.argumento}\").\n"
         f"# Antes de escrever: python -m trilha_copy pacote {pasta} {a.codigo} --formato {a.formato}\n"
@@ -259,6 +287,20 @@ def cmd_exportar(a) -> int:
     return 1 if recusadas else 0
 
 
+def cmd_roteiros(a) -> int:
+    for mid, m in modelos().items():
+        print(f"{mid} — {m.nome}" + (f" ({m.fonte})" if m.fonte else ""))
+        if m.quando:
+            print(f"  quando: {m.quando}")
+        for x in m.partes:
+            print(f"  {x.id:<12} {x.faz}" + (" (opcional)" if x.opcional else ""))
+        if m.ciclo:
+            print(f"  {' e '.join(m.ciclo)} podem se repetir em sequência")
+        print(f"  {'cta':<12} a cena da chamada falada, sempre no fim (o texto vai no campo cta)\n")
+    print(f"Os modelos ficam em {ARQUIVO_ROTEIROS}: edite ou acrescente outros.")
+    return 0
+
+
 def cmd_ganchos(a) -> int:
     for nome, (descricao, exemplo) in GANCHOS.items():
         print(f"{nome:<22} {descricao}\n{'':<22} ex.: {exemplo}")
@@ -281,7 +323,8 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("pacote"); s.add_argument("pasta"); s.add_argument("codigo"); s.add_argument("--formato", choices=list(FORMATOS))
     s.set_defaults(f=cmd_pacote)
     s = sub.add_parser("nova"); s.add_argument("pasta"); s.add_argument("codigo"); s.add_argument("--formato", choices=list(FORMATOS), required=True)
-    s.add_argument("--id"); s.set_defaults(f=cmd_nova)
+    s.add_argument("--id"); s.add_argument("--modelo", help="roteiro_video: cria as cenas a partir do modelo de corpo")
+    s.set_defaults(f=cmd_nova)
     s = sub.add_parser("checklist"); s.add_argument("peca"); s.set_defaults(f=cmd_checklist)
     s = sub.add_parser("avancar"); s.add_argument("peca"); s.add_argument("--nota", default=""); s.set_defaults(f=cmd_avancar)
     s = sub.add_parser("validar"); s.add_argument("pasta"); s.set_defaults(f=cmd_validar)
@@ -293,6 +336,7 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("exportar"); s.add_argument("pasta"); s.add_argument("--codigo"); s.add_argument("--saida", default="dist")
     s.set_defaults(f=cmd_exportar)
     s = sub.add_parser("ganchos"); s.set_defaults(f=cmd_ganchos)
+    s = sub.add_parser("roteiros", help="modelos de corpo para roteiro"); s.set_defaults(f=cmd_roteiros)
     s = sub.add_parser("referencias"); s.add_argument("pasta", nargs="?", default="referencias"); s.set_defaults(f=cmd_referencias)
     a = ap.parse_args(argv)
     return a.f(a)

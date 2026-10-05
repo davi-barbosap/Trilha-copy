@@ -47,10 +47,11 @@ def peca(caminho=PT01, mudar=None) -> Peca:
 
 
 def meta(*textos, estado="refinado", **campos) -> Peca:
-    """PT01 com outros textos principais, fora de 'aprovado' para a aprovação não interferir."""
+    """PT01 com outros textos principais, fora de 'aprovado' para a aprovação não interferir, e sem a arte."""
     def mudar(d):
         d["estado"] = estado
         d.pop("aprovacao")
+        d["meta"].pop("arte", None)
         d["meta"]["textos_principais"] = list(textos)
         d.update(campos)
     return peca(PT01, mudar)
@@ -288,7 +289,7 @@ class TestRevisao(unittest.TestCase):
                 cena["texto_tela"] = ""
         a = avisos(peca(PT02, mudar))
         for trecho in ("o gancho precisa resolver nos primeiros 3s", "as cenas somam 30s, mas a duração diz 45s",
-                       "a fala da cena 3-12 tem 40 palavras", "roteiro sem chamada", "roteiro sem texto na tela"):
+                       "a fala da cena 3-8 tem 40 palavras", "roteiro sem chamada", "roteiro sem texto na tela"):
             self.assertTrue(contem(a, trecho), trecho)
         torto = peca(PT02, lambda d: d["roteiro"]["cenas"][0].update(tempo="início"))
         self.assertTrue(contem(avisos(torto), "use o tempo das cenas"))
@@ -410,7 +411,8 @@ class TestExportar(Base):
         escritos, recusadas, avisos = exportar(self.pasta, contrato(), self.tmp / "dist")
         self.assertEqual(recusadas, [])
         self.assertEqual(avisos, [])
-        self.assertEqual([e.name for e in escritos], ["anuncios.csv", "subida.csv"])
+        self.assertEqual([e.name for e in escritos], ["anuncios.csv", "subida.csv", "pt01-meta-feed.md"])
+        self.assertEqual(escritos[2].parent.name, "criativos")
         with open(escritos[0], encoding="utf-8") as f:
             linhas = list(csv.DictReader(f))
         self.assertEqual({(x["peca"], x["utm_content"]) for x in linhas}, {("pt01-meta-feed", "PT01")})
@@ -436,8 +438,87 @@ class TestExportar(Base):
         escritos, _, _ = exportar(self.pasta, c, self.tmp / "dist", codigo="PT02")
         self.assertEqual([e.name for e in escritos], ["pt02-roteiro-video.md"])
         md = escritos[0].read_text(encoding="utf-8")
-        self.assertIn("| 0-3 | Entende tudo, mas a frase não sai?", md)
+        self.assertIn("| 0-3 | gancho | Entende tudo, mas a frase não sai?", md)
         self.assertIn("`PT02`", md)
+
+
+class TestRoteirosECriativo(Base):
+    """Modelos de corpo para roteiro (editáveis) e o briefing do criativo para a equipe de criação."""
+
+    def test_modelos_carregam_e_conferem_a_ordem(self):
+        from trilha_copy.roteiros import modelos
+        m = modelos()
+        self.assertEqual(set(m), {"educativo", "historia", "oferta_direta"})
+        h = m["historia"]
+        self.assertEqual(h.conferir(["gancho", "situacao", "mas", "entao", "mas", "entao", "resultado", "cta"]), [])
+        problemas = h.conferir(["gancho", "mas", "situacao", "", "xx", "cta", "resultado"])
+        for trecho in ("cena(s) 4 sem `parte`", "partes que o modelo não tem: xx", "faltam as partes: entao",
+                       "'situacao' vem depois de 'mas'", "a cena da chamada (cta) fica no fim"):
+            self.assertTrue(contem(problemas, trecho), trecho)
+        self.assertEqual(m["oferta_direta"].conferir(["gancho", "promessa", "prova", "processo"]), [])  # prioridade é opcional
+
+    def test_modelo_que_nao_existe_nao_valida(self):
+        with self.assertRaises(ValidationError):
+            peca(PT02, lambda d: d["roteiro"].update(modelo="novela"))
+
+    def test_revisao_confere_o_modelo(self):
+        trocado = peca(PT02, lambda d: d["roteiro"]["cenas"][2].update(parte="como"))
+        self.assertTrue(contem(avisos(trocado, nivel="atencao"), "faltam as partes: por_que"))
+        sem_modelo = peca(PT02, lambda d: d["roteiro"].update(modelo=None))
+        self.assertTrue(contem(avisos(sem_modelo, nivel="sugestao"), "roteiro sem modelo de corpo"))
+        self.assertEqual(avisos(carregar_peca(PT02)), [])
+
+    def test_fluxo_pede_modelo_e_briefing_do_criativo(self):
+        rascunho = peca(PT02, lambda d: (d.update(estado="rascunho"), d["roteiro"].update(modelo=None)))
+        self.assertTrue(contem(pendencias(rascunho, contrato()), "modelo de corpo do roteiro"))
+        sem_arte = peca(PT01, lambda d: (d.pop("aprovacao"), d.update(estado="refinado"), d["meta"].pop("arte")))
+        self.assertTrue(contem(pendencias(sem_arte, contrato()), "briefing do criativo (meta.arte.mostrar)"))
+
+    def test_assinatura_antiga_continua_valendo(self):
+        # Campos novos vazios não mudam a assinatura: peça aprovada antes deles segue aprovada.
+        p = peca(PT02)
+        sem_campos_novos = Peca.model_validate(
+            {**ler(PT02), "roteiro": {k: v for k, v in ler(PT02)["roteiro"].items() if k != "modelo"}})
+        self.assertNotEqual(p.assinatura_conteudo(), sem_campos_novos.assinatura_conteudo())  # modelo preenchido pesa
+        limpa = peca(PT02, lambda d: (d["roteiro"].update(modelo=None), [c.pop("parte") for c in d["roteiro"]["cenas"]]))
+        crua = peca(PT02, lambda d: (d["roteiro"].pop("modelo"), [c.pop("parte") for c in d["roteiro"]["cenas"]]))
+        self.assertEqual(limpa.assinatura_conteudo(), crua.assinatura_conteudo())
+
+    def test_texto_na_arte_passa_pela_revisao(self):
+        p = peca(PT01, lambda d: (d.pop("aprovacao"), d.update(estado="refinado"),
+                                  d["meta"]["arte"].update(texto_na_arte=["Aula imperdível"])))
+        self.assertTrue(contem(avisos(p, nivel="bloqueia"), "meta.arte.texto_na_arte[0]"))
+
+    def test_briefing_do_criativo(self):
+        escritos, _, _ = exportar(self.pasta, contrato(), self.tmp / "dist", codigo="PT01")
+        md = next(e for e in escritos if e.parent.name == "criativos").read_text(encoding="utf-8")
+        for trecho in ("# Briefing do criativo — PT01 v1 (pt01-meta-feed)",
+                       "Anúncio: **PT01 | v1** (campanha _exemplo | meta-profissional, conjunto amplo)",
+                       "## Para quem", "## O que a arte precisa mostrar", "Adulto em reunião por vídeo",
+                       "- A frase não sai?", "Evitar: Bandeiras", "1080×1350 (4:5)", "Botão: Agendar", "`PT01`",
+                       "## Identidade da marca", "Tipografia: titulos Poppins", "Estilo de imagem: alunos reais"):
+            self.assertIn(trecho, md)
+
+    def test_roteiro_com_partes_no_markdown(self):
+        from trilha_copy.exportar import roteiro_md
+        md = roteiro_md(carregar_peca(PT02), contrato())
+        self.assertIn("Modelo: Educativo: o quê → por quê → como", md)
+        self.assertIn("| 3-8 | o_que | Isso não é falta de vocabulário.", md)
+        self.assertIn("- **por_que**: por que isso importa", md)
+        self.assertIn("## Para quem", md)
+
+    def test_nova_com_modelo(self):
+        rc, saida = rodar("nova", self.pasta, "VA01", "--formato", "roteiro_video", "--modelo", "historia")
+        self.assertEqual(rc, 0, saida)
+        p = carregar_peca(self.arquivo("VA01", "va01-roteiro-video"))
+        self.assertEqual(p.roteiro.modelo, "historia")
+        self.assertEqual([c.parte for c in p.roteiro.cenas], ["gancho", "situacao", "mas", "entao", "resultado", "cta"])
+        self.assertEqual(p.roteiro.cenas[0].tempo, "0-3")
+        self.assertEqual(p.roteiro.cenas[-1].tempo.split("-")[1], "30")
+        self.assertEqual(rodar("nova", self.pasta, "VA01", "--formato", "meta_feed", "--modelo", "historia")[0], 1)
+        rc, saida = rodar("roteiros")
+        self.assertEqual(rc, 0)
+        self.assertIn("oferta_direta", saida)
 
 
 class TestSubida(Base):
