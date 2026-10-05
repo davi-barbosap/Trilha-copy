@@ -1,5 +1,14 @@
 # Mudanças
 
+## 0.1.1 — organização do ecossistema (out/2026)
+
+- **Nome:** Trilha-copy (antes Trilha-copywritter).
+- **`validar <pasta>`:** confere se o contrato e as peças estão no formato certo, sem julgar o texto. É o que o Trilha-clientes usa para conferir os clientes.
+- **Correção:** a documentação dizia que o Trilha-ads já lê o `utm_content` no raio-x. Ele ainda não agrupa por esse código; está no roadmap de lá.
+- **Clientes reais** ficam no Trilha-clientes, pasta `copy/`. O briefing exporta direto para lá.
+- **CI:** clona o Trilha-briefing e roda o teste de contrato de verdade, em vez de pulá-lo.
+- **README:** cada comando com o que faz, entradas e saídas, o que não faz e a situação atual.
+
 ## 0.1.0 — primeira versão (out/2026)
 
 Estrutura e revisão de copy a partir do contrato com o Trilha-briefing. Não gera texto.

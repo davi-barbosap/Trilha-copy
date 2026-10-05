@@ -8,7 +8,14 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: pip install -e .
+      - name: Trilha-briefing, para o teste de contrato
+        run: |
+          git clone --depth 1 https://github.com/davi-barbosap/Trilha-briefing ../Trilha-briefing
+          pip install -e ../Trilha-briefing
       - run: python -m unittest discover -s tests -v
+      - name: O teste de contrato não pode ter sido pulado
+        run: python -c "import trilha_briefing.exportar"
+      - run: python -m trilha_copy validar clientes/_exemplo
       - run: python -m trilha_copy revisar clientes/_exemplo
       - run: python -m trilha_copy pacote clientes/_exemplo PT01 --formato meta_feed
       - run: python -m trilha_copy exportar clientes/_exemplo
