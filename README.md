@@ -31,7 +31,7 @@ O código da célula da grade (`PT01`, `GB01`…) amarra as etapas. Ele nasce na
 | `avancar <peca>` | Passa a peça ao próximo estado, se nada faltar. |
 | `revisar <peça ou pasta>` | Dá avisos em três gravidades e sai com erro se algo bloqueia. |
 | `aprovar <peca> --por NOME --teste-do-vendedor` | Aprova a peça final (regras abaixo). |
-| `exportar <pasta>` | Gera `anuncios.csv` (Meta e Google) e os roteiros em Markdown, só das peças aprovadas. |
+| `exportar <pasta>` | Gera, só das peças aprovadas: `anuncios.csv` (os textos de Meta e Google), `subida.csv` (um anúncio por linha, com campanha, conjunto, nome do anúncio e parâmetros de URL vindos do plano de campanhas do briefing) e os roteiros em Markdown. |
 | `ganchos` | Catálogo de 15 tipos de gancho, com exemplos de segmentos diferentes. |
 | `referencias` | Banco de peças boas, decupadas trecho a trecho, com o porquê. |
 
@@ -88,10 +88,10 @@ Formatos:
 A revisão aponta e não reescreve. Os limites de cada formato estão em [`trilha_copy/formatos.py`](trilha_copy/formatos.py).
 
 **Entradas:**
-- `copy.yaml`, o contrato com o Trilha-briefing: personas, voz, ofertas, provas utilizáveis, compliance, grade e hipóteses;
+- `copy.yaml`, o contrato com o Trilha-briefing: personas, voz, ofertas, provas utilizáveis, compliance, grade, hipóteses e onde cada célula vira anúncio (`veiculacao`, do plano de campanhas);
 - as peças, em `pecas/<codigo>/<peca>.yaml`.
 
-**Saídas:** `dist/<id>/anuncios.csv`, com uma linha por texto, o código da célula e o `utm_content`, e `dist/<id>/roteiros/<peca>.md`. Detalhes em [contrato](docs/contrato.md).
+**Saídas:** `dist/<id>/anuncios.csv`, com uma linha por texto, o código da célula e o `utm_content`; `dist/<id>/subida.csv`, com uma linha por anúncio (campanha, conjunto, nome e parâmetros de URL); e `dist/<id>/roteiros/<peca>.md`. Detalhes em [contrato](docs/contrato.md).
 
 ## Arquivos
 
@@ -133,7 +133,7 @@ python -m trilha_copy checklist copy/minha-cliente/pecas/PT01/pt01-meta-feed.yam
 python -m trilha_copy avancar   copy/minha-cliente/pecas/PT01/pt01-meta-feed.yaml
 python -m trilha_copy revisar   copy/minha-cliente
 python -m trilha_copy aprovar   copy/minha-cliente/pecas/PT01/pt01-meta-feed.yaml --por "Seu nome" --teste-do-vendedor
-python -m trilha_copy exportar  copy/minha-cliente        # dist/minha-cliente/anuncios.csv (não versionar)
+python -m trilha_copy exportar  copy/minha-cliente        # dist/minha-cliente/anuncios.csv e subida.csv (não versionar)
 
 python -m trilha_copy ganchos
 python -m trilha_copy referencias

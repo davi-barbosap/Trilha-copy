@@ -85,6 +85,7 @@ class Peca(_Base):
     id: Id
     codigo: Annotated[str, Field(pattern=r"^[A-Z0-9]{2,8}$")]
     formato: Literal["meta_feed", "meta_reels", "google_rsa", "roteiro_video"]
+    versao: int = Field(default=1, ge=1)  # 1, 2, 3… entre as peças da mesma célula na mesma plataforma; vai no nome do anúncio
     estado: Estado = "fundacao"
     # fundação
     persona: str = ""
@@ -175,6 +176,36 @@ def carregar_peca(caminho: str | Path) -> Peca:
 
 def pecas_da_pasta(pasta: str | Path) -> list[Path]:
     return sorted(Path(pasta).glob("pecas/*/*.yaml"))
+
+
+def plataforma_da(p: Peca) -> str:
+    return FORMATOS[p.formato].plataforma
+
+
+def versoes_repetidas(pecas: list[Peca]) -> list[str]:
+    """Peças da mesma célula e plataforma com a mesma versão: os anúncios teriam o mesmo nome."""
+    vistas: dict[tuple[str, str, int], str] = {}
+    problemas = []
+    for p in pecas:
+        chave = (p.codigo, plataforma_da(p), p.versao)
+        if plataforma_da(p) != "video" and chave in vistas:
+            problemas.append(f"{vistas[chave]} e {p.id}: mesma célula ({p.codigo}), mesma plataforma ({chave[1]}) e mesma "
+                             f"versão ({p.versao}); os anúncios teriam o mesmo nome. Mude `versao` de uma delas.")
+        vistas.setdefault(chave, p.id)
+    return problemas
+
+
+def proxima_versao(pasta: str | Path, codigo: str, formato: str) -> int:
+    plataforma = FORMATOS[formato].plataforma
+    usadas = []
+    for caminho in sorted(Path(pasta).glob(f"pecas/{codigo}/*.yaml")):
+        try:
+            p = carregar_peca(caminho)
+        except ErroPeca:
+            continue
+        if plataforma_da(p) == plataforma:
+            usadas.append(p.versao)
+    return max(usadas, default=0) + 1
 
 
 # ---------- escrita que preserva os comentários do arquivo ----------

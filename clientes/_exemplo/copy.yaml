@@ -653,3 +653,28 @@ hipoteses:
   aprendizado: ''
 metrica_principal: agendamento
 evento_otimizacao: lead
+veiculacao:
+- codigo: GB01
+  plataforma: google
+  campanha: _exemplo | google-ingles-adultos
+  conjunto: ingles-adultos
+  anuncio: '{codigo} | v{versao}'
+  parametros_url: utm_source=google&utm_medium=pago&utm_campaign=google-ingles-adultos&utm_content={codigo}
+- codigo: PT01
+  plataforma: meta
+  campanha: _exemplo | meta-profissional
+  conjunto: amplo
+  anuncio: '{codigo} | v{versao}'
+  parametros_url: utm_source=meta&utm_medium=pago&utm_campaign=meta-profissional&utm_content={codigo}
+- codigo: PT02
+  plataforma: meta
+  campanha: _exemplo | meta-profissional
+  conjunto: amplo
+  anuncio: '{codigo} | v{versao}'
+  parametros_url: utm_source=meta&utm_medium=pago&utm_campaign=meta-profissional&utm_content={codigo}
+- codigo: PT03
+  plataforma: meta
+  campanha: _exemplo | meta-profissional
+  conjunto: amplo
+  anuncio: '{codigo} | v{versao}'
+  parametros_url: utm_source=meta&utm_medium=pago&utm_campaign=meta-profissional&utm_content={codigo}

@@ -1,5 +1,12 @@
 # Mudanças
 
+## 0.1.3 — lista de subida a partir do plano de campanhas (out/2026)
+
+- **`subida.csv`:** um anúncio por linha, com a campanha, o conjunto, o nome do anúncio e os parâmetros de URL. Os nomes e a UTM vêm do plano de campanhas do briefing (`veiculacao` no contrato); a copy só põe o código e a versão da peça. Antes, quem subia montava o nome e a UTM à mão.
+- **`versao` na peça:** numera as peças da mesma célula na mesma plataforma e entra no nome do anúncio. O `nova` dá o próximo número sozinho (rodar duas vezes na mesma célula cria a versão 2, em vez de recusar), e o `validar` recusa duas peças com a mesma versão.
+- **Aviso:** peça aprovada cuja célula não está em nenhum conjunto da plataforma no plano fica fora da subida, com aviso. Contrato sem plano gera só os textos, também com aviso.
+- **Teste de contrato:** tolera o bloco `veiculacao` no exemplo enquanto o Trilha-briefing instalado não o exporta (até o merge da 0.4.1 de lá).
+
 ## 0.1.2 — o raio-x já lê o código (out/2026)
 
 - **Documentação:** o Trilha-ads 0.8.0 agrupa o raio-x pelo código da célula no `utm_content` (`por_criativo`). README, contrato e exportação deixam de dizer que isso está no roadmap.

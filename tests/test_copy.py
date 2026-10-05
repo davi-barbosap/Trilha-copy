@@ -407,9 +407,10 @@ class TestFluxo(unittest.TestCase):
 
 class TestExportar(Base):
     def test_so_aprovadas(self):
-        escritos, recusadas = exportar(self.pasta, contrato(), self.tmp / "dist")
+        escritos, recusadas, avisos = exportar(self.pasta, contrato(), self.tmp / "dist")
         self.assertEqual(recusadas, [])
-        self.assertEqual([e.name for e in escritos], ["anuncios.csv"])
+        self.assertEqual(avisos, [])
+        self.assertEqual([e.name for e in escritos], ["anuncios.csv", "subida.csv"])
         with open(escritos[0], encoding="utf-8") as f:
             linhas = list(csv.DictReader(f))
         self.assertEqual({(x["peca"], x["utm_content"]) for x in linhas}, {("pt01-meta-feed", "PT01")})
@@ -432,11 +433,67 @@ class TestExportar(Base):
         ap, problemas = preparar_aprovacao(carregar_peca(caminho), c, "assessor", True, hoje=date(2026, 10, 6))
         self.assertEqual(problemas, [])
         registrar_estado(caminho, "aprovado", hoje=date(2026, 10, 6), aprovacao=ap)
-        escritos, _ = exportar(self.pasta, c, self.tmp / "dist", codigo="PT02")
+        escritos, _, _ = exportar(self.pasta, c, self.tmp / "dist", codigo="PT02")
         self.assertEqual([e.name for e in escritos], ["pt02-roteiro-video.md"])
         md = escritos[0].read_text(encoding="utf-8")
         self.assertIn("| 0-3 | Entende tudo, mas a frase não sai?", md)
         self.assertIn("`PT02`", md)
+
+
+class TestSubida(Base):
+    """O plano de campanhas do briefing diz onde cada peça entra, com que nome e com que parâmetros de URL."""
+
+    def subida(self, c=None):
+        escritos, _, avisos = exportar(self.pasta, c or contrato(), self.tmp / "dist")
+        arquivo = next((e for e in escritos if e.name == "subida.csv"), None)
+        if arquivo is None:
+            return None, avisos
+        with open(arquivo, encoding="utf-8") as f:
+            return list(csv.DictReader(f)), avisos
+
+    def test_uma_linha_por_anuncio_com_nome_e_parametros(self):
+        linhas, avisos = self.subida()
+        self.assertEqual(avisos, [])
+        self.assertEqual(linhas, [{
+            "plataforma": "meta", "campanha": "_exemplo | meta-profissional", "conjunto": "amplo",
+            "nome_anuncio": "PT01 | v1",
+            "parametros_url": "utm_source=meta&utm_medium=pago&utm_campaign=meta-profissional&utm_content=PT01",
+            "codigo": "PT01", "peca": "pt01-meta-feed", "formato": "meta_feed"}])
+
+    def test_mesma_peca_em_dois_conjuntos(self):
+        def mudar(d):
+            pt01 = next(l for l in d["veiculacao"] if l["codigo"] == "PT01")
+            d["veiculacao"].append({**pt01, "campanha": "_exemplo | meta-remarketing", "conjunto": "visitantes",
+                                    "parametros_url": pt01["parametros_url"].replace("meta-profissional", "meta-remarketing")})
+        linhas, _ = self.subida(contrato(mudar))
+        self.assertEqual([(l["conjunto"], l["nome_anuncio"]) for l in linhas], [("amplo", "PT01 | v1"), ("visitantes", "PT01 | v1")])
+        self.assertIn("utm_campaign=meta-remarketing", linhas[1]["parametros_url"])
+
+    def test_versao_entra_no_nome(self):
+        caminho = self.arquivo("PT01", "pt01-meta-feed")
+        caminho.write_text(caminho.read_text(encoding="utf-8").replace("formato: meta_feed\n", "formato: meta_feed\nversao: 3\n", 1),
+                           encoding="utf-8")
+        linhas, _ = self.subida()
+        self.assertEqual(linhas[0]["nome_anuncio"], "PT01 | v3")
+
+    def test_celula_fora_do_plano_avisa(self):
+        linhas, avisos = self.subida(contrato(lambda d: d.update(veiculacao=[l for l in d["veiculacao"] if l["codigo"] != "PT01"])))
+        self.assertIsNone(linhas)
+        self.assertTrue(contem(avisos, "pt01-meta-feed: a célula PT01 não está em nenhum conjunto de meta"))
+
+    def test_sem_plano_no_contrato(self):
+        linhas, avisos = self.subida(contrato(lambda d: d.pop("veiculacao")))
+        self.assertIsNone(linhas)
+        self.assertTrue(contem(avisos, "subida.csv não foi gerado"))
+
+    def test_versao_repetida_nao_valida(self):
+        destino = self.arquivo("PT01", "pt01-meta-feed").parent / "pt01-meta-reels.yaml"
+        texto = self.arquivo("PT01", "pt01-meta-feed").read_text(encoding="utf-8")
+        destino.write_text(texto.replace("id: pt01-meta-feed", "id: pt01-meta-reels").replace("formato: meta_feed", "formato: meta_reels"),
+                           encoding="utf-8")
+        rc, saida = rodar("validar", self.pasta)
+        self.assertEqual(rc, 1)
+        self.assertIn("mesma versão (1)", saida)
 
 
 class TestCLI(Base):
@@ -456,7 +513,11 @@ class TestCLI(Base):
         p = carregar_peca(caminho)
         self.assertEqual((p.estado, p.persona, p.oferta, p.intensidade), ("fundacao", "viajante", "aula-experimental", 2))
         self.assertIn("# 'historico' é a última chave", caminho.read_text(encoding="utf-8"))
-        self.assertEqual(rodar("nova", self.pasta, "VA01", "--formato", "meta_reels")[0], 1)  # já existe
+        # de novo na mesma célula e plataforma: outra peça, versão 2 (outro nome de anúncio)
+        rc, saida = rodar("nova", self.pasta, "VA01", "--formato", "meta_feed")
+        self.assertEqual(rc, 0, saida)
+        self.assertEqual(carregar_peca(self.arquivo("VA01", "va01-meta-feed-v2")).versao, 2)
+        self.assertEqual(rodar("nova", self.pasta, "VA01", "--formato", "meta_reels", "--id", "va01-meta-reels")[0], 1)
         self.assertEqual(rodar("nova", self.pasta, "XX01", "--formato", "meta_feed")[0], 1)
         rc, saida = rodar("checklist", caminho)
         self.assertEqual(rc, 1)

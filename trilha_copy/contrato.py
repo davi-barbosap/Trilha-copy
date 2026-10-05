@@ -218,6 +218,23 @@ class Hipotese(_Base):
     resultado: str = "planejada"
 
 
+class Local(_Base):
+    """Onde uma célula vira anúncio, vindo do plano de campanhas do briefing com os nomes já resolvidos.
+
+    Só `{codigo}` e `{versao}` ficam para preencher com a peça.
+    """
+
+    codigo: str
+    plataforma: str
+    campanha: str
+    conjunto: str
+    anuncio: str = "{codigo} | v{versao}"
+    parametros_url: str = "utm_content={codigo}"
+
+    def preencher(self, molde: str, codigo: str, versao: int) -> str:
+        return molde.replace("{codigo}", codigo).replace("{versao}", str(versao))
+
+
 class Cliente(_Base):
     id: str
     nome: str
@@ -244,6 +261,7 @@ class Contrato(_Base):
     hipoteses: list[Hipotese] = Field(default_factory=list)
     metrica_principal: str = ""
     evento_otimizacao: str = ""
+    veiculacao: list[Local] = Field(default_factory=list)  # vazio quando o briefing ainda não tem plano de campanhas
 
     @model_validator(mode="after")
     def _versao(self) -> Contrato:
@@ -263,6 +281,9 @@ class Contrato(_Base):
 
     def prova(self, pid: str) -> Prova | None:
         return next((p for p in self.provas if p.id == pid), None)
+
+    def locais_de(self, codigo: str, plataforma: str) -> list[Local]:
+        return [l for l in self.veiculacao if l.codigo == codigo and l.plataforma == plataforma]
 
     def hipoteses_da(self, codigo: str) -> list[Hipotese]:
         return [h for h in self.hipoteses if codigo in h.codigos]
