@@ -76,3 +76,19 @@ def contem_termo(texto: str, termo: str) -> bool:
 
 def palavras_de_conteudo(texto: str) -> set[str]:
     return {normalizar(p) for p in palavras(texto) if len(p) >= 5 and normalizar(p) not in STOPWORDS}
+
+
+def nomes_proprios(texto: str, ignorar: set[str] = frozenset()) -> list[str]:
+    """Palavras com inicial maiúscula fora do começo da frase: nome de lugar, pessoa, marca, método.
+
+    CAIXA ALTA de 4 letras ou mais não conta (é ênfase, não nome). `ignorar`: palavras normalizadas que não contam,
+    como o nome do próprio cliente e da oferta.
+    """
+    achados = []
+    for f in frases(texto):
+        for i, p in enumerate(palavras(f)):
+            if i == 0 or not p[0].isupper() or (len(p) >= 4 and p.isupper()):
+                continue
+            if normalizar(p) not in ignorar:
+                achados.append(p)
+    return achados

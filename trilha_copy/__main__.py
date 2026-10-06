@@ -7,6 +7,8 @@
     python -m trilha_copy checklist <peca.yaml>                       o que falta para sair do estado atual
     python -m trilha_copy avancar <peca.yaml>                         passa ao próximo estado, se nada faltar
     python -m trilha_copy revisar <peca.yaml | pasta>                 avisos por gravidade; sai com erro se algo bloqueia
+    python -m trilha_copy revisar-pagina <pagina.yaml> [--contrato copy/<id>]   o texto da página pelo mesmo padrão
+    python -m trilha_copy padrao                                      princípios e regras do padrão de texto
     python -m trilha_copy aprovar <peca.yaml> --por NOME --teste-do-vendedor [--mesmo-dia]
     python -m trilha_copy exportar <pasta> [--codigo X] [--saida dist]   anuncios.csv, subida.csv e roteiros das aprovadas
     python -m trilha_copy ganchos                                     catálogo de tipos de gancho
@@ -23,6 +25,7 @@ import shutil
 import sys
 from pathlib import Path
 
+import yaml
 from pydantic import ValidationError
 
 from trilha_copy.contrato import Contrato, carregar_contrato
@@ -36,7 +39,9 @@ from trilha_copy.peca import (ErroPeca, carregar_peca, pecas_da_pasta, proxima_v
 from trilha_copy.referencias import carregar_referencias
 from trilha_copy.roteiros import ARQUIVO as ARQUIVO_ROTEIROS
 from trilha_copy.roteiros import esqueleto, modelos
-from trilha_copy.revisao import NIVEIS, revisar
+from trilha_copy.padrao import ARQUIVO as ARQUIVO_PADRAO
+from trilha_copy.padrao import carregar as carregar_padrao
+from trilha_copy.revisao import NIVEIS, revisar, revisar_pagina
 
 ICONE = {"bloqueia": "✗", "atencao": "⚠", "sugestao": "·"}
 ROTULO = {"bloqueia": "Bloqueia", "atencao": "Atenção", "sugestao": "Sugestão"}
@@ -237,6 +242,46 @@ def cmd_validar(a) -> int:
     return 1 if erros else 0
 
 
+def _contrato_da_pagina(pagina: Path, dados: dict, contrato: str | None) -> Contrato:
+    """--contrato, ou o copy/<id>/ do Trilha-clientes quando a página está em lp/<id>/<pagina>/pagina.yaml."""
+    if contrato:
+        return _contrato_da_pasta(Path(contrato))
+    cliente = (dados.get("pagina") or {}).get("cliente", "")
+    for raiz in pagina.resolve().parents:
+        candidato = raiz / "copy" / cliente
+        if cliente and (candidato / "copy.yaml").exists():
+            return _contrato_da_pasta(candidato)
+    sys.exit(f"✗ não achei copy/{cliente or '<cliente>'}/copy.yaml acima de {pagina}: informe --contrato <pasta do copy>")
+
+
+def cmd_revisar_pagina(a) -> int:
+    caminho = Path(a.pagina)
+    try:
+        dados = yaml.safe_load(caminho.read_text(encoding="utf-8")) or {}
+    except (OSError, yaml.YAMLError) as e:
+        sys.exit(f"✗ {caminho}: {e}")
+    c = _contrato_da_pagina(caminho, dados, a.contrato)
+    avisos = revisar_pagina(dados, c)
+    print(f"{caminho} (página, padrão de texto): {len(avisos)} aviso(s)")
+    _mostrar(avisos)
+    print("A estrutura da página (blocos, ordem, rastreamento) é conferida na Trilha-LP: python -m trilha_lp validar")
+    return 1 if any(x.nivel == "bloqueia" for x in avisos) else 0
+
+
+def cmd_padrao(a) -> int:
+    p = carregar_padrao()
+    print(f"Padrão de texto da Trilha, versão {p.versao} ({ARQUIVO_PADRAO})\n")
+    for x in p.principios:
+        print(f"· {x.principio}")
+    for superficie in ("anuncio", "roteiro", "pagina", "briefing"):
+        regras = [r for r in p.regras if superficie in r.aplica_a and r.gravidade != "desligada"]
+        print(f"\n{superficie} ({len(regras)} regras)")
+        for nivel in NIVEIS:
+            for r in (x for x in regras if x.gravidade_em({superficie}) == nivel):
+                print(f"  {ICONE[nivel]} {r.id}: {r.o_que}")
+    return 0
+
+
 def cmd_revisar(a) -> int:
     alvo = Path(a.alvo)
     caminhos = pecas_da_pasta(alvo) if alvo.is_dir() else [alvo]
@@ -329,6 +374,10 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("avancar"); s.add_argument("peca"); s.add_argument("--nota", default=""); s.set_defaults(f=cmd_avancar)
     s = sub.add_parser("validar"); s.add_argument("pasta"); s.set_defaults(f=cmd_validar)
     s = sub.add_parser("revisar"); s.add_argument("alvo"); s.set_defaults(f=cmd_revisar)
+    s = sub.add_parser("revisar-pagina", help="o texto de uma página da Trilha-LP pelo padrão de texto")
+    s.add_argument("pagina"); s.add_argument("--contrato", help="pasta com o copy.yaml do cliente (copy/<id>)")
+    s.set_defaults(f=cmd_revisar_pagina)
+    s = sub.add_parser("padrao", help="o padrão de texto: princípios e regras por superfície"); s.set_defaults(f=cmd_padrao)
     s = sub.add_parser("aprovar"); s.add_argument("peca"); s.add_argument("--por", required=True)
     s.add_argument("--teste-do-vendedor", action="store_true", help="um bom vendedor diria isso com o cliente na frente dele?")
     s.add_argument("--mesmo-dia", action="store_true", help="aprovar no mesmo dia em que a peça virou final")

@@ -29,7 +29,9 @@ O código da célula da grade (`PT01`, `GB01`…) amarra as etapas. Ele nasce na
 | `nova <pasta> <codigo> --formato F [--modelo M]` | Cria a peça a partir da célula, já com persona, oferta, macro-ação, hipótese, intensidade e a próxima `versao`. Para roteiro, `--modelo` cria as cenas do modelo de corpo com tempos sugeridos. |
 | `checklist <peca>` | Mostra o que falta para a peça sair do estado atual. |
 | `avancar <peca>` | Passa a peça ao próximo estado, se nada faltar. |
-| `revisar <peça ou pasta>` | Dá avisos em três gravidades e sai com erro se algo bloqueia. |
+| `revisar <peça ou pasta>` | Dá avisos em três gravidades, pelo padrão de texto da Trilha, e sai com erro se algo bloqueia. |
+| `revisar-pagina <pagina.yaml>` | O texto de uma página da Trilha-LP pelo mesmo padrão. |
+| `padrao` | Os princípios e as regras do padrão de texto, por superfície e gravidade. |
 | `aprovar <peca> --por NOME --teste-do-vendedor` | Aprova a peça final (regras abaixo). |
 | `exportar <pasta>` | Gera, só das peças aprovadas: `anuncios.csv` (os textos de Meta e Google), `subida.csv` (um anúncio por linha, com campanha, conjunto, nome do anúncio e parâmetros de URL vindos do plano de campanhas do briefing), o **briefing do criativo** de cada anúncio do Meta e os roteiros, para a equipe de criação. |
 | `ganchos` | Catálogo de 15 tipos de gancho, com exemplos de segmentos diferentes. |
@@ -55,38 +57,53 @@ Formatos:
 
 `avancar` e `aprovar` trocam a linha `estado:` e acrescentam ao `historico:` sem reescrever o resto do arquivo: os comentários ficam.
 
-**A revisão** confere a peça contra o contrato do cliente, o formato e os princípios de copy ([método](docs/metodo.md)):
+**A revisão** segue o **padrão de texto da Trilha** ([`trilha_copy/regras/padrao.yaml`](trilha_copy/regras/padrao.yaml), explicado em [docs/padrao-de-texto.md](docs/padrao-de-texto.md)). É um arquivo só, com princípios, vocabulários, parâmetros e 48 regras, cada uma com gravidade, mensagem e fonte. O mesmo padrão vale para anúncio, roteiro e página; o briefing e a LP conferem as cópias deles contra ele na CI.
 - **Bloqueia:**
-  - termo ou promessa proibidos no briefing;
-  - texto acima do limite que a plataforma recusa;
-  - menos textos do que a plataforma exige;
-  - prazo ou vagas acabando sem urgência ou escassez reais no briefing;
+  - termo ou promessa proibidos (do cliente ou do segmento);
+  - garantia de resultado que não depende só da empresa;
+  - prazo ou vagas acabando sem urgência real (com motivo) ou escassez real (com evidência) no briefing;
   - prova que não está no contrato;
+  - preço num canal em que o cliente não mostra preço;
   - no Meta, afirmação sobre atributo pessoal de quem lê;
+  - limite de caracteres ou de quantidade que a plataforma recusa;
   - texto alterado depois da aprovação;
   - célula que não existe na grade.
 - **Atenção:**
-  - número que não vem de nenhuma prova, oferta ou promessa do briefing;
-  - promessa de ganho com número;
-  - concorrente citado pelo nome;
-  - mais "nós/nosso" do que "você";
+  - número sem lastro no briefing;
+  - promessa de ganho com número e sem ressalva;
+  - público restringido no texto;
+  - concorrente pelo nome;
+  - mais "nós" do que "você";
   - autoelogio;
-  - intensidade acima da combinada com o cliente;
-  - prova de outro perfil de persona;
+  - peça sem nenhum dado concreto;
+  - intensidade acima da combinada;
+  - prova de outra persona;
+  - preço fora da forma combinada ("a partir de", parcela);
+  - registro profissional ausente;
+  - antes e depois em saúde;
   - leitura difícil;
-  - gancho cortado pelo "ver mais";
-  - fala que não cabe no tempo da cena;
-  - vídeo que não prende nos 3 primeiros segundos;
-  - roteiro fora do modelo de corpo: parte que falta, fora de ordem ou desconhecida.
+  - texto cortado na tela;
+  - no roteiro: gancho depois de 3 s, fala que não cabe, roteiro fora do modelo de corpo.
 - **Sugestão:**
-  - frases todas do mesmo tamanho;
-  - nenhuma palavra das frases literais da persona;
   - adjetivo sem fato;
+  - frases do mesmo tamanho;
+  - nenhuma palavra das frases literais da persona;
   - chamada sem "quando";
-  - menos de 10 títulos no Google;
+  - poucos títulos no Google;
   - título que não repete a busca;
   - vídeo sem texto na tela;
-  - roteiro sem modelo de corpo.
+  - roteiro sem modelo.
+
+Os termos casam como palavra inteira (com `radical*` e `re:` quando a lista quer variações): "corra" não pega mais "ocorra". Para mudar uma gravidade ou desligar uma regra, edite o YAML.
+
+**`revisar-pagina <pagina.yaml>`** revisa o texto de uma página da Trilha-LP com o mesmo padrão. Lê o contrato do cliente em `copy/<id>/` do Trilha-clientes (ou `--contrato`) e confere, além das regras de texto:
+- título de bloco genérico;
+- botão genérico;
+- objeção sem resposta;
+- título do topo e descrição de SEO longos;
+- registro no rodapé.
+
+A estrutura da página continua com `python -m trilha_lp validar`.
 
 A revisão aponta e não reescreve. Os limites de cada formato estão em [`trilha_copy/formatos.py`](trilha_copy/formatos.py).
 
@@ -124,8 +141,8 @@ referencias/<id>.yaml          peças boas de qualquer segmento, decupadas trech
 
 ## Situação atual
 
-Versão 0.1.4, sem cliente real ainda. Próximos passos:
-- o padrão de texto da Trilha num arquivo só, aplicado também às páginas;
+Versão 0.2.0, sem cliente real ainda. Próximos passos:
+- o que o padrão de texto ainda não automatiza ([lista em ordem de valor](docs/padrao-de-texto.md#o-que-ainda-não-está-automatizado)): coerência anúncio → página, superlativo sem prova, chamada única;
 - as peças vencedoras voltando como referência.
 
 ## Como usar
@@ -143,6 +160,7 @@ python -m trilha_copy nova      copy/minha-cliente PT01 --formato meta_feed
 python -m trilha_copy checklist copy/minha-cliente/pecas/PT01/pt01-meta-feed.yaml
 python -m trilha_copy avancar   copy/minha-cliente/pecas/PT01/pt01-meta-feed.yaml
 python -m trilha_copy revisar   copy/minha-cliente
+python -m trilha_copy revisar-pagina lp/minha-cliente/X-meta/pagina.yaml   # contrato achado em copy/minha-cliente/
 python -m trilha_copy aprovar   copy/minha-cliente/pecas/PT01/pt01-meta-feed.yaml --por "Seu nome" --teste-do-vendedor
 python -m trilha_copy exportar  copy/minha-cliente        # dist/minha-cliente/anuncios.csv e subida.csv (não versionar)
 
