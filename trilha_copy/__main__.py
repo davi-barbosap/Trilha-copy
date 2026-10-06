@@ -14,6 +14,7 @@
     python -m trilha_copy ganchos                                     catálogo de tipos de gancho
     python -m trilha_copy roteiros                                    modelos de corpo para roteiro (editáveis)
     python -m trilha_copy referencias [pasta]                         banco de referências decupadas
+    python -m trilha_copy vencedora <peca.yaml> --hipotese H          a peça que venceu um teste vira referência do cliente
 
 Formatos: meta_feed, meta_reels, google_rsa, roteiro_video.
 """
@@ -36,7 +37,7 @@ from trilha_copy.ganchos import GANCHOS
 from trilha_copy.pacote import em_markdown, montar
 from trilha_copy.peca import (ErroPeca, carregar_peca, pecas_da_pasta, proxima_versao, registrar_estado,
                              versoes_repetidas)
-from trilha_copy.referencias import carregar_referencias
+from trilha_copy.referencias import carregar_referencias, de_peca_vencedora
 from trilha_copy.roteiros import ARQUIVO as ARQUIVO_ROTEIROS
 from trilha_copy.roteiros import esqueleto, modelos
 from trilha_copy.padrao import ARQUIVO as ARQUIVO_PADRAO
@@ -352,6 +353,35 @@ def cmd_ganchos(a) -> int:
     return 0
 
 
+def cmd_vencedora(a) -> int:
+    caminho = Path(a.peca)
+    p = _peca(caminho)
+    pasta = _pasta_da_peca(caminho)
+    c = _contrato_da_pasta(pasta)
+    h = next((x for x in c.hipoteses if x.id == a.hipotese), None)
+    if h is None:
+        print(f"✗ a hipótese '{a.hipotese}' não está no contrato: exporte o briefing de novo depois de decidir")
+        return 1
+    problemas = []
+    if h.resultado != "validada":
+        problemas.append(f"a hipótese está '{h.resultado}': só teste validado (decidir … validada) vira referência de vencedora")
+    if p.codigo not in h.codigos:
+        problemas.append(f"a peça é da célula {p.codigo}, e a hipótese testou {', '.join(h.codigos) or 'nenhum código'}")
+    if p.estado != "aprovado":
+        problemas.append("só peça aprovada (o texto que foi ao ar) vira referência")
+    if problemas:
+        for x in problemas:
+            print(f"✗ {x}")
+        return 1
+    ref = de_peca_vencedora(p, c, h)
+    destino = pasta / "referencias" / f"{ref.id}.yaml"
+    destino.parent.mkdir(exist_ok=True)
+    destino.write_text("# Peça vencedora do cliente, gerada por: python -m trilha_copy vencedora. Complete o porquê se quiser.\n"
+                       + yaml.safe_dump(ref.model_dump(), allow_unicode=True, sort_keys=False, width=120), encoding="utf-8")
+    print(f"✓ {destino}\n  Aparece em: python -m trilha_copy referencias {pasta / 'referencias'}")
+    return 0
+
+
 def cmd_referencias(a) -> int:
     refs, erros = carregar_referencias(a.pasta)
     for nome, erro in erros.items():
@@ -387,6 +417,8 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("ganchos"); s.set_defaults(f=cmd_ganchos)
     s = sub.add_parser("roteiros", help="modelos de corpo para roteiro"); s.set_defaults(f=cmd_roteiros)
     s = sub.add_parser("referencias"); s.add_argument("pasta", nargs="?", default="referencias"); s.set_defaults(f=cmd_referencias)
+    s = sub.add_parser("vencedora", help="a peça aprovada que venceu um teste vira referência do cliente")
+    s.add_argument("peca"); s.add_argument("--hipotese", required=True); s.set_defaults(f=cmd_vencedora)
     a = ap.parse_args(argv)
     return a.f(a)
 

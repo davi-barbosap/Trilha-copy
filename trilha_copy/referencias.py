@@ -52,3 +52,33 @@ def carregar_referencias(pasta: str | Path) -> tuple[list[Referencia], dict[str,
         else:
             refs.append(r)
     return refs, erros
+
+
+FORMATO_DA_PLATAFORMA = {"meta": "meta", "google": "google", "video": "video"}
+
+
+def de_peca_vencedora(p, contrato, hipotese) -> Referencia:
+    """A peça aprovada que venceu um teste vira referência decupada do próprio cliente.
+
+    A decupagem vem do subtexto da peça (o que cada trecho deveria fazer sentir); o porquê, do aprendizado registrado
+    no briefing; o resultado, da hipótese, com a fonte (o retorno do Trilha-ads). É o estudo que vale mais: o que
+    funcionou com este público.
+    """
+    from trilha_copy.peca import plataforma_da
+
+    textos = [t for _, t in p.textos()]
+    return Referencia(
+        id=p.id,
+        titulo=f"{contrato.cliente.nome}, {p.codigo}: {p.ideia or (textos[0] if textos else p.id)}"[:120],
+        fonte=f"{contrato.cliente.nome}, peça {p.id}; hipótese {hipotese.id} {hipotese.resultado}"
+              + (f" em {hipotese.fim:%d/%m/%Y}" if hipotese.fim else "") + " (retorno do Trilha-ads)",
+        formato=FORMATO_DA_PLATAFORMA.get(plataforma_da(p), "outro"),
+        segmento=contrato.cliente.segmento,
+        gancho_tipo=p.gancho_tipo if p.gancho_tipo in GANCHOS else "",
+        texto="\n\n".join(textos),
+        decupagem=[Trecho(trecho=x.trecho, funcao=x.funcao) for x in p.subtexto],
+        por_que_funciona=hipotese.aprendizado,
+        resultado_conhecido=f"{hipotese.hipotese} Critério: {hipotese.criterio_sucesso}."
+                            + (f" Conversões por variação: {hipotese.conversoes_obtidas}." if hipotese.conversoes_obtidas else ""),
+    )
+
