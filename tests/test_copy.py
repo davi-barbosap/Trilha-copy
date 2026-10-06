@@ -485,6 +485,7 @@ class TestPadraoDeTexto(Base):
 
     def test_preco_conforme_a_regra_do_canal(self):
         nunca = contrato(lambda d: d.update(preco={"anuncio": "nunca"}))
+        self.assertEqual(contrato().preco["anuncio"], "nunca")  # o exemplo combinou não mostrar preço no anúncio
         self.assertTrue(contem(avisos(meta("Mensalidade por R$ 460. Agende hoje."), nunca, nivel="bloqueia"),
                                "a regra comercial do cliente para anuncio é não mostrar preço"))
         partir = contrato(lambda d: d.update(preco={"anuncio": "a_partir_de"}))
@@ -493,7 +494,7 @@ class TestPadraoDeTexto(Base):
         # número de prova em reais não é preço
         self.assertFalse(contem(avisos(meta("R$ 2 milhões em bolsas concedidas. Agende hoje."), nunca), "mostrar preço"))
         # sem regra do cliente, o segmento manda: imobiliário mostra parcela no anúncio
-        imob = contrato(lambda d: d["cliente"].update(playbook="imobiliario"))
+        imob = contrato(lambda d: (d["cliente"].update(playbook="imobiliario"), d.update(preco={})))
         self.assertTrue(contem(avisos(meta("Apartamento por R$ 450 mil. Agende hoje."), imob), "(parcela)"))
 
     def test_registro_profissional(self):
