@@ -38,23 +38,12 @@ Os estados seguem o checklist do curso:
 
 ## 3. Regras da revisão e de onde vêm
 
-| Regra | Origem | Como confere |
-|---|---|---|
-| Serviço, não "compre a minha marca" | Hopkins | conta "nós/nosso/somos/a gente" contra "você/seu"; lista de frases egoístas ("exija", "evite imitações", "somos líderes") |
-| Fato no lugar de adjetivo | Hopkins, KJ | "melhor", "qualidade", "excelência" num texto sem nenhum número |
-| Todo número tem lastro | nosso | números com dois dígitos ou mais, em reais ou em porcentagem, precisam aparecer numa prova, na oferta ou na promessa do contrato |
-| Só provas utilizáveis | nosso | a peça cita provas por id; o contrato só traz as com fonte ou autorização |
-| Prova parecida com quem lê | 6 Ps | prova com `personas` diferente da persona da peça vira aviso |
-| Urgência e escassez reais | KJ, CDC | palavras de prazo ou vagas acabando sem urgência válida (real e no prazo) ou escassez com evidência bloqueiam |
-| Termostato da voz | KJ | marcas de exagero (palavras de euforia, exclamações, CAIXA ALTA) acima do limite da intensidade combinada (1 a 5) |
-| Palavras de quem lê | 6 Ps, KJ | ao menos uma palavra de conteúdo das frases literais da persona |
-| Nada confuso | KJ | índice de legibilidade (seção 4) |
-| Nada chato | KJ, 6 Ps | variação do tamanho das frases |
-| Chamada completa: quem, o quê, até quando, como | 6 Ps | chamada sem "hoje", "até", "esta semana"… |
-| Políticas das plataformas | nosso | atributos pessoais e promessa de ganho no Meta; limites de caracteres; mínimo e máximo de textos |
-| Concorrente pelo nome | CONAR | nome de concorrente do briefing no texto |
-| Gancho em 3 segundos; fala que cabe no tempo | nosso | primeira cena até 3 s; 2,5 palavras por segundo |
-| Corpo do roteiro segue o modelo | aula de copy 3, 6 Ps | cada cena declara a parte; falta, ordem e parte desconhecida viram atenção |
+As regras estão no **padrão de texto da Trilha** (`trilha_copy/regras/padrao.yaml`), o mesmo para anúncio, roteiro, página e briefing. [docs/padrao-de-texto.md](padrao-de-texto.md) tem:
+- os 15 princípios e as 48 regras, por superfície e gravidade, cada uma com a fonte (Hopkins, KJ, 6 Ps, aula de landing page, CDC, CONAR, políticas das plataformas, decisões das ferramentas);
+- as 21 divergências que havia entre as três ferramentas e o que o padrão adotou;
+- o que ainda não está automatizado, em ordem de valor.
+
+Além do texto, a revisão da peça confere o modelo de corpo do roteiro (seção 6). Esse é processo da copy, não regra de texto.
 
 ## 4. Medidas de texto
 
@@ -102,5 +91,5 @@ O texto na arte passa pela mesma revisão do resto, porque é texto que o públi
 - **Uma ideia grande por peça:** conferir que não há duas promessas exige ler o sentido. Ficou como campo (`ideia`), não como regra.
 - **Nada inacreditável:** comparar a promessa com a sofisticação do público. O pacote mostra a sofisticação; a revisão não julga.
 - **Lista de jargões por público:** depende do segmento. Hoje entra pelos termos proibidos do briefing.
-- **Chamada única:** avisar peça com duas chamadas.
+- **Chamada única,** **superlativo sem prova** e **coerência anúncio → página:** estão entre as lacunas do padrão de texto, em ordem de valor.
 - **Aprendizados dos testes voltando como referência:** quando o Trilha-ads tiver o vencedor de uma hipótese, a peça pode virar referência decupada.

@@ -166,8 +166,9 @@ class Oferta(_Base):
     cta: str = ""
 
     def urgencia_valida(self) -> bool:
+        """Real, com motivo e dentro do prazo (padrão de texto: urgencia_ou_escassez_sem_lastro)."""
         u = self.urgencia
-        return bool(u and u.real and (u.data is None or u.data >= date.today()))
+        return bool(u and u.real and u.motivo.strip() and (u.data is None or u.data >= date.today()))
 
     def escassez_valida(self) -> bool:
         return bool(self.escassez and self.escassez.real and self.escassez.evidencia)
@@ -249,6 +250,7 @@ class Cliente(_Base):
     id: str
     nome: str
     segmento: str = ""
+    playbook: str = ""  # padrao, imobiliario…: liga as regras de segmento do padrão de texto
     whatsapp: str = ""
     area: str = ""
 
@@ -273,6 +275,7 @@ class Contrato(_Base):
     metrica_principal: str = ""
     evento_otimizacao: str = ""
     veiculacao: list[Local] = Field(default_factory=list)  # vazio quando o briefing ainda não tem plano de campanhas
+    preco: dict[str, str] = Field(default_factory=dict)  # anuncio | whatsapp | landing → nunca, a_partir_de, parcela, valor_cheio
 
     @model_validator(mode="after")
     def _versao(self) -> Contrato:

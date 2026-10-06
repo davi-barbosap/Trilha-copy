@@ -219,7 +219,7 @@ class TestRevisao(unittest.TestCase):
 
     def test_prova_inexistente_bloqueia_e_de_outra_persona_alerta(self):
         self.assertTrue(contem(avisos(meta("Agende hoje.", provas=["inventada"]), nivel="bloqueia"),
-                               "prova 'inventada' não está no contrato"))
+                               'a prova "inventada" não é utilizável'))
         c = contrato(lambda d: d["provas"][3].update(personas=["viajante"]))
         self.assertTrue(contem(avisos(meta("Agende hoje.", provas=["renata"]), c, nivel="atencao"), "de outra persona"))
 
@@ -241,7 +241,7 @@ class TestRevisao(unittest.TestCase):
         p = meta("A melhor escola com qualidade de verdade. Venha conhecer.")
         s = avisos(p, nivel="sugestao")
         self.assertTrue(contem(s, "adjetivo sem fato"))
-        self.assertTrue(contem(s, "chamada sem 'quando'"))
+        self.assertTrue(contem(s, 'chamada sem "quando"'))
         self.assertTrue(contem(s, "frases literais da persona"))
 
     def test_leitura_dificil_e_ritmo(self):
@@ -257,7 +257,7 @@ class TestRevisao(unittest.TestCase):
                  "e a frase fica guardada de novo."
         p = meta(gancho + " Agende hoje.")
         a = avisos(p, nivel="atencao")
-        self.assertTrue(contem(a, "a primeira frase tem"))
+        self.assertTrue(contem(a, "(primeira frase) com"))
         p = peca(PT01, lambda d: (d.pop("aprovacao"), d.update(estado="refinado"),
                                   d["meta"].update(titulos=["Um título longo demais para caber inteiro no feed"],
                                                    cta_botao="")))
@@ -277,7 +277,7 @@ class TestRevisao(unittest.TestCase):
         self.assertTrue(contem(s, "com 10 ou mais"))
         self.assertTrue(contem(s, "nenhum título repete uma palavra-chave"))
         poucos = peca(GB01, lambda d: d["google"].update(titulos=["Inglês para Adultos"]))
-        self.assertTrue(contem(avisos(poucos, nivel="bloqueia"), "o mínimo é 3"))
+        self.assertTrue(contem(avisos(poucos, nivel="bloqueia"), "a plataforma pede de 3 a 15"))
 
     def test_roteiro(self):
         def mudar(d):
@@ -440,6 +440,161 @@ class TestExportar(Base):
         md = escritos[0].read_text(encoding="utf-8")
         self.assertIn("| 0-3 | gancho | Entende tudo, mas a frase não sai?", md)
         self.assertIn("`PT02`", md)
+
+
+class TestPadraoDeTexto(Base):
+    """As regras do padrão (regras/padrao.yaml) que vieram das três ferramentas ou são novas."""
+
+    def test_arquivo_canonico_e_consistente(self):
+        from trilha_copy import padrao as pd
+        p = pd.carregar()
+        self.assertEqual(len({r.id for r in p.regras}), len(p.regras))
+        usadas = {r.id for r in p.regras}
+        # toda regra de anúncio, roteiro ou página tem quem a aplique aqui
+        import inspect
+        from trilha_copy import revisao
+        fonte = inspect.getsource(revisao)
+        for r in p.regras:
+            if set(r.aplica_a) & {"anuncio", "roteiro", "pagina"}:
+                self.assertIn(f'"{r.id}"', fonte, r.id)
+        self.assertIn("garantia_de_resultado", usadas)
+
+    def test_termo_inteiro_nao_pega_pedaco_de_palavra(self):
+        from trilha_copy import padrao as pd
+        self.assertEqual(pd.achar("urgencia", "Caso ocorra algum atraso, isso até muda"), [])
+        self.assertEqual(pd.achar("atributo_pessoal", "Responda depressa, com a gravidade que o caso pede"), [])
+        self.assertEqual(pd.achar("urgencia", "Corra: só até sexta"), ["so ate", "corra"])
+        self.assertEqual(pd.achar("preco_valor", "por R$ 450"), ["r$ 4"])
+        self.assertEqual(pd.achar("forma_parcela", "20 xícaras"), [])
+
+    def test_garantia_de_resultado(self):
+        a = avisos(meta("Fluência em inglês garantida em 6 meses. Agende hoje."), nivel="bloqueia")
+        self.assertTrue(contem(a, "garante um resultado que não depende só da empresa"))
+        self.assertFalse(contem(avisos(meta("Garanta sua vaga na turma de até 6. Agende hoje.")), "garante um resultado"))
+
+    def test_exclusao_de_publico(self):
+        a = avisos(meta("Curso só para mulheres que querem falar inglês. Agende hoje."), nivel="atencao")
+        self.assertTrue(contem(a, "o texto restringe o público"))
+
+    def test_concretude(self):
+        vago = peca(PT01, lambda d: (d.pop("aprovacao"), d.update(estado="refinado", provas=[]), d["meta"].pop("arte"),
+                                     d["meta"].update(textos_principais=["Aprenda a falar com confiança. Agende hoje."],
+                                                      titulos=["Fale com confiança"], descricoes=[])))
+        self.assertTrue(contem(avisos(vago, nivel="atencao"), "não tem nenhum número, nome próprio ou prova"))
+        self.assertFalse(contem(avisos(meta("Turma de até 6 alunos. Agende hoje.")), "não tem nenhum número"))
+
+    def test_preco_conforme_a_regra_do_canal(self):
+        nunca = contrato(lambda d: d.update(preco={"anuncio": "nunca"}))
+        self.assertTrue(contem(avisos(meta("Mensalidade por R$ 460. Agende hoje."), nunca, nivel="bloqueia"),
+                               "a regra comercial do cliente para anuncio é não mostrar preço"))
+        partir = contrato(lambda d: d.update(preco={"anuncio": "a_partir_de"}))
+        self.assertTrue(contem(avisos(meta("Mensalidade por R$ 460. Agende hoje."), partir), "preço fora da forma combinada"))
+        self.assertFalse(contem(avisos(meta("Mensalidade a partir de R$ 460. Agende hoje."), partir), "forma combinada"))
+        # número de prova em reais não é preço
+        self.assertFalse(contem(avisos(meta("R$ 2 milhões em bolsas concedidas. Agende hoje."), nunca), "mostrar preço"))
+        # sem regra do cliente, o segmento manda: imobiliário mostra parcela no anúncio
+        imob = contrato(lambda d: d["cliente"].update(playbook="imobiliario"))
+        self.assertTrue(contem(avisos(meta("Apartamento por R$ 450 mil. Agende hoje."), imob), "(parcela)"))
+
+    def test_registro_profissional(self):
+        c = contrato(lambda d: d["compliance"].update(registros_profissionais=["CRO-PR 12345"]))
+        self.assertTrue(contem(avisos(meta("Turma de até 6. Agende hoje."), c, nivel="atencao"),
+                               "falta o registro profissional (CRO-PR 12345)"))
+        self.assertFalse(contem(avisos(meta("Turma de até 6. CRO-PR 12345. Agende hoje."), c), "registro profissional"))
+        # registro na arte conta
+        na_arte = peca(PT01, lambda d: (d.pop("aprovacao"), d.update(estado="refinado"),
+                                        d["meta"]["arte"].update(registro_na_arte=True)))
+        self.assertFalse(contem(avisos(na_arte, c), "registro profissional"))
+
+    def test_saude_antes_e_depois(self):
+        c = contrato(lambda d: d["compliance"].update(registros_profissionais=["CRO-PR 12345"],
+                                                      regras_legais=["CFO: sem antes e depois"]))
+        a = avisos(meta("Veja o antes e depois. CRO-PR 12345. Agende hoje."), c, nivel="atencao")
+        self.assertTrue(contem(a, "antes e depois ou prazo de resultado em saúde"))
+        self.assertTrue(contem(a, "CFO: sem antes e depois"))
+
+    def test_promessa_de_ganho_com_ressalva_passa(self):
+        self.assertTrue(contem(avisos(meta("Ganhe R$ 5.000 a mais por mês. Agende hoje.")), "promessa de ganho"))
+        self.assertFalse(contem(avisos(meta("Ganhe R$ 5.000 a mais por mês. Resultados variam. Agende hoje.")),
+                                "promessa de ganho"))
+        self.assertFalse(contem(avisos(meta("Ganhe 2 aulas extras. Agende hoje.")), "promessa de ganho"))
+
+    def test_urgencia_precisa_de_motivo(self):
+        sem_motivo = contrato(lambda d: next(o for o in d["ofertas"] if o["id"] == "conversacao-adultos")["urgencia"]
+                              .update(motivo=""))
+        texto = "Últimos dias para entrar na turma de novembro. Agende hoje."
+        p = meta(texto, oferta="conversacao-adultos")
+        self.assertFalse(contem(avisos(p), "não tem urgência ou escassez reais"))  # escassez real com evidência basta
+        sem_nada = contrato(lambda d: next(o for o in d["ofertas"] if o["id"] == "conversacao-adultos").update(escassez=None))
+        sem_nada_e_sem_motivo = contrato(lambda d: (
+            next(o for o in d["ofertas"] if o["id"] == "conversacao-adultos").update(escassez=None),
+            next(o for o in d["ofertas"] if o["id"] == "conversacao-adultos")["urgencia"].update(motivo="")))
+        self.assertFalse(contem(avisos(p, sem_nada), "não tem urgência ou escassez reais"))
+        self.assertTrue(contem(avisos(p, sem_nada_e_sem_motivo, nivel="bloqueia"), "não tem urgência ou escassez reais"))
+        del sem_motivo
+
+    def test_gravidade_desligada(self):
+        from trilha_copy import padrao as pd
+        r = pd.carregar().regra("ritmo_monotono")
+        antiga = r.gravidade
+        try:
+            r.gravidade = "desligada"
+            monotono = " ".join(["Você fala na aula toda semana."] * 6)
+            self.assertFalse(contem(avisos(meta(monotono)), "mesmo tamanho"))
+        finally:
+            r.gravidade = antiga
+
+
+class TestRevisarPagina(Base):
+    """A página da Trilha-LP revisada com as mesmas regras de texto."""
+
+    def pagina(self, mudar=None):
+        dados = {
+            "pagina": {"id": "x", "cliente": "_exemplo", "oferta": "conversacao-adultos", "segmento": "escola",
+                       "origem": "meta", "titulo_seo": "Inglês para adultos", "descricao_seo": "Turma de até 6 alunos"},
+            "marca": {"nome": "Escola", "registro_profissional": ""},
+            "contato": {"mensagem_whatsapp": "Oi! Vim pela página (PT01)"},
+            "topo": {"titulo": "Fale inglês na reunião em turmas de até 6", "subtitulo": "Você treina conversa desde a "
+                     "primeira aula, no seu nível, com situações do seu trabalho.", "provas": ["Turma de até 6 alunos"],
+                     "cta": {"texto": "Agendar aula experimental"}},
+            "beneficios": {"titulo": "Você fala desde a primeira aula", "itens": [
+                {"titulo": "Turma de até 6", "texto": "Você fala a maior parte da aula."}]},
+            "como_funciona": {"titulo": "Como funciona a aula experimental", "passos": []},
+            "objecoes": {"titulo": "Dúvidas antes de começar", "itens": [
+                {"pergunta": "E se eu não gostar?", "resposta": "Você cancela no primeiro mês, sem multa."}]},
+            "fechamento": {"titulo": "Sua vaga na turma de novembro", "subtitulo": "", "lista": []},
+            "formulario": {"botao": "Quero minha aula experimental"},
+        }
+        if mudar:
+            mudar(dados)
+        return dados
+
+    def test_pagina_boa_passa(self):
+        from trilha_copy.revisao import revisar_pagina
+        self.assertEqual([a.texto for a in revisar_pagina(self.pagina(), contrato()) if a.nivel == "bloqueia"], [])
+
+    def test_regras_de_pagina(self):
+        from trilha_copy.revisao import revisar_pagina
+        def mudar(d):
+            d["beneficios"]["titulo"] = "Benefícios"
+            d["formulario"]["botao"] = "Enviar"
+            d["objecoes"]["itens"][0]["resposta"] = "Entre em contato."
+            d["topo"]["titulo"] = ("Fluência garantida em poucos meses para quem trava no inglês do trabalho e quer "
+                                   "falar nas reuniões")
+        a = [x.texto for x in revisar_pagina(self.pagina(mudar), contrato())]
+        for trecho in ('beneficios.titulo: título genérico ("Benefícios")', 'formulario.botao: botão genérico ("Enviar")',
+                       "objecoes.itens[0]: objeção sem resposta", 'termo proibido — "fluência garantida"',
+                       "topo.titulo com 98 caracteres"):
+            self.assertTrue(contem(a, trecho), trecho)
+
+    def test_linha_de_comando(self):
+        caminho = self.tmp / "pagina.yaml"
+        caminho.write_text(yaml.safe_dump(self.pagina(), allow_unicode=True), encoding="utf-8")
+        rc, saida = rodar("revisar-pagina", caminho, "--contrato", self.pasta)
+        self.assertEqual(rc, 0, saida)
+        ruim = self.pagina(lambda d: d["topo"].update(titulo="Imperdível: fale inglês"))
+        caminho.write_text(yaml.safe_dump(ruim, allow_unicode=True), encoding="utf-8")
+        self.assertEqual(rodar("revisar-pagina", caminho, "--contrato", self.pasta)[0], 1)
 
 
 class TestRoteirosECriativo(Base):

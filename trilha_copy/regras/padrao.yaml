@@ -1,0 +1,1576 @@
+# Padrão de texto da Trilha: o arquivo canônico.
+#
+# Vale para todo texto que o público lê: anúncio, roteiro, página e as afirmações do briefing que viram copy.
+# O Trilha-copy revisa anúncio, roteiro e página com este arquivo. O Trilha-briefing e a Trilha-LP guardam uma
+# cópia dos vocabulários que usam, e a CI deles confere a cópia contra este arquivo: mudou aqui, atualize lá.
+#
+# Para mudar uma regra, mude aqui: a gravidade (bloqueia, atencao, sugestao ou desligada), a mensagem, os
+# vocabulários, os parâmetros. Mensagens usam {campos} preenchidos pela revisão (onde, trecho, termo, n…).
+# Divergências entre as ferramentas e o que ficou de fora: docs/padrao-de-texto.md.
+
+versao: 2026-10
+gravidades:
+  bloqueia: 'Não vai ao ar assim: risco jurídico (CDC, CONAR, conselho profissional), recusa da plataforma, afirmação falsa
+    ou sem lastro, ou algo que o cliente proibiu. A revisão sai com erro e a peça não avança nem é aprovada.'
+  atencao: 'Vai custar caro ou sair fraco: reprovação provável, texto cortado, promessa que não convence, falta de concretude.
+    Não trava, mas o assessor lê e decide.'
+  sugestao: 'Melhora a peça: ritmo, palavras do cliente, adjetivo trocado por fato.'
+notacao:
+  normalizacao: 'NFKD, depois ASCII, depois minúsculas (trilha_copy/texto.py::normalizar). Todo item dos vocabulários já está
+    normalizado: sem acento e em minúsculas.'
+  termo: Item simples casa como termo inteiro no texto normalizado, com borda de palavra dos dois lados (a mesma de texto.py::contem_termo).
+    "so ate" casa com "Só até sexta", mas não com "isso até"; "corra" casa com "Corra!", mas não com "ocorra".
+  radical: 'Item terminado em * casa no começo de uma palavra: "revolucionari*" pega revolucionário e revolucionária; "garantid*"
+    pega garantido e garantida, mas não garantia.'
+  regex: Item começado por "re:" é expressão regular aplicada ao texto normalizado, com borda de palavra no começo e no fim.
+principios:
+- id: servico_nao_marca
+  principio: 'Anúncio é venda multiplicada: fale do que a pessoa ganha, não de quem a empresa é.'
+  explicacao: 'O teste é o do vendedor: um bom vendedor diria isso com o cliente na frente dele? Autoelogio, pedido egoísta
+    ("exija", "evite imitações") e título que apresenta a empresa afastam quem lê.'
+  fonte: 'aulas-copy-1-e-2.txt, Aula 1 (Hopkins: "Advertising is multiplied salesmanship"; "The best ads ask no one to buy";
+    "The greatest two faults in advertising lie in boasts and in selfishness"); aula-landing-page.txt (o título não explica
+    quem a empresa é); trilha-copywritter/docs/metodo.md §2 e §3.'
+  regras:
+  - fala_de_si
+  - frase_egoista
+- id: fato_no_lugar_de_adjetivo
+  principio: 'Concretude obrigatória: número, nome próprio ou detalhe no lugar do adjetivo.'
+  explicacao: '"Barbear em 78 segundos" e não "barbear rápido"; "a 500 m do Shopping Pátio" e não "perto de tudo". Se você
+    só pudesse apontar, para o que apontaria?'
+  fonte: 'Trilha/docs/arquitetura/nucleo.md §1, princípio 6 ("Copy sem número, fato ou nome próprio é barrada"); beatriz-moraes082/briefing-trilha/skills/fluxos-imobiliarios/SKILL.md
+    ("Apelos comerciais reais do produto — indispensável"); aulas-copy-1-e-2.txt, Aula 1 (Hopkins: 78 segundos, lucro de 3%);
+    aula-copy-3.txt (Concrete; teste do surdo-mudo); trilha-briefing/docs/metodo.md, princípio 4.'
+  regras:
+  - vago_sem_fato
+  - peca_sem_concretude
+  - promessa_incobravel
+- id: tudo_tem_lastro
+  principio: 'Tudo o que a peça afirma vem do briefing: número, prova, promessa, urgência.'
+  explicacao: Faltou algo, volta ao briefing; não se inventa na peça. Prova só entra com fonte (número) ou autorização (depoimento),
+    e convence mais quando se parece com quem lê.
+  fonte: trilha_copy/contrato.py ("A copy não inventa nada sobre o cliente"); trilha-copywritter/docs/metodo.md §1; aula-copy-3.txt
+    ("Trust is belief with evidence"; "proof is relative"); curso-marketing.txt ("Para cada promessa, uma prova").
+  regras:
+  - numero_sem_lastro
+  - prova_nao_utilizavel
+  - prova_de_outra_persona
+  - validada_sem_evidencia
+  - afirmacao_sem_fonte
+- id: promessa_cobravel_e_crivel
+  principio: Promessa com resultado observável, prazo e para quem vale, do tamanho em que esse público acredita.
+  explicacao: Promessa que dá para cobrar diferencia; promessa grande demais vira "bom demais para ser verdade". Nunca garantir
+    o que não depende só da empresa (valorização, aprovação, renda, cura).
+  fonte: trilha-briefing/docs/metodo.md, princípio 5; curso-marketing.txt (promessa SMART; "tá bom demais para ser verdade");
+    aulas-copy-1-e-2.txt, Aula 2 (confusing, unbelievable, boring; "Do your claims match your audience's current belief?");
+    trilha-lp/docs/estrutura.md (nada de valorização garantida).
+  regras:
+  - promessa_incobravel
+  - garantia_de_resultado
+  - promessa_de_ganho
+- id: prioridade_real
+  principio: Urgência e escassez só quando são reais, específicas e com motivo.
+  explicacao: Prazo inventado é publicidade enganosa e queima a confiança. Sem urgência real, use o custo de não agir.
+  fonte: 'aulas-copy-1-e-2.txt, Aula 2, módulo de urgência e escassez ("It must be real… combine with a reason why… don''t
+    do fake scarcity"); aula-copy-3.txt (priority: escassez, urgência e custo de não agir); trilha-copywritter/docs/metodo.md
+    §5 ("Urgência falsa não é técnica, é publicidade enganosa").'
+  regras:
+  - urgencia_ou_escassez_sem_lastro
+  - urgencia_vencida
+- id: compliance_e_condicao
+  principio: O que o cliente, a lei e a plataforma proíbem não vai ao ar; regra de segmento entra por condição.
+  explicacao: 'Termos e promessas proibidos, atributos pessoais, registro profissional, regra de preço por canal. A ferramenta
+    serve para qualquer segmento: a regra do imobiliário ou da saúde só vale quando o cliente declara o segmento, e mora em
+    dados (playbook, briefing), nunca no código.'
+  fonte: Trilha/docs/arquitetura/nucleo.md §1, princípios 1 e 10; trilha-lp/README.md ("as regras de um segmento só valem
+    quando a página declara esse segmento"); Trilha/playbooks/imobiliario/playbook.yaml (compliance, regras_comerciais_padrao);
+    decisão atual em trilha_copy/revisao.py::_compliance.
+  regras:
+  - termo_ou_promessa_proibida
+  - atributo_pessoal
+  - exclusao_de_publico
+  - preco_proibido_no_canal
+  - preco_sem_forma_combinada
+  - registro_profissional_ausente
+  - antes_e_depois_em_saude
+  - concorrente_citado
+- id: uma_pessoa_nas_palavras_dela
+  principio: Escreva para uma pessoa, com as palavras que ela usa, sobre o desejo e a situação dela.
+  explicacao: Frases literais da escuta voltam para o anúncio. Falar da situação ("organize as contas do mês") e nunca afirmar
+    quem a pessoa é ("você está endividado?").
+  fonte: 'aulas-copy-1-e-2.txt, Aula 1 (Hopkins: "We must treat people in advertising as we treat them in person"); aula-copy-3.txt
+    (transcrever as ligações de venda e devolver as frases; Conversational); trilha_copy/revisao.py::_compliance (atributo
+    pessoal, Meta).'
+  regras:
+  - sem_palavras_da_persona
+  - atributo_pessoal
+  - fala_de_si
+- id: uma_ideia_uma_chamada
+  principio: Uma ideia por peça, uma chamada, um objetivo por página.
+  explicacao: Ideias demais diluem a mensagem; dois objetivos criam dúvida. A chamada diz quem, o quê, até quando e como.
+  fonte: curso-marketing.txt ("Uma ideia por COP"; "Só é um único CTA"); aula-copy-3.txt ("one CTA to one avatar to one offer";
+    CTA who, what, when, how); trilha-lp/docs/estrutura.md, princípio 2; aulas-copy-1-e-2.txt, Aula 2 ("Have you stuck to
+    the one big idea?").
+  regras:
+  - chamada_sem_quando
+  - cta_generico
+  - roteiro_sem_chamada
+  - meta_sem_botao
+- id: claro_conciso_com_ritmo
+  principio: 'Claro, curto e com ritmo: frases simples, palavras comuns, tamanhos variados.'
+  explicacao: Quem lê está ocupado e distraído. Leitura difícil e frases todas iguais fazem a pessoa desistir no meio.
+  fonte: 'aula-copy-3.txt (os 5 Cs: clear, concise, concrete, conversational, cadence; teste do bombeiro); aulas-copy-1-e-2.txt,
+    Aula 2 ("Third to fifth grade reading level"); trilha_copy/texto.py.'
+  regras:
+  - leitura_dificil
+  - ritmo_monotono
+  - texto_longo_para_a_tela
+- id: titulo_escolhe_quem_le
+  principio: O título escolhe quem lê e carrega a promessa principal; título de bloco diz o benefício.
+  explicacao: 'Muita gente só lê os títulos. Trocar só o título muda muito o retorno do mesmo anúncio: escreva muitos, descarte
+    a maioria.'
+  fonte: 'aulas-copy-1-e-2.txt, Aula 1 (Hopkins: "The purpose of a headline is to pick out people you could interest"; "Your
+    main appeal should lie in your headline"); aula-landing-page.txt ("real people, real results… horrible headline"; ler
+    só os títulos); trilha-copywritter/docs/metodo.md §2 (10 rascunhos).'
+  regras:
+  - titulo_de_bloco_generico
+  - titulo_sem_palavra_chave
+  - gancho_depois_de_3s
+- id: voz_combinada
+  principio: 'A voz é a combinada com o cliente: intensidade, termos, exemplos de assim sim e assim não, pessoa gramatical.'
+  explicacao: O termostato de 1 (sóbrio) a 5 (euforia de lançamento) limita exclamação, CAIXA ALTA e palavra de euforia. A
+    assinatura (marca, pessoa, marca e pessoa) define se o texto diz "nós" ou "eu".
+  fonte: aulas-copy-1-e-2.txt, Aula 2 ("If you push on these emotions too hard, your copy might come off as very salesy… unbelievable");
+    trilha_briefing/esquema.py (Voz.intensidade); Trilha/docs/arquitetura/nucleo.md §5.1 (assinatura define a pessoa gramatical);
+    beatriz-moraes082/briefing-trilha/README.md (como o contexto muda a copy).
+  regras:
+  - intensidade_acima_da_combinada
+  - termo_ou_promessa_proibida
+  - fala_de_si
+- id: regua_e_a_venda
+  principio: 'A régua é a venda, não o clique: a peça provoca a micro-ação sem sabotar a macro.'
+  explicacao: Gancho que dá clique de curioso sem perfil derruba o funil. Curiosidade presa à dor ou ao desejo da persona;
+    a peça também filtra quem não é cliente.
+  fonte: mensagens-internas-trilha.txt ("custo por lead baixo com lead que não fecha é prejuízo disfarçado de eficiência");
+    aulas-copy-1-e-2.txt, Aula 2 (micro-ação sem comprometer a macro); trilha-copywritter/docs/metodo.md §2 e §5; trilha-lp/docs/estrutura.md,
+    princípio 4.
+  regras:
+  - promessa_de_ganho
+  - peca_sem_concretude
+- id: funil_coerente
+  principio: Anúncio, página e WhatsApp dizem a mesma coisa, ligados pelo código da célula.
+  explicacao: A primeira dobra da página continua a promessa do anúncio que trouxe a pessoa; o código da célula vai no utm_content
+    e na mensagem do WhatsApp.
+  fonte: Trilha/docs/arquitetura/nucleo.md §1, princípio 7, e §5.4; curso-marketing.txt (a primeira sessão "tem que estar
+    conectada com o anúncio que ele viu"); trilha-lp/README.md.
+  regras:
+  - celula_inexistente
+  - peca_diferente_da_celula
+- id: objecao_real
+  principio: 'Não somos genéricos: cada peça trata uma objeção real, com a resposta que o time usa ao vivo.'
+  explicacao: No imobiliário, os três eixos (preço, produto, localização) são obrigatórios na régua. Produto difícil de vender
+    no presencial pede contorno de objeção já no criativo.
+  fonte: beatriz-moraes082/briefing-trilha/skills/fluxos-imobiliarios/SKILL.md e references/objecoes_e_apelos.md; mensagens-internas-trilha.txt
+    ("argumentação de contorno de objeção já no criativo"); curso-marketing.txt ("para cada aumento de consciência, uma quebra
+    de objeção"); trilha-lp/docs/estrutura.md §5.
+  regras:
+  - objecao_sem_resposta
+  - diferencial_sem_e_dai
+- id: aponta_e_testa
+  principio: A revisão aponta, o assessor decide e o teste diz o que funciona.
+  explicacao: O que dá para conferir virou regra; o que depende de julgamento virou pergunta ou campo da peça (teste do vendedor,
+    dormir sobre a peça). Ângulo positivo ou negativo é variável de teste, não regra; anúncio que funciona não se troca por
+    cansaço de quem o vê todo dia.
+  fonte: 'trilha-copywritter/docs/metodo.md (abertura, §2 e §5); Trilha/docs/arquitetura/nucleo.md §1, princípio 11; aulas-copy-1-e-2.txt,
+    Aula 1 (Hopkins: "We must submit all things in advertising to the court of public opinion"; não trocar o anúncio que funciona).'
+  regras:
+  - aprovacao_invalidada
+parametros:
+  numero_relevante: 2 dígitos ou mais, ou com R$, ou com % (texto.py::numeros_relevantes)
+  limite_exagero_por_intensidade:
+    1: 0
+    2: 1
+    3: 2
+    4: 4
+    5: 99
+  fala_de_si_minimo_nos: 2
+  concorrente_minimo_letras: 4
+  legibilidade:
+    indice: 'Flesch adaptado ao português (Martins et al., 1996): 248,835 − 1,015 × palavras/frase − 84,6 × sílabas/palavra'
+    dificil_abaixo_de: 50
+    minimo_palavras: 30
+  ritmo:
+    coeficiente_de_variacao_minimo: 0.25
+    minimo_frases: 4
+  meta:
+    textos_principais:
+      minimo: 1
+      maximo: 5
+      recomendado_gancho: 125
+    titulos:
+      minimo: 1
+      maximo: 5
+      recomendado: 40
+    descricoes:
+      minimo: 0
+      maximo: 5
+      recomendado: 30
+  google_rsa:
+    titulos:
+      minimo: 3
+      maximo: 15
+      rigido: 30
+    descricoes:
+      minimo: 2
+      maximo: 4
+      rigido: 90
+    caminhos:
+      minimo: 0
+      maximo: 2
+      rigido: 15
+    titulos_recomendados: 10
+  roteiro:
+    palavras_por_segundo: 2.5
+    folga_palavras: 2
+    gancho_segundos: 3
+    folga_duracao_segundos: 1
+  pagina:
+    topo_titulo_maximo: 90
+    descricao_seo_maximo: 155
+  estados_sem_minimo:
+  - fundacao
+  - rascunho
+  janela_garantia_palavras: 8
+  janela_preco_palavras: 3
+  registro_por_segmento:
+    imobiliario:
+    - CRECI
+    saude:
+    - CRM
+    - CRO
+    - CRP
+    - CRN
+    - CREFITO
+    - COREN
+    - CRF
+    - CRBM
+    educacao_fisica:
+    - CREF
+    juridico:
+    - OAB
+  preco_padrao_por_segmento:
+    imobiliario:
+      anuncio: parcela
+      landing: a_partir_de
+      whatsapp: nunca
+vocabularios:
+  adjetivo_vago:
+  - melhor
+  - melhores
+  - qualidade
+  - excelencia
+  - excelente
+  - excelentes
+  - incrivel
+  - lider
+  - unico no mercado
+  - top
+  - otimo
+  - otima
+  - otimos
+  - otimas
+  - diferenciad*
+  - inovador*
+  - privilegiad*
+  - padrao superior
+  - perto de tudo
+  - regiao em crescimento
+  - solucao completa
+  - solucoes completas
+  - atendimento personalizado
+  - atendimento diferenciado
+  - profissionais qualificados
+  - equipe qualificada
+  - equipe especializada
+  - ampla experiencia
+  - anos de experiencia
+  - referencia no mercado
+  - referencia em
+  - menor preco
+  - precos baixos
+  - preco justo
+  - condicoes especiais
+  - condicao especial
+  - comprovad*
+  prova_vaga:
+  - milhares de
+  - centenas de
+  - diversos clientes
+  - varios clientes
+  - muitos clientes
+  - inumeros
+  - inumeras
+  - muita gente
+  - explodiu
+  - bombou
+  - sucesso absoluto
+  - empresas confiam
+  - lideres do setor
+  exagero:
+  - incrivel
+  - inacreditavel
+  - revolucionari*
+  - explosiv*
+  - chocante
+  - insan*
+  - absurd*
+  - segredo*
+  - nunca visto
+  - garantid*
+  - imperdivel
+  - ultima chance
+  - corra
+  - urgente
+  - milagr*
+  - magic*
+  - definitiv*
+  - extraordinari*
+  - surreal
+  - sem esforco
+  - ficar rico
+  - enriquec*
+  - bomba
+  - bombastic*
+  - oportunidade unica
+  - sensacional
+  - espetacular
+  - fantastic*
+  - imbativel
+  - irresistivel
+  urgencia:
+  - ultimas vagas
+  - ultimas unidades
+  - ultimos dias
+  - so hoje
+  - so ate
+  - acaba hoje
+  - termina hoje
+  - vagas limitadas
+  - por tempo limitado
+  - ultima chance
+  - corra
+  - encerra*
+  - nao perca
+  - urgente
+  - ultimas horas
+  - ultimo lote
+  - ultima turma
+  - ultima oportunidade
+  - somente hoje
+  - apenas hoje
+  - so amanha
+  - poucas vagas
+  - poucas unidades
+  - estoque limitado
+  - unidades limitadas
+  - ate esgotar
+  - enquanto durar*
+  - oferta relampago
+  - agora ou nunca
+  - prazo final
+  - virada de lote
+  - esgotando
+  - quase esgotad*
+  - re:restam? (so |apenas )?\d+
+  - re:faltam (so |apenas )?\d+ (dias|horas|vagas|unidades|lugares)
+  - re:(o )?preco (sobe|aumenta) (amanha|na segunda|semana que vem)
+  atributo_pessoal:
+  - acima do peso
+  - obes*
+  - gordo
+  - gorda
+  - gordura
+  - diabet*
+  - depressao
+  - depressiv*
+  - deprimid*
+  - ansiedade
+  - ansios*
+  - doenc*
+  - cancer*
+  - calvicie
+  - careca
+  - acne
+  - divida
+  - dividas
+  - endividad*
+  - nome sujo
+  - negativad*
+  - falid*
+  - desempregad*
+  - pobre*
+  - gay
+  - gays
+  - lesbica*
+  - bissexua*
+  - transgener*
+  - evangelic*
+  - catolic*
+  - religiao
+  - religioso
+  - religiosa
+  - deficien*
+  - gravida
+  - gravidas
+  - gravidez
+  - infertil
+  - solteir*
+  - divorciad*
+  - celulite
+  - estrias
+  - flacidez
+  - calvo
+  - queda de cabelo
+  - menopausa
+  - impotencia
+  - disfuncao eretil
+  - hipertens*
+  - colesterol
+  - insonia
+  - tdah
+  - autis*
+  - viciad*
+  - alcoolatra
+  - alcoolismo
+  - nome no spc
+  - nome no serasa
+  - score baixo
+  - inadimplent*
+  - falencia
+  - idos*
+  - terceira idade
+  - homossexua*
+  - trans
+  - lgbt*
+  - umbanda
+  - candomble
+  - espirita*
+  - muculman*
+  - judeu
+  - judia
+  - ateu
+  - ateia
+  - cadeirante
+  - mae solo
+  - mae solteira
+  - gestante
+  pronomes_leitor:
+  - voce
+  - voces
+  - vc
+  - seu
+  - sua
+  - seus
+  - suas
+  - te
+  - ti
+  - contigo
+  pronomes_marca:
+  - nosso
+  - nossa
+  - nossos
+  - nossas
+  - somos
+  - conosco
+  - a gente
+  pronomes_pessoa:
+  - eu
+  - meu
+  - minha
+  - meus
+  - minhas
+  - comigo
+  frase_egoista:
+  - exija
+  - nao aceite imitacoes
+  - evite imitacoes
+  - cuidado com imitacoes
+  - somos lideres
+  - lider de mercado
+  - lideres de mercado
+  - a melhor empresa
+  - os melhores do mercado
+  - nossa missao
+  - temos orgulho
+  - orgulho em
+  - nos orgulhamos
+  - nao aceite substitutos
+  - cuidado com falsificacoes
+  - insista
+  - somos os melhores
+  - somos referencia
+  - a maior empresa
+  - ninguem faz como nos
+  promessa_de_ganho:
+  - ganh*
+  - fatur*
+  - lucr*
+  - renda extra
+  - renda mensal
+  - renda passiva
+  - dinheiro extra
+  - ficar rico
+  - enriquec*
+  - milionari*
+  - primeiro milhao
+  - independencia financeira
+  - liberdade financeira
+  - rentabilidade
+  - rendiment*
+  - valoriz*
+  - re:retorno de \d
+  - re:dobr\w* (o |a |seu |sua )?(salario|faturamento|renda|vendas|lucro)
+  ressalva_de_resultado:
+  - resultados variam
+  - resultado varia
+  - nao e garantia
+  - nao ha garantia
+  - sem garantia de
+  - resultado individual
+  - resultados individuais
+  - nao e resultado tipico
+  - nao representa resultado tipico
+  - nao representa a media
+  - re:resultado (dela|dele|do cliente|da cliente)
+  garantia_de_resultado:
+  - resultado garantido
+  - resultados garantidos
+  - sucesso garantido
+  - 100% garantido
+  - risco zero
+  - sem risco
+  - sem riscos
+  - retorno certo
+  - lucro certo
+  - lucro garantido
+  - retorno garantido
+  - renda garantida
+  - valorizacao garantida
+  - valorizacao certa
+  - aprovacao garantida
+  - credito garantido
+  - financiamento garantido
+  - cura definitiva
+  - emagrecimento garantido
+  - fluencia garantida
+  - aprovacao certa
+  - re:valoriza\w* garantid\w*
+  - re:garant\w* (de )?valoriza\w*
+  resultado_garantivel:
+  - resultado*
+  - valoriz*
+  - aprovac*
+  - aprovad*
+  - credito
+  - financiamento
+  - renda
+  - retorno
+  - lucro
+  - cura
+  - emagrec*
+  - fluencia
+  - emprego
+  - vendas
+  - faturamento
+  inversao_de_risco:
+  - dinheiro de volta
+  - devolucao
+  - devolvemos
+  - re:garantia de \d+ dias
+  - re:\d+ dias de garantia
+  - garantia incondicional
+  - teste gratis
+  - sem compromisso
+  - cancele quando quiser
+  exclusao_de_publico:
+  - so para mulheres
+  - so para homens
+  - apenas para mulheres
+  - apenas para homens
+  - exclusivo para mulheres
+  - exclusivo para homens
+  - ideal para casais
+  - ideal para jovens
+  - nao aceitamos
+  - re:(so|apenas|exclusivo) para (jovens|idosos|casais|solteiros|casados|familias|estrangeiros)
+  - re:(so|apenas|exclusivo) para (maiores|menores) de \d+
+  - re:(para quem tem|pessoas com|pessoas de|publico de|clientes de|candidatos de) (ate|mais de|acima de) \d+ anos
+  titulo_generico:
+  - depoimentos
+  - nossos depoimentos
+  - o que dizem nossos clientes
+  - o que nossos clientes dizem
+  - pessoas reais resultados reais
+  - resultados reais
+  - como funciona
+  - nossos diferenciais
+  - diferenciais
+  - beneficios
+  - sobre nos
+  - quem somos
+  - avaliacoes
+  - nossas avaliacoes
+  - veja o que dizem
+  - o que dizem sobre nos
+  - por que nos escolher
+  - por que escolher a gente
+  - nossos servicos
+  - servicos
+  - vantagens
+  - nossas vantagens
+  - nossa equipe
+  - passo a passo
+  - etapas
+  - fale conosco
+  - contato
+  cta_generico:
+  - enviar
+  - envie
+  - clique aqui
+  - saiba mais
+  - quero saber mais
+  - entre em contato
+  - fale conosco
+  - cadastrar
+  - cadastre-se
+  - confirmar
+  - continuar
+  - ok
+  - submit
+  quando_da_chamada:
+  - hoje
+  - agora
+  - amanha
+  - ate
+  - esta semana
+  - essa semana
+  - neste mes
+  - nesse mes
+  - ainda
+  - re:dia \d+
+  - re:\d+ de [a-z]+
+  preco_valor:
+  - re:r\$ ?\d
+  preco_contexto:
+  - por
+  - a partir de
+  - desde
+  - apenas
+  - so
+  - valor
+  - valores
+  - preco
+  - custa
+  - investimento
+  - entrada
+  - parcela*
+  - mensalidade
+  - a vista
+  - ao mes
+  - por mes
+  - re:\d+ ?x
+  forma_a_partir_de:
+  - a partir de
+  - desde
+  - valores a partir
+  forma_parcela:
+  - parcela*
+  - mensal
+  - mensais
+  - mensalidade*
+  - por mes
+  - ao mes
+  - /mes
+  - re:\d+ ?x( de)?
+  promessa_proibida_imobiliario:
+  - aprovacao garantida
+  - credito garantido
+  - financiamento garantido
+  - sem consulta
+  - sem consulta ao spc
+  - sem consulta ao serasa
+  - sem analise de credito
+  - valorizacao garantida
+  - retorno garantido
+  promessa_proibida_saude:
+  - cura
+  - curar
+  - cura definitiva
+  - resultado garantido
+  - sem efeitos colaterais
+  - 100% seguro
+  - o melhor medico
+  - o melhor dentista
+  - milagr*
+  - re:(perca|emagreca|elimine) \d+ ?(kg|quilos)
+  antes_e_depois:
+  - antes e depois
+  - re:antes (x|/) ?depois
+  - re:resultado em \d+ (dias|semanas|sessoes)
+regras:
+- id: termo_ou_promessa_proibida
+  grupo: compliance
+  o_que: Nenhum texto público usa termo ou promessa que a marca, o compliance do cliente ou o padrão do segmento proíbem.
+  como_detectar: Lista = voz.termos_proibidos ∪ compliance.termos_proibidos ∪ compliance.promessas_proibidas do cliente ∪
+    promessa_proibida_<segmento> do playbook (imobiliario, saude), sem repetidos depois de normalizar. O motivo é "termo proibido"
+    (voz), "promessa proibida" (compliance) ou "proibido no segmento" (playbook). Procura cada item como termo inteiro em
+    cada campo público. Um aviso por campo e termo. Na página, as listas vêm do copy.yaml do cliente, não da cópia gravada
+    no pagina.yaml.
+  gravidade: bloqueia
+  aplica_a:
+  - briefing
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa:
+  - promessa_proibida_imobiliario
+  - promessa_proibida_saude
+  fonte: 'decisão atual em trilha_copy/revisao.py::_compliance, trilha_briefing/revisao.py::_copy e trilha_lp/revisao.py::revisar;
+    listas do segmento: Trilha/docs/arquitetura/nucleo.md §5.1 (regras_comerciais.promessas_proibidas) e trilha-lp/docs/estrutura.md
+    (Regras do imobiliário).'
+  mensagem: '{onde}: {motivo} — "{termo}". Não vai ao ar assim: troque o termo. Se a regra mudou, mude a lista no briefing
+    e exporte de novo, não aqui.'
+  exemplo_ruim: Fluência garantida em 3 meses! (escola cujo briefing proíbe "fluência garantida")
+  exemplo_bom: Em 4 meses, a Carla passou a conduzir a reunião semanal em inglês.
+- id: garantia_de_resultado
+  grupo: compliance
+  o_que: 'Não garantir resultado que não depende só da empresa: valorização, aprovação de crédito, renda, cura, fluência,
+    vendas.'
+  como_detectar: 'Por frase: (a) algum item de garantia_de_resultado; ou (b) "garant*" a até 8 palavras (janela_garantia_palavras),
+    na mesma frase, de um item de resultado_garantivel, em qualquer ordem. "Garanta sua vaga" não dispara: vaga não é resultado.
+    Exceção: a frase fala de inversão de risco (inversao_de_risco) e a oferta tem inversao_risco ou condição equivalente no
+    briefing; garantia contratual ("carreira garantida por contrato") só passa se o texto do contrato estiver no briefing.'
+  gravidade: bloqueia
+  aplica_a:
+  - briefing
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa:
+  - garantia_de_resultado
+  - resultado_garantivel
+  - inversao_de_risco
+  fonte: decisão atual em trilha_lp/revisao.py (valorização garantida, só imobiliário), generalizada; trilha-lp/docs/estrutura.md;
+    curso-marketing.txt ("100.000 em 7 dias" tomava bloqueio no Facebook e no Google por ser promessa de ganho; "carreira
+    garantida por contrato" só porque havia contrato); aulas-copy-1-e-2.txt, Aula 2 ("This course will make you rich, guaranteed"
+    como copy inacreditável); assim_nao do cliente-exemplo do briefing ("Fluência garantida em 3 meses!").
+  mensagem: '{onde}: garante um resultado que não depende só da empresa ("{trecho}"). É promessa que não dá para cumprir e
+    vira publicidade enganosa (CDC). Mostre o que já aconteceu, com prova e fonte, ou garanta o que a empresa controla (prazo,
+    devolução, teste).'
+  exemplo_ruim: 'Valorização garantida: compre na planta e lucre na entrega.'
+  exemplo_bom: Lotes prontos na mesma rua custam hoje de 20% a 30% a mais (tabela das imobiliárias da região, mar/2026).
+- id: atributo_pessoal
+  grupo: compliance
+  o_que: 'Não afirmar nada sobre quem lê: saúde, finanças, idade, religião, orientação, origem.'
+  como_detectar: 'Por frase: há item de pronomes_leitor e item de atributo_pessoal na mesma frase ("Você está acima do peso?").
+    Frase sem você/seu não dispara ("Para quem quer perder peso" passa).'
+  gravidade: bloqueia
+  gravidade_por_contexto:
+    google_rsa: atencao
+    roteiro: atencao
+    pagina: atencao
+  aplica_a:
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa:
+  - pronomes_leitor
+  - atributo_pessoal
+  fonte: decisão atual em trilha_copy/revisao.py::_compliance (ATRIBUTOS_PESSOAIS, bloqueia no Meta e alerta nos outros);
+    política de atributos pessoais do Meta citada em trilha-copywritter/docs/metodo.md §5.
+  mensagem: '{onde}: possível afirmação sobre atributo pessoal de quem lê ("{frase}"): o Meta reprova; fale do desejo ou da
+    situação, não de quem a pessoa é.'
+  exemplo_ruim: Você está endividado e com o nome sujo?
+  exemplo_bom: Organize as contas do mês numa planilha que fecha em 15 minutos.
+- id: exclusao_de_publico
+  grupo: compliance
+  o_que: Não restringir nem excluir público por gênero, idade, estado civil ou família no texto.
+  como_detectar: 'Por frase: item de exclusao_de_publico. Idade só conta com sujeito de público ("para quem tem até 35 anos"),
+    para não pegar prazo ("financie em até 35 anos"). Sobe para bloqueia quando a peça é do Meta e a oferta está em categoria
+    especial (habitação, emprego, crédito): compliance.categoria_especial_anuncio do marca.yaml, ou playbook imobiliário com
+    categoria marcada.'
+  gravidade: atencao
+  gravidade_por_contexto:
+    meta_categoria_especial: bloqueia
+  aplica_a:
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa:
+  - exclusao_de_publico
+  fonte: 'trilha-copywritter/docs/metodo.md §5 ("Ganchos de identidade e promessa de renda (\"só para mulheres\"…) são pontos
+    de reprovação no Meta. Anúncio de oportunidade de trabalho pode cair em categoria especial"); Trilha/playbooks/imobiliario/playbook.yaml
+    (categoria_especial_anuncio: verificar); aula-copy-3.txt (o anúncio-exemplo "It''s only for women" é o tipo que reprova
+    aqui).'
+  mensagem: '{onde}: o texto restringe o público ("{trecho}"). Em habitação, emprego e crédito o Meta reprova e nem deixa
+    segmentar assim; nos outros casos, filtre pela situação ou pelo desejo, não por quem a pessoa é.'
+  exemplo_ruim: 'Só para casais jovens de até 35 anos: o apartamento ideal para começar a família.'
+  exemplo_bom: 'Apartamento de 2 quartos a 600 m da estação Vila Nova: para quem quer ir a pé para o metrô.'
+- id: promessa_de_ganho
+  grupo: compliance
+  o_que: Promessa de ganho com número diz de quem é o resultado e que ele não é o típico.
+  como_detectar: 'Por frase: item de promessa_de_ganho e número relevante na mesma frase. Para "ganh*", só conta número em
+    R$, % ou com "mil". Não avisa se a peça tem item de ressalva_de_resultado ou um dos compliance.avisos_legais do cliente.
+    Se a mesma frase também garante o resultado, quem responde é garantia_de_resultado.'
+  gravidade: atencao
+  aplica_a:
+  - briefing
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa:
+  - promessa_de_ganho
+  - ressalva_de_resultado
+  fonte: decisão atual em trilha_copy/revisao.py::_compliance (PROMESSA_DE_GANHO); curso-marketing.txt (promessa de ganho
+    bloqueada no Meta e no Google); trilha-copywritter/docs/metodo.md §5.
+  mensagem: '{onde}: promessa de ganho com número ("{frase}"): diga de quem é o resultado e que não é o típico (CDC e políticas
+    do Meta). Promessa de renda sem ressalva é motivo comum de reprovação.'
+  exemplo_ruim: Fature R$ 10 mil por mês revendendo nossos kits.
+  exemplo_bom: A Bruna faturou R$ 4.200 no 3º mês. É o resultado dela; a média da turma foi R$ 1.100.
+- id: concorrente_citado
+  grupo: compliance
+  o_que: 'Citar concorrente pelo nome só com o cliente sabendo: publicidade comparativa tem regras.'
+  como_detectar: Cada nome em concorrentes do briefing com 4 letras ou mais, como termo inteiro, em qualquer campo público.
+  gravidade: atencao
+  aplica_a:
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_compliance; trilha-copywritter/docs/metodo.md §3 (CONAR).
+  mensagem: 'cita o concorrente "{nome}": publicidade comparativa tem regras (CONAR); confirme com o cliente.'
+  exemplo_ruim: Mais barato que a Inglês Já e sem taxa de matrícula.
+  exemplo_bom: 'Sem taxa de matrícula: você paga só as aulas que faz.'
+- id: urgencia_ou_escassez_sem_lastro
+  grupo: lastro
+  o_que: Prazo ou vagas acabando só aparecem quando são reais, com motivo, e estão registrados no briefing.
+  como_detectar: 'Texto (anúncio, roteiro, página): a peça casa com item de urgencia e a oferta da peça (peca.oferta; na página,
+    pagina.oferta) não tem urgência válida nem escassez válida. Urgência válida = real e (motivo ou evidência) e (sem data
+    ou data ≥ hoje). Escassez válida = real e evidência. Briefing: escassez sem real e evidência, ou urgência sem real e (motivo
+    ou evidência), bloqueia mesmo antes de existir peça.'
+  gravidade: bloqueia
+  aplica_a:
+  - briefing
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa:
+  - urgencia
+  fonte: decisão atual em trilha_copy/revisao.py::_lastro com contrato.py::urgencia_valida/escassez_valida, e trilha_briefing/revisao.py::_copy;
+    aulas-copy-1-e-2.txt, Aula 2 ("It must be real. People can smell fake deadlines"; "combine with a reason why"; "don't
+    do fake scarcity"); CDC.
+  mensagem: '{onde}: fala em "{termo}", mas a oferta não tem urgência ou escassez reais no briefing (marcada como real, com
+    motivo ou evidência, dentro do prazo). Prazo ou vaga inventados são publicidade enganosa (CDC) e queimam a confiança:
+    registre a urgência no briefing ou tire a frase.'
+  exemplo_ruim: Últimas vagas! Corra que acaba hoje. (nada registrado no briefing)
+  exemplo_bom: 'Inscrições até 31/10: a turma noturna começa em 3 de novembro e não entra ninguém depois. (urgência real,
+    com motivo, no briefing)'
+- id: urgencia_vencida
+  grupo: lastro
+  o_que: Urgência com data passada é atualizada antes de ir para qualquer peça.
+  como_detectar: Oferta com urgencia.data anterior a hoje. Nas peças, urgência vencida já não vale como lastro (regra anterior).
+  gravidade: atencao
+  aplica_a:
+  - briefing
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_briefing/revisao.py::_copy.
+  mensagem: 'ofertas.{id}.urgencia vencida em {data}: atualize antes de usar em peças. Vencida, ela deixa de liberar palavras
+    de prazo nos anúncios e na página.'
+  exemplo_ruim: 'urgencia: {texto: Matrícula com desconto até 30/09, data: 2026-09-30} em outubro'
+  exemplo_bom: 'urgencia: {texto: Turma de novembro fecha em 31/10, data: 2026-10-31, motivo: turma só abre a cada 2 meses}'
+- id: numero_sem_lastro
+  grupo: lastro
+  o_que: Todo número que afirma algo vem de uma prova, da oferta ou da promessa aprovada no briefing.
+  como_detectar: 'Junta os números relevantes do briefing para a oferta da peça (provas, histórias, promessa, diferenciais,
+    bastidores, raridade, custo de não agir, como funciona, condições, urgência e data, escassez, antes e depois, promessa
+    da célula: revisao.py::_numeros_do_contrato). Todo número relevante de um campo público que não está nesse conjunto entra
+    num aviso por peça, com a lista dos números.'
+  gravidade: atencao
+  aplica_a:
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_lastro; trilha-copywritter/docs/metodo.md §3 ("Todo número tem lastro");
+    curso-marketing.txt ("Para cada promessa, uma prova").
+  mensagem: 'número(s) sem lastro no briefing ({numeros}): todo número precisa vir de uma prova, da oferta ou da promessa
+    aprovada. Se o número é verdadeiro, registre no briefing com a fonte e exporte de novo.'
+  exemplo_ruim: Mais de 5.000 alunos aprovados. (nenhuma prova com esse número)
+  exemplo_bom: 'Nota 4,9 com 87 avaliações no Google. (prova com fonte: perfil do Google)'
+- id: prova_nao_utilizavel
+  grupo: lastro
+  o_que: Só entra em anúncio e página a prova com fonte (número, autoridade, mídia, certificação) ou com autorização (depoimento,
+    case).
+  como_detectar: 'Peça: cada id em peca.provas existe no contrato (o contrato só traz provas utilizáveis). Página: cada depoimento
+    e número de prova_social e topo.provas corresponde a uma prova utilizável do briefing (pelo número ou pelo texto; pelo
+    id quando a página passar a citar ids). Briefing: prova de número, autoridade, mídia ou certificação sem fonte; depoimento
+    ou case sem autorização.'
+  gravidade: bloqueia
+  gravidade_por_contexto:
+    briefing: atencao
+  aplica_a:
+  - briefing
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_lastro e trilha_briefing/revisao.py::_provas (esquema.py::Provas.utilizaveis);
+    trilha-copywritter/docs/metodo.md §5 (autoridade por associação sem autorização esbarra no CONAR e no direito de imagem).
+  mensagem: '{onde}: a prova "{prova}" não é utilizável: {motivo}. Número precisa de fonte; depoimento e case precisam de
+    autorização de nome e imagem. Sem isso ela fica fora de anúncios e páginas (CONAR e direito de imagem).'
+  exemplo_ruim: '"Melhor escola da cidade!" — Dra. Paula, médica (sem autorização registrada)'
+  exemplo_bom: '"Na 4ª aula eu já apresentei o relatório em inglês." — Rafael, analista (autorizado, com data)'
+- id: prova_de_outra_persona
+  grupo: lastro
+  o_que: A prova usada se parece com quem lê.
+  como_detectar: 'Peça: prova citada com personas preenchido e sem a persona da peça. Briefing: depoimento ou case utilizável
+    sem personas (a copy não sabe para quem ele convence).'
+  gravidade: atencao
+  gravidade_por_contexto:
+    briefing: sugestao
+  aplica_a:
+  - briefing
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_lastro e trilha_briefing/revisao.py::_provas; aula-copy-3.txt ("proof is
+    relative… match the proof with your avatar").
+  mensagem: 'prova "{prova}" ({perfil}) é de outra persona: prova parecida com quem lê convence mais. Troque por uma do perfil
+    da persona ou marque no briefing para quem ela convence.'
+  exemplo_ruim: Anúncio para dono de oficina com depoimento de uma dentista.
+  exemplo_bom: 'Anúncio para dono de oficina com o caso do Paulo, da Auto Center Paulista: agenda cheia em 6 semanas.'
+- id: validada_sem_evidencia
+  grupo: lastro
+  o_que: Afirmação marcada como validada tem evidência registrada.
+  como_detectar: Item do briefing (dores, desejos, objeções, ganchos, SWOT, razões para acreditar, diferenciais, histórico)
+    com status validada e sem evidencia.
+  gravidade: atencao
+  aplica_a:
+  - briefing
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_briefing/revisao.py::_origem; trilha-briefing/docs/metodo.md, princípio 2 (hipótese até prova).
+  mensagem: '{onde}: marcada como validada sem evidência. Diga de onde veio (entrevista, conversa do CRM, relatório): é ela
+    que libera o uso como prova ou argumento na copy.'
+  exemplo_ruim: 'diferencial: Turmas pequenas — status: validada, evidencia: '''''
+  exemplo_bom: 'diferencial: Turmas de até 6 — status: validada, evidencia: grade de turmas 2026'
+- id: afirmacao_sem_fonte
+  grupo: lastro
+  o_que: 'Toda afirmação do briefing diz quem falou: empresa, consumidor, mercado, dados ou assessor.'
+  como_detectar: Itens com fonte nao_informada; um aviso com a contagem e o primeiro exemplo.
+  gravidade: sugestao
+  aplica_a:
+  - briefing
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_briefing/revisao.py::_origem; trilha-briefing/docs/metodo.md, princípio 1 (vozes separadas).
+  mensagem: '{n} afirmação(ões) sem fonte (ex.: {onde}): diga se veio da empresa, do consumidor, do mercado, dos dados ou
+    de você. Opinião da empresa é ponto de partida, não argumento de anúncio.'
+  exemplo_ruim: 'dor: Não tem tempo para estudar (fonte: nao_informada)'
+  exemplo_bom: 'dor: Não tem tempo para estudar (fonte: consumidor, 7 de 12 entrevistas)'
+- id: promessa_incobravel
+  grupo: lastro
+  o_que: A promessa da oferta tem resultado observável com número, prazo e condição (para quem vale).
+  como_detectar: 'Para cada oferta com promessa: falta prazo; não há dígito em promessa.resultado (ou no texto, se não houver
+    resultado); falta condição. Um aviso por oferta, listando o que falta.'
+  gravidade: atencao
+  aplica_a:
+  - briefing
+  segmento: geral
+  usa: []
+  fonte: 'decisão atual em trilha_briefing/revisao.py::_copy (três avisos); trilha-briefing/docs/metodo.md, princípio 5; curso-marketing.txt
+    (promessa SMART: específica, mensurável, alcançável, realista e com prazo).'
+  mensagem: 'ofertas.{id}.promessa sem {faltas}: promessa que dá para cobrar tem resultado observável (com número), prazo
+    e para quem vale. Sem isso ela não diferencia e ainda gera cliente frustrado.'
+  exemplo_ruim: Inglês de verdade para a sua carreira.
+  exemplo_bom: Em 4 meses, conduzir uma reunião de 30 minutos em inglês, para quem já lê e entende o básico.
+- id: objecao_sem_resposta
+  grupo: lastro
+  o_que: Toda objeção que aparece tem a resposta que o time usa ao vivo.
+  como_detectar: 'Briefing: objeção da oferta sem resposta. Página: item de objecoes com resposta vazia, ou resposta que só
+    manda falar com a equipe (casa com "entre em contato", "fale com", "estamos a disposicao" e não tem fato).'
+  gravidade: atencao
+  aplica_a:
+  - briefing
+  - pagina
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_briefing/revisao.py::_copy; trilha-lp/docs/estrutura.md §5; beatriz-moraes082/ briefing-trilha/skills/fluxos-imobiliarios/SKILL.md
+    ("Mensagens tipo 'estamos aqui para tirar suas dúvidas' sozinhas são proibidas"); curso-marketing.txt ("exterminador de
+    objeção").
+  mensagem: '{onde}: objeção sem resposta — "{objecao}". Objeção que aparece e fica sem resposta derruba a decisão; traga
+    a frase que o time usa ao vivo.'
+  exemplo_ruim: E se a obra atrasar? Entre em contato com nossa equipe.
+  exemplo_bom: E se a obra atrasar? Terraplenagem e drenagem já foram concluídas; a entrega está prevista em contrato para
+    30/06/2027.
+- id: fala_de_si
+  grupo: clareza
+  o_que: A peça fala mais de quem lê do que da empresa.
+  como_detectar: 'Na peça inteira: conta pronomes_marca (nós) e pronomes_leitor (você). Avisa se nós ≥ 2 e nós > você. Quando
+    voz.assinatura é pessoa ou marca_pessoa, pronomes_pessoa (eu, meu) entram na conta da marca.'
+  gravidade: atencao
+  aplica_a:
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa:
+  - pronomes_marca
+  - pronomes_leitor
+  - pronomes_pessoa
+  fonte: 'decisão atual em trilha_copy/revisao.py::_hopkins; aulas-copy-1-e-2.txt, Aula 1 (Hopkins: "Everywhere we see advertisers
+    merely crying a name"; o fabricante "tells of things that he takes pride in").'
+  mensagem: 'fala mais de si ({nos}× nós/nosso) do que de quem lê ({voce}× você/seu): quem lê quer saber o que ganha.'
+  exemplo_ruim: Nossa escola tem nossa metodologia própria e nossos professores são nossos maiores orgulhos.
+  exemplo_bom: 'Você fala em todas as aulas: a turma tem no máximo 6 alunos.'
+- id: frase_egoista
+  grupo: clareza
+  o_que: Sem autoelogio nem pedido egoísta.
+  como_detectar: 'Na peça inteira (ou no campo, no briefing): algum item de frase_egoista; um aviso com o primeiro encontrado.'
+  gravidade: atencao
+  aplica_a:
+  - briefing
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa:
+  - frase_egoista
+  fonte: 'decisão atual em trilha_copy/revisao.py::_hopkins; aulas-copy-1-e-2.txt, Aula 1 (Hopkins: "Phrases like insist on
+    buying this brand, avoid imitations, look out for substitution… Do not boast").'
+  mensagem: 'autoelogio ou pedido egoísta ("{trecho}"): um bom vendedor não diria isso com o cliente na frente dele.'
+  exemplo_ruim: Somos líderes de mercado. Exija o original!
+  exemplo_bom: 312 oficinas da região usam o sistema para fechar o orçamento no mesmo dia.
+- id: vago_sem_fato
+  grupo: clareza
+  o_que: Adjetivo ou prova vaga vem acompanhado de um fato no mesmo campo.
+  como_detectar: 'Por campo: algum item de adjetivo_vago ou prova_vaga e nenhum fato no mesmo campo. Fato = dígito, ou nome
+    próprio (palavra com inicial maiúscula fora do começo da frase e diferente do nome do cliente e da oferta). No briefing:
+    diferenciais e promessa.'
+  gravidade: sugestao
+  aplica_a:
+  - briefing
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa:
+  - adjetivo_vago
+  - prova_vaga
+  fonte: 'decisão atual em trilha_copy/revisao.py::_hopkins (ADJETIVO_VAGO) e trilha_briefing/revisao.py::_copy (PALAVRAS_VAGAS);
+    aulas-copy-1-e-2.txt, Aula 1 (Hopkins: "Platitudes and generalities roll off… like water from a duck"); aula-copy-3.txt
+    (teste do surdo-mudo); beatriz-moraes082/briefing-trilha/assets/ briefing_empreendimento.md ("Ruim: ótima estrutura, excelente
+    lazer, padrão superior").'
+  mensagem: '{onde}: adjetivo sem fato ("{trecho}"): troque por número, nome ou detalhe. Se você só pudesse apontar, para
+    o que apontaria?'
+  exemplo_ruim: Ótima localização e atendimento de qualidade.
+  exemplo_bom: A 500 m do Shopping Pátio e a 5 minutos de carro do Mix Mateus.
+- id: peca_sem_concretude
+  grupo: clareza
+  o_que: 'A peça tem ao menos um dado concreto: número, nome próprio ou prova.'
+  como_detectar: 'Na peça inteira (na página: topo + benefícios): nenhum dígito, nenhum nome próprio além do nome do cliente
+    e da oferta, e nenhuma prova citada (peca.provas vazio).'
+  gravidade: atencao
+  aplica_a:
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa: []
+  fonte: 'Trilha/docs/arquitetura/nucleo.md §1, princípio 6 ("Concretude obrigatória. Copy sem número, fato ou nome próprio
+    é barrada"); beatriz-moraes082/briefing-trilha/skills/fluxos-imobiliarios/SKILL.md ("Cada disparo tem que usar pelo menos
+    um dado concreto"); aula-copy-3.txt (Concrete: "We took a roofing company from 14 leads a month to 70").'
+  mensagem: 'a peça não tem nenhum número, nome próprio ou prova: copy sem fato soa como a de qualquer concorrente e a pessoa
+    passa reto. Ponha ao menos um dado do briefing (número, prazo, nome, marco).'
+  exemplo_ruim: Transforme sua vida com a nossa solução completa. Fale com a gente!
+  exemplo_bom: 'Turmas de até 6 alunos: você fala em todas as aulas. Aula experimental na terça, às 19h.'
+- id: intensidade_acima_da_combinada
+  grupo: voz
+  o_que: O tom não passa da intensidade combinada com o cliente (termostato de 1 a 5).
+  como_detectar: Marcas na peça = itens distintos de exagero presentes + cada "!" + cada palavra de 4 letras ou mais em CAIXA
+    ALTA (sem dígitos). Compara com limite_exagero_por_intensidade[intensidade], onde intensidade = peca.intensidade ou voz.intensidade.
+    Sem intensidade combinada, não avisa.
+  gravidade: atencao
+  aplica_a:
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa:
+  - exagero
+  fonte: decisão atual em trilha_copy/revisao.py::_hopkins (LIMITE_EXAGERO); aulas-copy-1-e-2.txt, Aula 2 ("should I crank
+    up the emotions or tone it down?"); trilha_briefing/esquema.py (Voz.intensidade).
+  mensagem: 'intensidade acima da combinada: {n} marca(s) de exagero (palavras de euforia, exclamações, CAIXA ALTA) para intensidade
+    {intensidade}. O cliente combinou esse tom; acima dele, a peça soa como promessa de vendedor.'
+  exemplo_ruim: INCRÍVEL!!! Método revolucionário e imperdível! (intensidade 2)
+  exemplo_bom: Três aulas por semana e reposição em qualquer horário da grade.
+- id: sem_palavras_da_persona
+  grupo: voz
+  o_que: A peça usa ao menos uma palavra das frases literais da persona.
+  como_detectar: Palavras de conteúdo (5 letras ou mais, fora das stopwords) das frases literais da persona da peça; avisa
+    se nenhuma aparece na peça. Sem frases na persona, não avisa.
+  gravidade: sugestao
+  aplica_a:
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_leitura; aula-copy-3.txt (transcrever as ligações de venda e dizer de volta
+    as mesmas coisas; "If you can describe someone's pain point better than they can…").
+  mensagem: 'não usa nenhuma palavra das frases literais da persona: devolva ao leitor as palavras dele. Quem se reconhece
+    no texto acredita que você entende o problema.'
+  exemplo_ruim: 'Aprimore sua proficiência oral em contextos corporativos. (a persona disse: "eu travo na reunião")'
+  exemplo_bom: Você entende a reunião inteira, mas trava na hora de falar? É isso que a aula treina.
+- id: diferencial_sem_e_dai
+  grupo: voz
+  o_que: Diferencial da oferta principal sobe a escada do "e daí?" até o resultado.
+  como_detectar: Oferta de degrau principal com diferencial sem e_dai; um aviso por oferta com a contagem e o primeiro exemplo.
+  gravidade: sugestao
+  aplica_a:
+  - briefing
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_briefing/revisao.py::_copy; aula-copy-3.txt (o teste do "so what?" do tapete).
+  mensagem: 'ofertas.{id}: {n} diferencial(is) sem a escada do "e daí?" (ex.: "{diferencial}"): a copy precisa do resultado,
+    não da característica.'
+  exemplo_ruim: 'diferencial: Plataforma em nuvem (e_dai vazio)'
+  exemplo_bom: 'diferencial: Plataforma em nuvem → orçamento aprovado no celular → cliente fecha na hora → oficina que não
+    perde serviço'
+- id: leitura_dificil
+  grupo: leitura
+  o_que: O texto corrido é fácil de ler.
+  como_detectar: Índice de Flesch adaptado ao português (parametros.legibilidade) sobre os campos corridos juntos; só com
+    30 palavras ou mais. Avisa abaixo de 50.
+  gravidade: atencao
+  aplica_a:
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa: []
+  fonte: 'decisão atual em trilha_copy/revisao.py::_leitura e texto.py::legibilidade; aula-copy-3.txt (Clear: teste do bombeiro,
+    Hemingway); aulas-copy-1-e-2.txt, Aula 2 ("Third to fifth grade reading level").'
+  mensagem: 'leitura difícil (índice {nota}; abaixo de 50 é difícil): frases mais curtas, palavras mais simples. Quem está
+    rolando o feed não relê.'
+  exemplo_ruim: Nossa metodologia proprietária potencializa a proficiência comunicativa mediante imersão contextualizada em
+    situações corporativas reais.
+  exemplo_bom: Você treina a reunião de verdade. Fala, erra, ajusta. Na semana seguinte, fala de novo.
+- id: ritmo_monotono
+  grupo: leitura
+  o_que: As frases variam de tamanho.
+  como_detectar: Coeficiente de variação do tamanho das frases nos campos corridos, com 4 frases ou mais; avisa abaixo de
+    0,25.
+  gravidade: sugestao
+  aplica_a:
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_leitura e texto.py::variacao_ritmo; aula-copy-3.txt (Cadence; "Write like
+    music", de Gary Provost).
+  mensagem: 'frases todas do mesmo tamanho: misture curtas, médias e longas. Texto monótono cansa e perde o leitor no meio.'
+  exemplo_ruim: A aula é ao vivo. A turma é pequena. O horário é flexível. A reposição é grátis.
+  exemplo_bom: A aula é ao vivo. Com no máximo 6 alunos, você fala em todas, e se perder uma, repõe no horário que quiser.
+- id: limite_rigido_da_plataforma
+  grupo: formato
+  o_que: Nenhum texto passa do limite de caracteres que a plataforma recusa.
+  como_detectar: 'Campos com limite rígido (Google: títulos 30, descrições 90, caminhos 15); conta caracteres do texto como
+    escrito.'
+  gravidade: bloqueia
+  aplica_a:
+  - anuncio
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_formato e formatos.py.
+  mensagem: '{campo}[{i}] com {n} caracteres; o limite é {limite}: a plataforma recusa o texto.'
+  exemplo_ruim: 'Título do Google: "Aulas de inglês para reuniões de trabalho" (41 caracteres)'
+  exemplo_bom: 'Título do Google: "Inglês para reuniões" (20 caracteres)'
+- id: quantidade_de_textos
+  grupo: formato
+  o_que: Cada campo tem a quantidade de textos que a plataforma aceita.
+  como_detectar: 'Máximo sempre (Meta: 5 textos, 5 títulos, 5 descrições; Google: 15 títulos, 4 descrições, 2 caminhos). Mínimo
+    só fora de fundação e rascunho (Meta: 1 texto e 1 título; Google: 3 títulos e 2 descrições).'
+  gravidade: bloqueia
+  aplica_a:
+  - anuncio
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_formato e formatos.py.
+  mensagem: '{campo}: {n} item(ns); a plataforma pede de {minimo} a {maximo}. Fora disso o anúncio não sobe.'
+  exemplo_ruim: google.titulos com 2 títulos numa peça refinada
+  exemplo_bom: google.titulos com 10 a 15 títulos
+- id: texto_longo_para_a_tela
+  grupo: formato
+  o_que: 'O texto cabe na tela antes do corte: o gancho e o título aparecem inteiros.'
+  como_detectar: 'Limites recomendados: meta.textos_principais, só a primeira frase (o gancho), 125 ("é cortado no feed e
+    o gancho some"); meta.titulos 40 e meta.descricoes 30 ("é cortado na tela"); pagina.topo.titulo 90 ("no celular passa
+    de 3 linhas e empurra o botão para baixo"); proposta: pagina.descricao_seo 155.'
+  gravidade: atencao
+  aplica_a:
+  - anuncio
+  - pagina
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_formato (recomendado, so_gancho) e trilha_lp/revisao.py (LIMITE_TITULO);
+    aula-landing-page.txt (60% não passa da primeira dobra).
+  mensagem: '{onde} com {n} caracteres: depois de {limite}, {efeito}.'
+  exemplo_ruim: Topo da página com 130 caracteres de título
+  exemplo_bom: Seu apartamento a 600 m do metrô, com entrada em 60 vezes (58 caracteres)
+- id: titulos_google_repetidos
+  grupo: formato
+  o_que: Os títulos do anúncio responsivo não se repetem.
+  como_detectar: Títulos normalizados repetidos em google.titulos.
+  gravidade: atencao
+  aplica_a:
+  - anuncio
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_formato.
+  mensagem: 'google.titulos repetidos: o Google combina títulos e repetição desperdiça espaço.'
+  exemplo_ruim: '"Inglês para reuniões" e "Inglês Para Reuniões"'
+  exemplo_bom: '"Inglês para reuniões" e "Turmas de até 6 alunos"'
+- id: poucos_titulos_google
+  grupo: formato
+  o_que: O anúncio responsivo tem títulos suficientes para o Google combinar.
+  como_detectar: Fora de fundação e rascunho, menos de 10 títulos em google.titulos.
+  gravidade: sugestao
+  aplica_a:
+  - anuncio
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_formato (TITULOS_GOOGLE_RECOMENDADOS).
+  mensagem: 'google.titulos: {n}; com 10 ou mais o Google tem o que combinar.'
+  exemplo_ruim: 4 títulos
+  exemplo_bom: 12 títulos, cada um com um ângulo
+- id: titulo_sem_palavra_chave
+  grupo: formato
+  o_que: Algum título repete uma palavra-chave do grupo.
+  como_detectar: Com palavras_chave preenchidas, nenhum título contém nenhuma delas como termo inteiro.
+  gravidade: sugestao
+  aplica_a:
+  - anuncio
+  segmento: geral
+  usa: []
+  fonte: 'decisão atual em trilha_copy/revisao.py::_formato; aulas-copy-1-e-2.txt, Aula 1 (Hopkins: o título chama a pessoa
+    pelo nome, "Hey there, Bill Jones").'
+  mensagem: 'nenhum título repete uma palavra-chave do grupo: quem busca quer ver o que buscou.'
+  exemplo_ruim: Busca "curso de inglês noturno", títulos sem "inglês" nem "noturno"
+  exemplo_bom: '"Curso de inglês noturno" entre os títulos'
+- id: meta_sem_botao
+  grupo: formato
+  o_que: O anúncio do Meta tem o botão que leva à micro-ação.
+  como_detectar: Fora de fundação e rascunho, meta.cta_botao vazio.
+  gravidade: atencao
+  aplica_a:
+  - anuncio
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_formato.
+  mensagem: 'meta.cta_botao vazio: escolha o botão que leva à micro-ação.'
+  exemplo_ruim: 'cta_botao: '''''
+  exemplo_bom: 'cta_botao: Enviar mensagem pelo WhatsApp'
+- id: chamada_sem_quando
+  grupo: formato
+  o_que: A chamada diz quem, o quê, até quando e como.
+  como_detectar: 'Fora de fundação e rascunho: a chamada (último texto principal no Meta, última descrição no Google, cta
+    no roteiro) não tem item de quando_da_chamada.'
+  gravidade: sugestao
+  aplica_a:
+  - anuncio
+  - roteiro
+  segmento: geral
+  usa:
+  - quando_da_chamada
+  fonte: 'decisão atual em trilha_copy/revisao.py::_formato; aula-copy-3.txt (CTA: who, what, when, how).'
+  mensagem: 'chamada sem "quando" (hoje, agora, até tal dia, esta semana): diga quem, o quê, até quando e como. Prazo só se
+    for real; sem prazo, "agora" basta.'
+  exemplo_ruim: Conheça nosso curso.
+  exemplo_bom: Se você trava nas reuniões, agende agora a aula experimental pelo WhatsApp.
+- id: roteiro_tempo_ilegivel
+  grupo: roteiro
+  o_que: Toda cena tem o tempo no formato início-fim, em segundos.
+  como_detectar: Alguma cena cujo tempo não casa com "0-3", "3-12" (aceita vírgula ou ponto e "s" no fim).
+  gravidade: atencao
+  aplica_a:
+  - roteiro
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_roteiro.
+  mensagem: 'roteiro: use o tempo das cenas no formato "0-3", "3-12" (segundos).'
+  exemplo_ruim: 'tempo: começo'
+  exemplo_bom: 'tempo: 0-3'
+- id: gancho_depois_de_3s
+  grupo: roteiro
+  o_que: O gancho resolve nos primeiros 3 segundos.
+  como_detectar: A primeira cena termina depois de 3 s (gancho_segundos).
+  gravidade: atencao
+  aplica_a:
+  - roteiro
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_roteiro (GANCHO_SEGUNDOS); aula-branding-e-pedido-briefing.txt ("you have
+    about two or three seconds to get their attention" no vídeo curto).
+  mensagem: 'roteiro: a primeira cena vai até {fim}s; o gancho precisa resolver nos primeiros 3s.'
+  exemplo_ruim: Cena 0-8 com apresentação da empresa
+  exemplo_bom: 'Cena 0-3: "Você entende a reunião inteira e trava na hora de falar?"'
+- id: duracao_nao_bate
+  grupo: roteiro
+  o_que: A soma das cenas bate com a duração declarada.
+  como_detectar: Fim da última cena difere de duracao_s em mais de 1 s.
+  gravidade: atencao
+  aplica_a:
+  - roteiro
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_roteiro.
+  mensagem: 'roteiro: as cenas somam {fim}s, mas a duração diz {duracao}s.'
+  exemplo_ruim: 'duracao_s: 30 com a última cena em 45-52'
+  exemplo_bom: 'duracao_s: 30 com a última cena em 25-30'
+- id: fala_nao_cabe_na_cena
+  grupo: roteiro
+  o_que: A fala cabe no tempo da cena.
+  como_detectar: Palavras da fala > (fim − início) × 2,5 + 2.
+  gravidade: atencao
+  aplica_a:
+  - roteiro
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_roteiro (PALAVRAS_POR_SEGUNDO).
+  mensagem: 'roteiro: a fala da cena {tempo} tem {n} palavras; cabem cerca de {cabe}.'
+  exemplo_ruim: Cena 0-3 com 20 palavras de fala
+  exemplo_bom: Cena 0-3 com 7 palavras de fala
+- id: roteiro_sem_chamada
+  grupo: roteiro
+  o_que: O roteiro diz o que fazer depois de assistir.
+  como_detectar: Fora de fundação e rascunho, roteiro.cta vazio.
+  gravidade: atencao
+  aplica_a:
+  - roteiro
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_roteiro.
+  mensagem: 'roteiro sem chamada (cta): diga o que fazer depois de assistir.'
+  exemplo_ruim: 'cta: '''''
+  exemplo_bom: 'cta: Chama no WhatsApp e agenda a aula experimental desta semana.'
+- id: roteiro_sem_texto_na_tela
+  grupo: roteiro
+  o_que: O roteiro funciona sem som.
+  como_detectar: Fora de fundação e rascunho, nenhuma cena com texto_tela.
+  gravidade: sugestao
+  aplica_a:
+  - roteiro
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_roteiro.
+  mensagem: 'roteiro sem texto na tela: muita gente assiste sem som.'
+  exemplo_ruim: Todas as cenas com texto_tela vazio
+  exemplo_bom: 'Cena 0-3 com texto_tela: "Trava na reunião em inglês?"'
+- id: titulo_de_bloco_generico
+  grupo: pagina
+  o_que: O título de cada bloco diz o benefício, porque muita gente só lê os títulos.
+  como_detectar: Título de prova_social, beneficios, como_funciona, objecoes e fechamento, normalizado e sem pontuação, igual
+    a um item de titulo_generico.
+  gravidade: atencao
+  aplica_a:
+  - pagina
+  segmento: geral
+  usa:
+  - titulo_generico
+  fonte: decisão atual em trilha_lp/revisao.py (TITULOS_GENERICOS); aula-landing-page.txt ("real people, real results… That's
+    a horrible headline"; "get the lawn you've always wanted in four simple steps").
+  mensagem: '{onde}: título genérico ("{titulo}"); o título do bloco diz o benefício, porque muita gente só lê os títulos.'
+  exemplo_ruim: Depoimentos
+  exemplo_bom: 'Mais de 300 famílias já visitaram o decorado: veja o que elas acharam'
+- id: cta_generico
+  grupo: pagina
+  o_que: O botão diz o que a pessoa recebe ao clicar.
+  como_detectar: topo.cta.texto e formulario.botao, normalizados e sem pontuação, iguais a um item de cta_generico.
+  gravidade: sugestao
+  aplica_a:
+  - pagina
+  segmento: geral
+  usa:
+  - cta_generico
+  fonte: 'trilha-lp/docs/estrutura.md ("Botão: um só, com o que a pessoa recebe (''Agendar visita ao decorado''), não ''Enviar''");
+    aula-landing-page.txt ("make it clear, what exactly are people getting").'
+  mensagem: '{onde}: botão genérico ("{texto}"): diga o que a pessoa recebe ao clicar. Botão que descreve o ganho converte
+    mais e já filtra quem não quer aquilo.'
+  exemplo_ruim: Enviar
+  exemplo_bom: Agendar visita ao decorado
+- id: preco_proibido_no_canal
+  grupo: segmento
+  o_que: Preço só aparece no canal em que a regra comercial do cliente permite.
+  como_detectar: 'Regra do canal = regras_comerciais.preco[canal] da marca (briefing: plataforma.preco), ou preco_padrao_por_segmento
+    quando a marca não definiu. Canal: anúncio e roteiro → anuncio; página → landing. Se a regra é "nunca" e algum campo tem
+    preco_valor com item de preco_contexto a até 3 palavras, avisa. Valor em prova ("R$ 2 milhões em vendas") não tem contexto
+    de preço e não conta.'
+  gravidade: bloqueia
+  aplica_a:
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa:
+  - preco_valor
+  - preco_contexto
+  fonte: 'trilha_briefing/esquema.py (Plataforma.preco: nunca, a_partir_de, parcela, valor_cheio); Trilha/docs/arquitetura/nucleo.md
+    §5.1 (regras_comerciais.preco por canal); Trilha/playbooks/imobiliario/ playbook.yaml (regras_comerciais_padrao); beatriz-moraes082/briefing-trilha/skills/fluxos-imobiliarios/
+    references/anatomia_nutricao.md ("Regra do preço — crítica").'
+  mensagem: '{onde}: mostra preço ("{trecho}"), mas a regra comercial do cliente para {canal} é não mostrar preço. Preço fora
+    da regra atrai quem só compara valor e tira do time a conversa de simulação: tire o valor e chame para a simulação ou
+    a visita.'
+  exemplo_ruim: 'Apartamento de 2 quartos por R$ 389.000. Compre já! (cliente com anuncio: nunca)'
+  exemplo_bom: Apartamento de 2 quartos com entrada parcelada em 60 vezes. Simule com a sua renda.
+- id: preco_sem_forma_combinada
+  grupo: segmento
+  o_que: 'Quando o preço pode aparecer, ele aparece na forma combinada: "a partir de" ou em parcela.'
+  como_detectar: 'Mesma regra do canal e mesmo critério de contexto de preço. "a_partir_de": todo preço precisa de item de
+    forma_a_partir_de até 4 palavras antes. "parcela": todo preço precisa estar como parcela (forma_parcela na mesma oração).
+    "valor_cheio": sem aviso.'
+  gravidade: atencao
+  aplica_a:
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa:
+  - preco_valor
+  - preco_contexto
+  - forma_a_partir_de
+  - forma_parcela
+  fonte: 'decisão atual em trilha_lp/revisao.py (imobiliário: preço sem "a partir de"), generalizada; trilha-lp/docs/estrutura.md
+    ("Preço só como ''a partir de'', amarrado à visita ou à simulação"); beatriz-moraes082/briefing-trilha/skills/fluxos-imobiliarios/references/objecoes_e_apelos.md
+    ("valores a partir de R$ [PRECO_MIN]" amarrado ao convite de visita).'
+  mensagem: '{onde}: preço fora da forma combinada para {canal} ({regra}): "{trecho}". Mostre só o valor de entrada ou a parcela,
+    amarrado à visita ou à simulação; o valor fechado fica com o time comercial.'
+  exemplo_ruim: 'Lotes de 250 m² por R$ 377 mil. (landing: a_partir_de)'
+  exemplo_bom: Lotes de 250 a 406 m², a partir de R$ 377 mil. Agende a visita à obra.
+- id: registro_profissional_ausente
+  grupo: segmento
+  o_que: Onde a profissão exige, o registro profissional aparece em toda publicidade.
+  como_detectar: 'Vale se o segmento está em registro_por_segmento ou se compliance.registros_profissionais não está vazio.
+    Página: marca.registro_profissional preenchido (vai no rodapé). Anúncio e roteiro: o número do registro em algum campo
+    de texto, ou a peça marca registro_na_arte: true (o registro pode estar na imagem).'
+  gravidade: bloqueia
+  gravidade_por_contexto:
+    anuncio: atencao
+    roteiro: atencao
+  aplica_a:
+  - anuncio
+  - roteiro
+  - pagina
+  segmento:
+  - imobiliario
+  - saude
+  - educacao_fisica
+  - juridico
+  usa: []
+  fonte: 'decisão atual em trilha_lp/esquema.py (Lp._segundo_bloco: "segmento imobiliario exige marca.registro_profissional
+    (CRECI)"); Trilha/playbooks/imobiliario/playbook.yaml (registros_profissionais: [CRECI]); Trilha/docs/arquitetura/nucleo.md
+    §5.1 ("CRECI, CRM, OAB — com número e onde exibir"); trilha-lp/docs/checklist-publicacao.md.'
+  mensagem: '{onde}: falta o registro profissional ({registro}) que o segmento exige em toda publicidade. Na página ele vai
+    no rodapé; no anúncio, no texto ou na arte (marque registro_na_arte se estiver na imagem).'
+  exemplo_ruim: Página de lançamento sem CRECI no rodapé
+  exemplo_bom: 'Rodapé: Maia Imóveis · CRECI 00000-J · Incorporação registrada sob o nº 00.000 no 0º Registro de Imóveis'
+- id: antes_e_depois_em_saude
+  grupo: segmento
+  o_que: Antes e depois e prazo de resultado em saúde só com a regra do conselho do cliente conferida.
+  como_detectar: 'Segmento saude (ou cliente com regra de conselho em compliance.regras_legais): algum item de antes_e_depois
+    no texto, ou peça com prova de formato imagem do tipo antes e depois. O aviso mostra as regras_legais do cliente para
+    o assessor conferir.'
+  gravidade: atencao
+  aplica_a:
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: saude
+  usa:
+  - antes_e_depois
+  fonte: 'trilha_briefing/esquema.py (Restricoes.regras_legais: "conselho profissional, publicidade regulada"); trilha-briefing/docs/metodo.md
+    ("conselhos profissionais têm regras próprias"); aulas-copy-1-e-2.txt, Aula 1 (Hopkins: "I have never pictured the afflicted");
+    aula-landing-page.txt (antes e depois como prova numa clínica de estética nos EUA: aqui depende do conselho).'
+  mensagem: '{onde}: antes e depois ou prazo de resultado em saúde ("{trecho}"). O conselho do cliente tem regra própria para
+    isso ({regras_legais}); confira antes de publicar e não prometa o resultado.'
+  exemplo_ruim: 'Antes e depois em 7 dias: elimine as manchas de vez.'
+  exemplo_bom: Avaliação com a Dra. Ana Lima (CRM-SP 000000) para entender o que funciona para a sua pele.
+- id: aprovacao_invalidada
+  grupo: integridade
+  o_que: Texto aprovado não muda sem nova aprovação.
+  como_detectar: Peça em aprovado cuja assinatura do conteúdo difere da assinatura guardada na aprovação.
+  gravidade: bloqueia
+  aplica_a:
+  - anuncio
+  - roteiro
+  - pagina
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_integridade (peca.py::aprovacao_valida).
+  mensagem: 'o texto mudou depois da aprovação: aprove de novo antes de exportar.'
+  exemplo_ruim: Vírgula trocada no título depois do aprovar
+  exemplo_bom: Mudou, voltou a final e foi aprovada de novo
+- id: celula_inexistente
+  grupo: integridade
+  o_que: Toda peça pertence a uma célula da grade do briefing.
+  como_detectar: peca.codigo não existe na grade do contrato.
+  gravidade: bloqueia
+  aplica_a:
+  - anuncio
+  - roteiro
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_integridade; Trilha/docs/arquitetura/nucleo.md §5.4.
+  mensagem: 'célula {codigo} não existe na grade do briefing: sem ela o raio-x não liga o anúncio aos leads.'
+  exemplo_ruim: 'codigo: PT09 (a grade vai até PT04)'
+  exemplo_bom: 'codigo: PT01'
+- id: peca_diferente_da_celula
+  grupo: integridade
+  o_que: Persona e oferta da peça são as da célula.
+  como_detectar: persona ou oferta da peça preenchidas e diferentes das da célula.
+  gravidade: atencao
+  aplica_a:
+  - anuncio
+  - roteiro
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_integridade.
+  mensagem: '{campo} da peça ({valor}) diferente da célula ({esperado}): o resultado vai ser lido como se fosse da célula.'
+  exemplo_ruim: Peça da célula PT01 (persona gestora) escrita para a persona estudante
+  exemplo_bom: Peça e célula com a mesma persona e a mesma oferta
+- id: hipotese_inexistente
+  grupo: integridade
+  o_que: A hipótese da peça existe no briefing.
+  como_detectar: peca.hipotese preenchida e fora de hipoteses do contrato.
+  gravidade: atencao
+  aplica_a:
+  - anuncio
+  - roteiro
+  segmento: geral
+  usa: []
+  fonte: decisão atual em trilha_copy/revisao.py::_integridade.
+  mensagem: 'hipótese ''{hipotese}'' não existe no briefing: sem ela, o teste não tem critério de sucesso.'
+  exemplo_ruim: 'hipotese: H9 (o briefing tem H1 a H3)'
+  exemplo_bom: 'hipotese: H1'
