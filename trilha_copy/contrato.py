@@ -216,7 +216,13 @@ class Hipotese(_Base):
     variavel: str = ""
     codigos: list[str] = Field(default_factory=list)
     criterio_sucesso: str = ""
-    resultado: str = "planejada"
+    resultado: str = "planejada"  # planejada, rodando, validada, refutada, inconclusiva
+    conversoes_obtidas: int | None = None
+    fim: date | None = None
+    aprendizado: str = ""  # o que o teste ensinou, registrado no briefing (decidir)
+
+    def decidida(self) -> bool:
+        return self.resultado in ("validada", "refutada", "inconclusiva")
 
 
 class IdentidadeVisual(_Base):

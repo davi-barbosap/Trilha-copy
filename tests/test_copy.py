@@ -546,6 +546,55 @@ class TestPadraoDeTexto(Base):
             r.gravidade = antiga
 
 
+class TestCaminhoDeVolta(Base):
+    """O que o teste ensinou volta pela copy: no pacote da célula e como referência da peça vencedora."""
+
+    def decidida(self, d, resultado="validada"):
+        h = next(x for x in d["hipoteses"] if x["id"] == "h01-gancho-travar")
+        h.update(resultado=resultado, aprendizado="O gancho da frase que não sai trouxe lead 23% mais barato",
+                 conversoes_obtidas=52, fim="2026-11-20")
+
+    def test_pacote_mostra_o_que_os_testes_disseram(self):
+        pk = montar(contrato(self.decidida), "PT01")
+        md = em_markdown(pk, contrato(self.decidida), "meta_feed")
+        self.assertIn("## O que os testes já disseram", md)
+        self.assertIn("✓ validada nesta célula (h01-gancho-travar): O gancho da frase que não sai", md)
+        md3 = em_markdown(montar(contrato(self.decidida), "PT03"), contrato(self.decidida))
+        self.assertIn("✓ validada em PT01, PT02 (h01-gancho-travar)", md3)  # aprendizado vale para as outras células
+
+    def test_teste_rodando_avisa_para_nao_mudar_a_variavel(self):
+        def rodando(d):
+            next(x for x in d["hipoteses"] if x["id"] == "h01-gancho-travar")["resultado"] = "rodando"
+        md = em_markdown(montar(contrato(rodando), "PT01"), contrato(rodando))
+        self.assertIn("em teste (h01-gancho-travar): não mude criativo", md)
+
+    def test_vencedora_vira_referencia(self):
+        caminho = self.pasta / "copy.yaml"
+        dados = yaml.safe_load(caminho.read_text(encoding="utf-8"))
+        self.decidida(dados)
+        caminho.write_text(yaml.safe_dump(dados, allow_unicode=True), encoding="utf-8")
+        rc, saida = rodar("vencedora", self.arquivo("PT01", "pt01-meta-feed"), "--hipotese", "h01-gancho-travar")
+        self.assertEqual(rc, 0, saida)
+        refs, erros = carregar_referencias(self.pasta / "referencias")
+        self.assertEqual(erros, {})
+        [r] = refs
+        self.assertEqual((r.id, r.formato), ("pt01-meta-feed", "meta"))
+        self.assertIn("23% mais barato", r.por_que_funciona)
+        self.assertIn("hipótese h01-gancho-travar validada em 20/11/2026", r.fonte)
+        self.assertTrue(r.decupagem)  # do subtexto da peça
+
+    def test_vencedora_so_com_teste_validado_e_peca_aprovada(self):
+        caminho = self.pasta / "copy.yaml"
+        dados = yaml.safe_load(caminho.read_text(encoding="utf-8"))
+        self.decidida(dados, "refutada")
+        caminho.write_text(yaml.safe_dump(dados, allow_unicode=True), encoding="utf-8")
+        rc, saida = rodar("vencedora", self.arquivo("PT01", "pt01-meta-feed"), "--hipotese", "h01-gancho-travar")
+        self.assertEqual(rc, 1)
+        self.assertIn("está 'refutada'", saida)
+        rc, saida = rodar("vencedora", self.arquivo("PT02", "pt02-roteiro-video"), "--hipotese", "h01-gancho-travar")
+        self.assertIn("só peça aprovada", saida)
+
+
 class TestRevisarPagina(Base):
     """A página da Trilha-LP revisada com as mesmas regras de texto."""
 

@@ -36,7 +36,8 @@ O código da célula da grade (`PT01`, `GB01`…) amarra as etapas. Ele nasce na
 | `exportar <pasta>` | Gera, só das peças aprovadas: `anuncios.csv` (os textos de Meta e Google), `subida.csv` (um anúncio por linha, com campanha, conjunto, nome do anúncio e parâmetros de URL vindos do plano de campanhas do briefing), o **briefing do criativo** de cada anúncio do Meta e os roteiros, para a equipe de criação. |
 | `ganchos` | Catálogo de 15 tipos de gancho, com exemplos de segmentos diferentes. |
 | `roteiros` | Modelos de corpo para roteiro: educativo (o quê → por quê → como), história (mas… então…) e oferta direta (os 6 Ps). Ficam em `trilha_copy/regras/roteiros.yaml`, editáveis. |
-| `referencias` | Banco de peças boas, decupadas trecho a trecho, com o porquê. |
+| `referencias [pasta]` | Banco de peças boas, decupadas trecho a trecho, com o porquê. O geral fica em `referencias/`; o de cada cliente, em `copy/<id>/referencias/`. |
+| `vencedora <peca> --hipotese H` | **O caminho de volta.** A peça aprovada que venceu um teste vira referência do cliente. A decupagem vem do subtexto da peça; o porquê, do aprendizado registrado no briefing (`decidir`). Só aceita hipótese validada que testou a célula da peça. |
 
 Formatos:
 - anúncio do Meta: feed, Reels e Stories;
@@ -141,9 +142,8 @@ referencias/<id>.yaml          peças boas de qualquer segmento, decupadas trech
 
 ## Situação atual
 
-Versão 0.2.0, sem cliente real ainda. Próximos passos:
+Versão 0.3.0, sem cliente real ainda. Próximos passos:
 - o que o padrão de texto ainda não automatiza ([lista em ordem de valor](docs/padrao-de-texto.md#o-que-ainda-não-está-automatizado)): coerência anúncio → página, superlativo sem prova, chamada única;
-- as peças vencedoras voltando como referência.
 
 ## Como usar
 
