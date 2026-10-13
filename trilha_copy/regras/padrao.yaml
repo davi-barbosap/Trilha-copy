@@ -38,7 +38,7 @@ principios:
   principio: 'Concretude obrigatória: número, nome próprio ou detalhe no lugar do adjetivo.'
   explicacao: '"Barbear em 78 segundos" e não "barbear rápido"; "a 500 m do Shopping Pátio" e não "perto de tudo". Se você
     só pudesse apontar, para o que apontaria?'
-  fonte: 'Trilha-ads/docs/arquitetura/nucleo.md §1, princípio 6 ("Copy sem número, fato ou nome próprio é barrada"); beatriz-moraes082/briefing-trilha/skills/fluxos-imobiliarios/SKILL.md
+  fonte: 'Trilha-ads/docs/arquitetura/nucleo.md §1, princípio 6 ("Copy sem número, fato ou nome próprio é barrada"); briefing-trilha/skills/fluxos-imobiliarios/SKILL.md
     ("Apelos comerciais reais do produto — indispensável"); aulas-copy-1-e-2.txt, Aula 1 (Hopkins: 78 segundos, lucro de 3%);
     aula-copy-3.txt (Concrete; teste do surdo-mudo); trilha-briefing/docs/metodo.md, princípio 4.'
   regras:
@@ -142,7 +142,7 @@ principios:
     assinatura (marca, pessoa, marca e pessoa) define se o texto diz "nós" ou "eu".
   fonte: aulas-copy-1-e-2.txt, Aula 2 ("If you push on these emotions too hard, your copy might come off as very salesy… unbelievable");
     trilha_briefing/esquema.py (Voz.intensidade); Trilha-ads/docs/arquitetura/nucleo.md §5.1 (assinatura define a pessoa gramatical);
-    beatriz-moraes082/briefing-trilha/README.md (como o contexto muda a copy).
+    briefing-trilha/README.md (como o contexto muda a copy).
   regras:
   - intensidade_acima_da_combinada
   - termo_ou_promessa_proibida
@@ -170,7 +170,7 @@ principios:
   principio: 'Não somos genéricos: cada peça trata uma objeção real, com a resposta que o time usa ao vivo.'
   explicacao: No imobiliário, os três eixos (preço, produto, localização) são obrigatórios na régua. Produto difícil de vender
     no presencial pede contorno de objeção já no criativo.
-  fonte: beatriz-moraes082/briefing-trilha/skills/fluxos-imobiliarios/SKILL.md e references/objecoes_e_apelos.md; mensagens-internas-trilha.txt
+  fonte: briefing-trilha/skills/fluxos-imobiliarios/SKILL.md e references/objecoes_e_apelos.md; mensagens-internas-trilha.txt
     ("argumentação de contorno de objeção já no criativo"); curso-marketing.txt ("para cada aumento de consciência, uma quebra
     de objeção"); trilha-lp/docs/estrutura.md §5.
   regras:
@@ -1017,7 +1017,7 @@ regras:
   - pagina
   segmento: geral
   usa: []
-  fonte: decisão atual em trilha_briefing/revisao.py::_copy; trilha-lp/docs/estrutura.md §5; beatriz-moraes082/ briefing-trilha/skills/fluxos-imobiliarios/SKILL.md
+  fonte: decisão atual em trilha_briefing/revisao.py::_copy; trilha-lp/docs/estrutura.md §5; briefing-trilha/skills/fluxos-imobiliarios/SKILL.md
     ("Mensagens tipo 'estamos aqui para tirar suas dúvidas' sozinhas são proibidas"); curso-marketing.txt ("exterminador de
     objeção").
   mensagem: '{onde}: objeção sem resposta — "{objecao}". Objeção que aparece e fica sem resposta derruba a decisão; traga
@@ -1081,7 +1081,7 @@ regras:
   - prova_vaga
   fonte: 'decisão atual em trilha_copy/revisao.py::_hopkins (ADJETIVO_VAGO) e trilha_briefing/revisao.py::_copy (PALAVRAS_VAGAS);
     aulas-copy-1-e-2.txt, Aula 1 (Hopkins: "Platitudes and generalities roll off… like water from a duck"); aula-copy-3.txt
-    (teste do surdo-mudo); beatriz-moraes082/briefing-trilha/assets/ briefing_empreendimento.md ("Ruim: ótima estrutura, excelente
+    (teste do surdo-mudo); briefing-trilha/assets/ briefing_empreendimento.md ("Ruim: ótima estrutura, excelente
     lazer, padrão superior").'
   mensagem: '{onde}: adjetivo sem fato ("{trecho}"): troque por número, nome ou detalhe. Se você só pudesse apontar, para
     o que apontaria?'
@@ -1100,7 +1100,7 @@ regras:
   segmento: geral
   usa: []
   fonte: 'Trilha-ads/docs/arquitetura/nucleo.md §1, princípio 6 ("Concretude obrigatória. Copy sem número, fato ou nome próprio
-    é barrada"); beatriz-moraes082/briefing-trilha/skills/fluxos-imobiliarios/SKILL.md ("Cada disparo tem que usar pelo menos
+    é barrada"); briefing-trilha/skills/fluxos-imobiliarios/SKILL.md ("Cada disparo tem que usar pelo menos
     um dado concreto"); aula-copy-3.txt (Concrete: "We took a roofing company from 14 leads a month to 70").'
   mensagem: 'a peça não tem nenhum número, nome próprio ou prova: copy sem fato soa como a de qualquer concorrente e a pessoa
     passa reto. Ponha ao menos um dado do briefing (número, prazo, nome, marco).'
@@ -1438,7 +1438,7 @@ regras:
   - preco_valor
   - preco_contexto
   fonte: 'trilha_briefing/esquema.py (Plataforma.preco: nunca, a_partir_de, parcela, valor_cheio); Trilha-ads/docs/arquitetura/nucleo.md
-    §5.1 (regras_comerciais.preco por canal); Trilha/playbooks/imobiliario/ playbook.yaml (regras_comerciais_padrao); beatriz-moraes082/briefing-trilha/skills/fluxos-imobiliarios/
+    §5.1 (regras_comerciais.preco por canal); Trilha/playbooks/imobiliario/ playbook.yaml (regras_comerciais_padrao); briefing-trilha/skills/fluxos-imobiliarios/
     references/anatomia_nutricao.md ("Regra do preço — crítica").'
   mensagem: '{onde}: mostra preço ("{trecho}"), mas a regra comercial do cliente para {canal} é não mostrar preço. Preço fora
     da regra atrai quem só compara valor e tira do time a conversa de simulação: tire o valor e chame para a simulação ou
@@ -1463,7 +1463,7 @@ regras:
   - forma_a_partir_de
   - forma_parcela
   fonte: 'decisão atual em trilha_lp/revisao.py (imobiliário: preço sem "a partir de"), generalizada; trilha-lp/docs/estrutura.md
-    ("Preço só como ''a partir de'', amarrado à visita ou à simulação"); beatriz-moraes082/briefing-trilha/skills/fluxos-imobiliarios/references/objecoes_e_apelos.md
+    ("Preço só como ''a partir de'', amarrado à visita ou à simulação"); briefing-trilha/skills/fluxos-imobiliarios/references/objecoes_e_apelos.md
     ("valores a partir de R$ [PRECO_MIN]" amarrado ao convite de visita).'
   mensagem: '{onde}: preço fora da forma combinada para {canal} ({regra}): "{trecho}". Mostre só o valor de entrada ou a parcela,
     amarrado à visita ou à simulação; o valor fechado fica com o time comercial.'
