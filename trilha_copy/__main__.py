@@ -3,14 +3,18 @@
     python -m trilha_copy importar <copy.yaml> [--pasta clientes]     traz o contrato do Trilha-briefing
     python -m trilha_copy validar <pasta>                             contrato e peças no formato certo (não julga o texto)
     python -m trilha_copy pacote <pasta> <codigo> [--formato F]       os 6 Ps da célula, antes de escrever
-    python -m trilha_copy nova <pasta> <codigo> --formato F [--id X]  cria a peça a partir da célula
+    python -m trilha_copy nova <pasta> <codigo> --formato F [--id X] [--modelo M]   cria a peça a partir da célula
     python -m trilha_copy checklist <peca.yaml>                       o que falta para sair do estado atual
     python -m trilha_copy avancar <peca.yaml>                         passa ao próximo estado, se nada faltar
     python -m trilha_copy revisar <peca.yaml | pasta>                 avisos por gravidade; sai com erro se algo bloqueia
+    python -m trilha_copy revisar-pagina <pagina.yaml> [--contrato copy/<id>]   o texto da página pelo mesmo padrão
+    python -m trilha_copy padrao                                      princípios e regras do padrão de texto
     python -m trilha_copy aprovar <peca.yaml> --por NOME --teste-do-vendedor [--mesmo-dia]
-    python -m trilha_copy exportar <pasta> [--codigo X] [--saida dist]   anúncios.csv e roteiros das peças aprovadas
+    python -m trilha_copy exportar <pasta> [--codigo X] [--saida dist]   anuncios.csv, subida.csv e roteiros das aprovadas
     python -m trilha_copy ganchos                                     catálogo de tipos de gancho
+    python -m trilha_copy roteiros                                    modelos de corpo para roteiro (editáveis)
     python -m trilha_copy referencias [pasta]                         banco de referências decupadas
+    python -m trilha_copy vencedora <peca.yaml> --hipotese H          a peça que venceu um teste vira referência do cliente
 
 Formatos: meta_feed, meta_reels, google_rsa, roteiro_video.
 """
@@ -22,6 +26,7 @@ import shutil
 import sys
 from pathlib import Path
 
+import yaml
 from pydantic import ValidationError
 
 from trilha_copy.contrato import Contrato, carregar_contrato
@@ -30,9 +35,14 @@ from trilha_copy.fluxo import avancar, pendencias, preparar_aprovacao
 from trilha_copy.formatos import CTA_META, FORMATOS
 from trilha_copy.ganchos import GANCHOS
 from trilha_copy.pacote import em_markdown, montar
-from trilha_copy.peca import ErroPeca, carregar_peca, pecas_da_pasta, registrar_estado
-from trilha_copy.referencias import carregar_referencias
-from trilha_copy.revisao import NIVEIS, revisar
+from trilha_copy.peca import (ErroPeca, carregar_peca, pecas_da_pasta, proxima_versao, registrar_estado,
+                             versoes_repetidas)
+from trilha_copy.referencias import carregar_referencias, de_peca_vencedora
+from trilha_copy.roteiros import ARQUIVO as ARQUIVO_ROTEIROS
+from trilha_copy.roteiros import esqueleto, modelos
+from trilha_copy.padrao import ARQUIVO as ARQUIVO_PADRAO
+from trilha_copy.padrao import carregar as carregar_padrao
+from trilha_copy.revisao import NIVEIS, revisar, revisar_pagina
 
 ICONE = {"bloqueia": "✗", "atencao": "⚠", "sugestao": "·"}
 ROTULO = {"bloqueia": "Bloqueia", "atencao": "Atenção", "sugestao": "Sugestão"}
@@ -101,6 +111,23 @@ def cmd_pacote(a) -> int:
     return 0
 
 
+def _roteiro_novo(modelo: str | None, duracao: int = 30) -> str:
+    if not modelo:
+        return ("roteiro:\n  modelo: null                 # educativo, historia, oferta_direta… (python -m trilha_copy roteiros)\n"
+                f"  duracao_s: {duracao}\n"
+                "  cenas: []                    # { tempo: \"0-3\", parte, fala, visual, texto_tela }; gancho nos 3 primeiros segundos\n"
+                "  cta: \"\"\n")
+    m = modelos()[modelo]
+    faz = {x.id: x.faz for x in m.partes} | {"cta": "a chamada falada: quem, o quê, até quando, como"}
+    cenas = "".join(f"    - {{ tempo: \"{c['tempo']}\", parte: {c['parte']}, fala: \"\", visual: \"\", texto_tela: \"\" }}"
+                    f"   # {faz[c['parte']]}\n" for c in esqueleto(modelo, duracao))
+    opcionais = [x.id for x in m.partes if x.opcional]
+    return (f"roteiro:\n  modelo: {modelo}                 # {m.nome}\n  duracao_s: {duracao}\n"
+            "  cenas:                       # tempos sugeridos: ajuste à fala (cerca de 2,5 palavras por segundo)\n"
+            f"{cenas}" + (f"  # partes opcionais deste modelo: {', '.join(opcionais)}\n" if opcionais else "")
+            + "  cta: \"\"\n")
+
+
 def cmd_nova(a) -> int:
     pasta = Path(a.pasta)
     c = _contrato_da_pasta(pasta)
@@ -108,7 +135,8 @@ def cmd_nova(a) -> int:
     if celula is None:
         print(f"✗ célula {a.codigo} não existe na grade do briefing")
         return 1
-    pid = a.id or f"{a.codigo.lower()}-{a.formato.replace('_', '-')}"
+    versao = proxima_versao(pasta, a.codigo, a.formato)
+    pid = a.id or f"{a.codigo.lower()}-{a.formato.replace('_', '-')}" + (f"-v{versao}" if versao > 1 else "")
     destino = pasta / "pecas" / a.codigo / f"{pid}.yaml"
     if destino.exists():
         print(f"✗ {destino} já existe")
@@ -120,18 +148,28 @@ def cmd_nova(a) -> int:
         "meta": ("meta:\n  textos_principais: []        # até 5; o gancho antes de 125 caracteres\n"
                  "  titulos: []                  # até 5; até 40 caracteres aparecem inteiros\n"
                  "  descricoes: []\n"
-                 f"  cta_botao: \"\"                # {', '.join(CTA_META[:5])}…\n"),
+                 f"  cta_botao: \"\"                # {', '.join(CTA_META[:5])}…\n"
+                 "  arte:                        # briefing do criativo: o que a arte precisa comunicar (a equipe de criação desenha)\n"
+                 "    tipo: imagem               # imagem | carrossel | video\n"
+                 "    mostrar: \"\"                # a cena, a pessoa, o produto em uso; exigido para ir a final\n"
+                 "    texto_na_arte: []          # curto; passa pela mesma revisão do texto\n"
+                 "    evitar: \"\"\n"
+                 "    referencias: []            # links ou ids do banco de referências\n"),
         "google": ("google:\n  titulos: []                  # 3 a 15, até 30 caracteres; 10 ou mais dão o que combinar\n"
                    "  descricoes: []               # 2 a 4, até 90 caracteres\n"
                    "  caminhos: []                 # até 2, até 15 caracteres\n"
                    "  palavras_chave: []           # as buscas do grupo, para conferir a relevância\n"),
-        "roteiro": ("roteiro:\n  duracao_s: 30\n  cenas: []                    # { tempo: \"0-3\", fala, visual, texto_tela }; gancho nos 3 primeiros segundos\n"
-                    "  cta: \"\"\n"),
+        "roteiro": _roteiro_novo(a.modelo),
     }[bloco]
+    if a.modelo and bloco != "roteiro":
+        print("✗ --modelo é só para roteiro_video")
+        return 1
     texto = (
         f"# Peça {pid} da célula {a.codigo} ({celula.publico} — \"{celula.argumento}\").\n"
         f"# Antes de escrever: python -m trilha_copy pacote {pasta} {a.codigo} --formato {a.formato}\n"
-        f"id: {pid}\ncodigo: {a.codigo}\nformato: {a.formato}\nestado: fundacao\n\n"
+        f"id: {pid}\ncodigo: {a.codigo}\nformato: {a.formato}\n"
+        f"versao: {versao}                       # 1, 2, 3… por célula e plataforma; vai no nome do anúncio\n"
+        "estado: fundacao\n\n"
         f"persona: {celula.persona}\noferta: {celula.oferta}\n"
         f"nivel_consciencia: {celula.nivel_consciencia or (persona.nivel_consciencia if persona else '') or 'null'}\n"
         f"micro_acao: \"{MICRO[a.formato]}\"\n"
@@ -190,16 +228,59 @@ def cmd_avancar(a) -> int:
 def cmd_validar(a) -> int:
     pasta = Path(a.pasta)
     c = _contrato_da_pasta(pasta)
-    erros = 0
+    erros, pecas = 0, []
     for caminho in pecas_da_pasta(pasta):
         try:
-            carregar_peca(caminho)
+            pecas.append(carregar_peca(caminho))
         except ErroPeca as e:
             print(f"✗ {e}")
             erros += 1
+    for problema in versoes_repetidas(pecas):
+        print(f"✗ {problema}")
+        erros += 1
     n = len(pecas_da_pasta(pasta))
     print(f"{'✓' if not erros else '✗'} {pasta}: contrato {c.contrato} de {c.cliente.id}; {n - erros} de {n} peça(s) válidas")
     return 1 if erros else 0
+
+
+def _contrato_da_pagina(pagina: Path, dados: dict, contrato: str | None) -> Contrato:
+    """--contrato, ou o copy/<id>/ do Trilha-clientes quando a página está em lp/<id>/<pagina>/pagina.yaml."""
+    if contrato:
+        return _contrato_da_pasta(Path(contrato))
+    cliente = (dados.get("pagina") or {}).get("cliente", "")
+    for raiz in pagina.resolve().parents:
+        candidato = raiz / "copy" / cliente
+        if cliente and (candidato / "copy.yaml").exists():
+            return _contrato_da_pasta(candidato)
+    sys.exit(f"✗ não achei copy/{cliente or '<cliente>'}/copy.yaml acima de {pagina}: informe --contrato <pasta do copy>")
+
+
+def cmd_revisar_pagina(a) -> int:
+    caminho = Path(a.pagina)
+    try:
+        dados = yaml.safe_load(caminho.read_text(encoding="utf-8")) or {}
+    except (OSError, yaml.YAMLError) as e:
+        sys.exit(f"✗ {caminho}: {e}")
+    c = _contrato_da_pagina(caminho, dados, a.contrato)
+    avisos = revisar_pagina(dados, c)
+    print(f"{caminho} (página, padrão de texto): {len(avisos)} aviso(s)")
+    _mostrar(avisos)
+    print("A estrutura da página (blocos, ordem, rastreamento) é conferida na Trilha-LP: python -m trilha_lp validar")
+    return 1 if any(x.nivel == "bloqueia" for x in avisos) else 0
+
+
+def cmd_padrao(a) -> int:
+    p = carregar_padrao()
+    print(f"Padrão de texto da Trilha, versão {p.versao} ({ARQUIVO_PADRAO})\n")
+    for x in p.principios:
+        print(f"· {x.principio}")
+    for superficie in ("anuncio", "roteiro", "pagina", "briefing"):
+        regras = [r for r in p.regras if superficie in r.aplica_a and r.gravidade != "desligada"]
+        print(f"\n{superficie} ({len(regras)} regras)")
+        for nivel in NIVEIS:
+            for r in (x for x in regras if x.gravidade_em({superficie}) == nivel):
+                print(f"  {ICONE[nivel]} {r.id}: {r.o_que}")
+    return 0
 
 
 def cmd_revisar(a) -> int:
@@ -240,19 +321,64 @@ def cmd_aprovar(a) -> int:
 def cmd_exportar(a) -> int:
     pasta = Path(a.pasta)
     c = _contrato_da_pasta(pasta)
-    escritos, recusadas = exportar(pasta, c, a.saida, a.codigo)
+    escritos, recusadas, avisos = exportar(pasta, c, a.saida, a.codigo)
     for r in recusadas:
         print(f"✗ {r}")
     for e in escritos:
         print(f"✓ {e}")
+    for x in avisos:
+        print(f"⚠ {x}")
     if not escritos:
         print("nenhuma peça aprovada para exportar")
     return 1 if recusadas else 0
 
 
+def cmd_roteiros(a) -> int:
+    for mid, m in modelos().items():
+        print(f"{mid} — {m.nome}" + (f" ({m.fonte})" if m.fonte else ""))
+        if m.quando:
+            print(f"  quando: {m.quando}")
+        for x in m.partes:
+            print(f"  {x.id:<12} {x.faz}" + (" (opcional)" if x.opcional else ""))
+        if m.ciclo:
+            print(f"  {' e '.join(m.ciclo)} podem se repetir em sequência")
+        print(f"  {'cta':<12} a cena da chamada falada, sempre no fim (o texto vai no campo cta)\n")
+    print(f"Os modelos ficam em {ARQUIVO_ROTEIROS}: edite ou acrescente outros.")
+    return 0
+
+
 def cmd_ganchos(a) -> int:
     for nome, (descricao, exemplo) in GANCHOS.items():
         print(f"{nome:<22} {descricao}\n{'':<22} ex.: {exemplo}")
+    return 0
+
+
+def cmd_vencedora(a) -> int:
+    caminho = Path(a.peca)
+    p = _peca(caminho)
+    pasta = _pasta_da_peca(caminho)
+    c = _contrato_da_pasta(pasta)
+    h = next((x for x in c.hipoteses if x.id == a.hipotese), None)
+    if h is None:
+        print(f"✗ a hipótese '{a.hipotese}' não está no contrato: exporte o briefing de novo depois de decidir")
+        return 1
+    problemas = []
+    if h.resultado != "validada":
+        problemas.append(f"a hipótese está '{h.resultado}': só teste validado (decidir … validada) vira referência de vencedora")
+    if p.codigo not in h.codigos:
+        problemas.append(f"a peça é da célula {p.codigo}, e a hipótese testou {', '.join(h.codigos) or 'nenhum código'}")
+    if p.estado != "aprovado":
+        problemas.append("só peça aprovada (o texto que foi ao ar) vira referência")
+    if problemas:
+        for x in problemas:
+            print(f"✗ {x}")
+        return 1
+    ref = de_peca_vencedora(p, c, h)
+    destino = pasta / "referencias" / f"{ref.id}.yaml"
+    destino.parent.mkdir(exist_ok=True)
+    destino.write_text("# Peça vencedora do cliente, gerada por: python -m trilha_copy vencedora. Complete o porquê se quiser.\n"
+                       + yaml.safe_dump(ref.model_dump(), allow_unicode=True, sort_keys=False, width=120), encoding="utf-8")
+    print(f"✓ {destino}\n  Aparece em: python -m trilha_copy referencias {pasta / 'referencias'}")
     return 0
 
 
@@ -272,11 +398,16 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("pacote"); s.add_argument("pasta"); s.add_argument("codigo"); s.add_argument("--formato", choices=list(FORMATOS))
     s.set_defaults(f=cmd_pacote)
     s = sub.add_parser("nova"); s.add_argument("pasta"); s.add_argument("codigo"); s.add_argument("--formato", choices=list(FORMATOS), required=True)
-    s.add_argument("--id"); s.set_defaults(f=cmd_nova)
+    s.add_argument("--id"); s.add_argument("--modelo", help="roteiro_video: cria as cenas a partir do modelo de corpo")
+    s.set_defaults(f=cmd_nova)
     s = sub.add_parser("checklist"); s.add_argument("peca"); s.set_defaults(f=cmd_checklist)
     s = sub.add_parser("avancar"); s.add_argument("peca"); s.add_argument("--nota", default=""); s.set_defaults(f=cmd_avancar)
     s = sub.add_parser("validar"); s.add_argument("pasta"); s.set_defaults(f=cmd_validar)
     s = sub.add_parser("revisar"); s.add_argument("alvo"); s.set_defaults(f=cmd_revisar)
+    s = sub.add_parser("revisar-pagina", help="o texto de uma página da Trilha-LP pelo padrão de texto")
+    s.add_argument("pagina"); s.add_argument("--contrato", help="pasta com o copy.yaml do cliente (copy/<id>)")
+    s.set_defaults(f=cmd_revisar_pagina)
+    s = sub.add_parser("padrao", help="o padrão de texto: princípios e regras por superfície"); s.set_defaults(f=cmd_padrao)
     s = sub.add_parser("aprovar"); s.add_argument("peca"); s.add_argument("--por", required=True)
     s.add_argument("--teste-do-vendedor", action="store_true", help="um bom vendedor diria isso com o cliente na frente dele?")
     s.add_argument("--mesmo-dia", action="store_true", help="aprovar no mesmo dia em que a peça virou final")
@@ -284,7 +415,10 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("exportar"); s.add_argument("pasta"); s.add_argument("--codigo"); s.add_argument("--saida", default="dist")
     s.set_defaults(f=cmd_exportar)
     s = sub.add_parser("ganchos"); s.set_defaults(f=cmd_ganchos)
+    s = sub.add_parser("roteiros", help="modelos de corpo para roteiro"); s.set_defaults(f=cmd_roteiros)
     s = sub.add_parser("referencias"); s.add_argument("pasta", nargs="?", default="referencias"); s.set_defaults(f=cmd_referencias)
+    s = sub.add_parser("vencedora", help="a peça aprovada que venceu um teste vira referência do cliente")
+    s.add_argument("peca"); s.add_argument("--hipotese", required=True); s.set_defaults(f=cmd_vencedora)
     a = ap.parse_args(argv)
     return a.f(a)
 

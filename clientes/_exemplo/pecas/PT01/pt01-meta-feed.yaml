@@ -50,6 +50,11 @@ meta:
   descricoes:
     - "60 minutos, no seu nível"
   cta_botao: "Agendar"                # Saiba mais, Cadastre-se, Inscreva-se, Enviar mensagem, Enviar mensagem pelo WhatsApp…
+  arte:                        # briefing do criativo para a equipe de criação: o que comunicar, não como desenhar
+    tipo: imagem
+    mostrar: "Adulto em reunião por vídeo, olhando para a câmera com a boca entreaberta, como quem desistiu da frase. Luz de escritório, cena real, nada de banco de imagens com sorriso."
+    texto_na_arte: ["A frase não sai?"]
+    evitar: "Bandeiras, livros e quadro-negro: o problema é falar, não estudar."
 
 subtexto:                        # { trecho, funcao }: o que cada trecho deve fazer sentir ou pensar
   - { trecho: "Você entende a reunião inteira, mas na hora de falar a frase não sai.", funcao: "espelho: ele se reconhece com as próprias palavras" }
@@ -57,7 +62,7 @@ subtexto:                        # { trecho, funcao }: o que cada trecho deve fa
   - { trecho: "turma de até 6 adultos do seu nível", funcao: "seguro: não vai passar vergonha" }
   - { trecho: "Sem demonstração de vendas", funcao: "derruba a objeção 'vão me empurrar matrícula'" }
 
-aprovacao: {assinatura: 17dc8a9950f5c232, data: '2026-10-05', por: assessor, teste_do_vendedor: true}
+aprovacao: {assinatura: 67d2855664e7ba1a, data: '2026-10-05', por: assessor, teste_do_vendedor: true}
 # 'historico' é a última chave: a ferramenta acrescenta os estados aqui.
 historico:
   - {data: '2026-10-05', estado: rascunho}

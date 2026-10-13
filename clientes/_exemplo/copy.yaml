@@ -1,7 +1,7 @@
 # Contrato com o Trilha-copy, gerado pelo Trilha-briefing a partir do cliente _exemplo.
 # Edite lá, não aqui. Importe com: python -m trilha_copy importar <este arquivo>
 contrato: 1
-gerado_em: '2026-10-05'
+gerado_em: '2026-10-06'
 cliente:
   id: _exemplo
   nome: Escola Exemplo de Inglês
@@ -48,6 +48,21 @@ posicionamento:
     mencoes: null
   percepcao_atual: uma escola de bairro simpática
   percepcao_desejada: a referência para adulto que precisa falar inglês no trabalho
+identidade_visual:
+  cores:
+    primaria: '#123C69'
+    secundaria: '#F2B33D'
+    fundo: '#FFFFFF'
+    texto: '#1A1A1A'
+  tipografia:
+    titulos: Poppins
+    texto: Inter
+  logo: assets/logo.svg
+  estilo_imagem: alunos reais em aula, sem banco de imagem
+preco:
+  anuncio: nunca
+  whatsapp: valor_cheio
+  landing: a_partir_de
 compliance:
   termos_proibidos:
   - imperdível
@@ -653,3 +668,28 @@ hipoteses:
   aprendizado: ''
 metrica_principal: agendamento
 evento_otimizacao: lead
+veiculacao:
+- codigo: GB01
+  plataforma: google
+  campanha: _exemplo | google-ingles-adultos
+  conjunto: ingles-adultos
+  anuncio: '{codigo} | v{versao}'
+  parametros_url: utm_source=google&utm_medium=pago&utm_campaign=google-ingles-adultos&utm_content={codigo}
+- codigo: PT01
+  plataforma: meta
+  campanha: _exemplo | meta-profissional
+  conjunto: amplo
+  anuncio: '{codigo} | v{versao}'
+  parametros_url: utm_source=meta&utm_medium=pago&utm_campaign=meta-profissional&utm_content={codigo}
+- codigo: PT02
+  plataforma: meta
+  campanha: _exemplo | meta-profissional
+  conjunto: amplo
+  anuncio: '{codigo} | v{versao}'
+  parametros_url: utm_source=meta&utm_medium=pago&utm_campaign=meta-profissional&utm_content={codigo}
+- codigo: PT03
+  plataforma: meta
+  campanha: _exemplo | meta-profissional
+  conjunto: amplo
+  anuncio: '{codigo} | v{versao}'
+  parametros_url: utm_source=meta&utm_medium=pago&utm_campaign=meta-profissional&utm_content={codigo}
