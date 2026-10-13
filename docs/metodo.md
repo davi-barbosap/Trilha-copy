@@ -38,22 +38,12 @@ Os estados seguem o checklist do curso:
 
 ## 3. Regras da revisão e de onde vêm
 
-| Regra | Origem | Como confere |
-|---|---|---|
-| Serviço, não "compre a minha marca" | Hopkins | conta "nós/nosso/somos/a gente" contra "você/seu"; lista de frases egoístas ("exija", "evite imitações", "somos líderes") |
-| Fato no lugar de adjetivo | Hopkins, KJ | "melhor", "qualidade", "excelência" num texto sem nenhum número |
-| Todo número tem lastro | nosso | números com dois dígitos ou mais, em reais ou em porcentagem, precisam aparecer numa prova, na oferta ou na promessa do contrato |
-| Só provas utilizáveis | nosso | a peça cita provas por id; o contrato só traz as com fonte ou autorização |
-| Prova parecida com quem lê | 6 Ps | prova com `personas` diferente da persona da peça vira aviso |
-| Urgência e escassez reais | KJ, CDC | palavras de prazo ou vagas acabando sem urgência válida (real e no prazo) ou escassez com evidência bloqueiam |
-| Termostato da voz | KJ | marcas de exagero (palavras de euforia, exclamações, CAIXA ALTA) acima do limite da intensidade combinada (1 a 5) |
-| Palavras de quem lê | 6 Ps, KJ | ao menos uma palavra de conteúdo das frases literais da persona |
-| Nada confuso | KJ | índice de legibilidade (seção 4) |
-| Nada chato | KJ, 6 Ps | variação do tamanho das frases |
-| Chamada completa: quem, o quê, até quando, como | 6 Ps | chamada sem "hoje", "até", "esta semana"… |
-| Políticas das plataformas | nosso | atributos pessoais e promessa de ganho no Meta; limites de caracteres; mínimo e máximo de textos |
-| Concorrente pelo nome | CONAR | nome de concorrente do briefing no texto |
-| Gancho em 3 segundos; fala que cabe no tempo | nosso | primeira cena até 3 s; 2,5 palavras por segundo |
+As regras estão no **padrão de texto da Trilha** (`trilha_copy/regras/padrao.yaml`), o mesmo para anúncio, roteiro, página e briefing. [docs/padrao-de-texto.md](padrao-de-texto.md) tem:
+- os 15 princípios e as 48 regras, por superfície e gravidade, cada uma com a fonte (Hopkins, KJ, 6 Ps, aula de landing page, CDC, CONAR, políticas das plataformas, decisões das ferramentas);
+- as 21 divergências que havia entre as três ferramentas e o que o padrão adotou;
+- o que ainda não está automatizado, em ordem de valor.
+
+Além do texto, a revisão da peça confere o modelo de corpo do roteiro (seção 6). Esse é processo da copy, não regra de texto.
 
 ## 4. Medidas de texto
 
@@ -68,19 +58,44 @@ Os estados seguem o checklist do curso:
 ## 5. Onde fomos críticos com as fontes
 
 - **Curiosidade solta traz clique de quem não compra.** O gancho precisa estar preso à dor ou ao desejo da persona. A ferramenta não consegue conferir isso sozinha. Por isso a peça declara micro e macro-ação, e o subtexto diz o que cada trecho deve fazer.
-- **Ângulo positivo ou negativo é variável de teste, não regra.** As aulas divergem; quem decide é o resultado medido no Trilha.
+- **Ângulo positivo ou negativo é variável de teste, não regra.** As aulas divergem; quem decide é o resultado medido no Trilha-ads.
 - **A "fórmula do gancho"** (benefício × relevância × credibilidade ÷ esforço) é útil para comparar variações, mas não é medida. Não virou nota automática.
 - **Autoridade por associação** ("fulano recomenda") sem autorização sugere um endosso que não existe. Esbarra no CONAR e no direito de imagem. Aqui, prova só entra pelo contrato, com fonte.
 - **Ganchos de identidade e promessa de renda** ("só para mulheres", "de barista a milionária") são pontos de reprovação no Meta. Anúncio de oportunidade de trabalho pode cair em categoria especial. Promessa de ganho precisa dizer que o resultado não é típico.
 - **Transcrever ligações de vendas com IA** é a dica mais forte da aula 3 e também a mais sensível. São dados de clientes do seu cliente (LGPD): anonimize antes de colar em qualquer ferramenta. As frases chegam aqui sem nome, pelo briefing.
-- **"Não troque o anúncio que funciona"** (Hopkins, Ogilvy). O cansaço de um anúncio se mede por frequência e CTR no Trilha, não pelo cansaço de quem o vê todo dia.
+- **"Não troque o anúncio que funciona"** (Hopkins, Ogilvy). O cansaço de um anúncio se mede por frequência e CTR no Trilha-ads, não pelo cansaço de quem o vê todo dia.
 - **Urgência falsa não é técnica, é publicidade enganosa (CDC).** Por isso bloqueia, e não só alerta.
 
-## 6. O que ficou de fora nesta versão
+## 6. Roteiro e briefing do criativo
+
+**Modelos de corpo** (`trilha_copy/regras/roteiros.yaml`, editável). Cada cena declara a parte do modelo que cumpre, e a revisão avisa parte que falta, fora de ordem ou desconhecida.
+
+| Modelo | Partes | Origem | Quando |
+|---|---|---|---|
+| educativo | gancho → o quê → por quê → como | aula de copy 3 | ensinar algo útil preso à dor; público que ainda não conhece a solução |
+| história | gancho → situação → mas… → então… (repete) → resultado | aula de copy 3 ("but, therefore") | a mudança de alguém parecido com a persona; só com história autorizada |
+| oferta direta | gancho → promessa → prova → processo → prioridade (opcional) | aula dos 6 Ps | público que já conhece o problema e compara soluções |
+
+- **Chamada:** fica no fim, em qualquer modelo (`parte: cta`), e o texto dela vai no campo `cta` (quem, o quê, até quando, como).
+- **Ponto crítico:** o modelo organiza, não garante. Um roteiro educativo que ensina algo sem ligação com a oferta atrai quem quer conteúdo grátis. Por isso o "como" pede a oferta fazendo pela pessoa, e a macro-ação continua na peça.
+
+**Briefing do criativo.** Não fazemos o design: ele é da equipe de criação. A copy entrega o que a arte precisa comunicar, num arquivo por peça aprovada:
+- para que serve e o que varia no teste;
+- para quem, a ideia, as provas, o que não pode;
+- o que mostrar, o texto na arte e as medidas.
+
+O texto na arte passa pela mesma revisão do resto, porque é texto que o público lê. A arte entra na assinatura da aprovação: mudou a arte, aprove de novo.
+
+## 7. O caminho de volta
+
+O que o teste ensinou volta para quem escreve. Ninguém começa uma peça sem saber o que já se aprendeu com aquele público.
+- **No pacote da célula:** "O que os testes já disseram" mostra as hipóteses decididas no briefing, com o aprendizado. Primeiro vêm as da célula, depois as das outras. Se há teste rodando na célula, o pacote avisa para não mudar a variável testada nas versões novas.
+- **Na referência:** `vencedora` transforma a peça aprovada de uma hipótese validada em referência do cliente (`copy/<id>/referencias/`), decupada pelo próprio subtexto.
+- **Ponto crítico:** um teste validado vale para aquele público, naquela época e com aquela oferta. A referência registra a fonte e a data para ninguém tratar o resultado como lei. Ângulo e gancho continuam sendo variáveis de teste.
+
+## 8. O que ficou de fora nesta versão
 
 - **Uma ideia grande por peça:** conferir que não há duas promessas exige ler o sentido. Ficou como campo (`ideia`), não como regra.
 - **Nada inacreditável:** comparar a promessa com a sofisticação do público. O pacote mostra a sofisticação; a revisão não julga.
 - **Lista de jargões por público:** depende do segmento. Hoje entra pelos termos proibidos do briefing.
-- **Chamada única:** avisar peça com duas chamadas.
-- **Modelos de corpo para roteiro** (educativo: o quê → por quê → como; história: "mas… então…"). O roteiro desta versão é básico.
-- **Aprendizados dos testes voltando como referência:** quando o Trilha tiver o vencedor de uma hipótese, a peça pode virar referência decupada.
+- **Chamada única,** **superlativo sem prova** e **coerência anúncio → página:** estão entre as lacunas do padrão de texto, em ordem de valor.

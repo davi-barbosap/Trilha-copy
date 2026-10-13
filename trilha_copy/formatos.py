@@ -26,6 +26,7 @@ class Formato:
     plataforma: str
     descricao: str
     campos: tuple[Campo, ...] = field(default_factory=tuple)
+    arte: str = ""  # medidas da arte para a equipe de criação (confira na documentação vigente da plataforma)
 
 
 CTA_META = (
@@ -40,14 +41,17 @@ META_CAMPOS = (
 )
 
 FORMATOS: dict[str, Formato] = {
-    "meta_feed": Formato("meta_feed", "meta", "Anúncio de feed (imagem ou carrossel) no Facebook e Instagram", META_CAMPOS),
-    "meta_reels": Formato("meta_reels", "meta", "Anúncio em Reels e Stories (o texto aparece por cima do vídeo)", META_CAMPOS),
+    "meta_feed": Formato("meta_feed", "meta", "Anúncio de feed (imagem ou carrossel) no Facebook e Instagram", META_CAMPOS,
+                         arte="1080×1350 (4:5) ou 1080×1080 (1:1); carrossel com a mesma proporção em todos os cartões"),
+    "meta_reels": Formato("meta_reels", "meta", "Anúncio em Reels e Stories (o texto aparece por cima do vídeo)", META_CAMPOS,
+                          arte="1080×1920 (9:16); nada importante nas faixas de cima e de baixo, que a interface cobre"),
     "google_rsa": Formato("google_rsa", "google", "Anúncio responsivo de pesquisa do Google", (
         Campo("titulos", 3, 15, rigido=30),
         Campo("descricoes", 2, 4, rigido=90),
         Campo("caminhos", 0, 2, rigido=15),
     )),
-    "roteiro_video": Formato("roteiro_video", "video", "Roteiro de vídeo curto (Reels, Shorts, anúncio em vídeo)"),
+    "roteiro_video": Formato("roteiro_video", "video", "Roteiro de vídeo curto (Reels, Shorts, anúncio em vídeo)",
+                             arte="vertical 9:16 (1080×1920); legenda ou texto na tela, porque muita gente assiste sem som"),
 }
 
 PALAVRAS_POR_SEGUNDO = 2.5  # fala natural em português, cerca de 150 palavras por minuto

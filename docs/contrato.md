@@ -4,7 +4,7 @@ Os repositórios não dependem um do outro em código. Eles combinam um arquivo.
 
 ## Entrada: `copy.yaml`
 
-Gerado no Trilha-briefing com `python -m trilha_briefing exportar clientes/<id> --para copy` e trazido com `python -m trilha_copy importar <arquivo>`.
+Gerado no Trilha-briefing. Com os clientes no Trilha-clientes, a exportação grava direto na pasta desta ferramenta: `python -m trilha_briefing exportar briefing/<id> --para copy --saida copy` cria `copy/<id>/copy.yaml`. Fora dele, `python -m trilha_copy importar <arquivo>` copia o contrato para `clientes/<id>/`.
 
 O campo `contrato` diz a versão. Esta ferramenta aceita as versões em `VERSOES_SUPORTADAS` (`trilha_copy/contrato.py`), hoje `{1}`, e recusa as outras com a mensagem "atualize o trilha-copy". Campos que ela ainda não conhece são ignorados. Assim o briefing pode acrescentar campos sem quebrar nada; mudar ou remover um campo exige uma versão nova.
 
@@ -35,14 +35,36 @@ Só saem peças **aprovadas** cujo texto não mudou depois da aprovação.
 | Coluna | Conteúdo |
 |---|---|
 | `codigo` | código da célula (`PT01`) |
-| `utm_content` | o mesmo código: é o que o Trilha lê no raio-x e o que a Trilha-LP põe na mensagem do WhatsApp |
+| `utm_content` | o mesmo código: vai no anúncio e é o que a Trilha-LP põe na mensagem do WhatsApp. O raio-x do Trilha-ads agrupa os resultados por ele (`por_criativo`) |
 | `peca` | id da peça |
 | `formato` | `meta_feed`, `meta_reels` ou `google_rsa` |
 | `campo` | `texto_principal`, `titulo`, `descricao`, `botao` (Meta); `titulo`, `descricao`, `caminho` (Google) |
 | `ordem` | posição do texto no campo, a partir de 1 |
 | `texto`, `caracteres` | o texto e o tamanho dele |
 
-**`roteiros/<peca>.md`**, um por roteiro aprovado: tabela de cenas (tempo, fala, visual, texto na tela), chamada e o código para a UTM.
+**`subida.csv`**, uma linha por anúncio a criar na plataforma. Sai quando o contrato traz o plano de campanhas (`veiculacao`):
+
+| Coluna | Conteúdo |
+|---|---|
+| `plataforma` | `meta` ou `google` |
+| `campanha`, `conjunto` | os nomes do plano, já com as regras de nomes do cliente |
+| `nome_anuncio` | o molde do plano (padrão `{codigo} \| v{versao}`) com o código e a `versao` da peça: `PT01 \| v2` |
+| `parametros_url` | o molde de UTM do plano, com o código: vai no campo "parâmetros de URL" do anúncio |
+| `codigo`, `peca`, `formato` | para achar os textos da peça no `anuncios.csv` |
+
+A mesma peça aparece em uma linha por conjunto em que a célula está no plano, porque cada campanha tem o seu `utm_campaign`. Peça aprovada cuja célula não está em nenhum conjunto daquela plataforma fica fora e gera um aviso: o lugar dela se decide no plano do briefing, não na hora de subir. Roteiro de vídeo não entra: ele vira anúncio pela peça `meta_reels` que usa o vídeo.
+
+`versao` (1, 2, 3…) numera as peças da mesma célula na mesma plataforma. O `nova` dá o próximo número sozinho, e o `validar` recusa duas peças com o mesmo, porque os anúncios teriam o mesmo nome.
+
+**`criativos/<peca>.md`**, um por anúncio do Meta aprovado: o briefing do criativo para a equipe de criação. Traz:
+- para que serve a peça e o que varia no teste;
+- para quem, a ideia e as provas;
+- o que não pode e o que é obrigatório;
+- o que a arte mostra, o texto na arte e as medidas;
+- a identidade da marca (`identidade_visual` do contrato);
+- os textos que acompanham a arte.
+
+**`roteiros/<peca>.md`**, um por roteiro aprovado, com o mesmo cabeçalho do briefing do criativo. Traz a tabela de cenas (tempo, parte do modelo, fala, visual, texto na tela), o que cada parte faz, a chamada e o código para a UTM.
 
 ## Mudou algo?
 

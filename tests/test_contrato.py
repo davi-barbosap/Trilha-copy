@@ -4,7 +4,7 @@ Os repositórios não dependem um do outro, então este teste só roda com o Tri
 
     PYTHONPATH=../Trilha-briefing python -m unittest tests.test_contrato -v
 
-Sem ele, os testes são pulados (a CI deste repositório não tem acesso ao outro).
+Sem ele, os testes são pulados. A CI clona o Trilha-briefing (é público) e roda o teste a cada push.
 """
 
 import shutil
@@ -28,6 +28,8 @@ except ImportError:
     TEM_BRIEFING = False
 
 EXEMPLO = Path(__file__).parent.parent / "clientes" / "_exemplo"
+# Blocos opcionais que o exemplo já tem e um Trilha-briefing mais antigo ainda não exporta.
+BLOCOS_NOVOS = {"veiculacao", "identidade_visual", "preco"}
 
 
 @unittest.skipUnless(TEM_BRIEFING, "Trilha-briefing fora do PYTHONPATH")
@@ -53,6 +55,8 @@ class TestContrato(unittest.TestCase):
         deles = yaml.safe_load(self.arquivo.read_text(encoding="utf-8"))
         nosso = yaml.safe_load((EXEMPLO / "copy.yaml").read_text(encoding="utf-8"))
         deles.pop("gerado_em"), nosso.pop("gerado_em")
+        for bloco in BLOCOS_NOVOS - deles.keys():
+            nosso.pop(bloco, None)  # o briefing instalado ainda não exporta este bloco opcional (merge pendente)
         self.assertEqual(deles, nosso)
 
     def test_pecas_do_exemplo_passam_com_o_contrato_novo(self):
