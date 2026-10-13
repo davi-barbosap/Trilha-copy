@@ -152,9 +152,22 @@ def em_markdown(pk: Pacote, c: Contrato, formato: str | None = None) -> str:
     linhas.append(f"Público: {pk.celula.publico or '—'} · Oferta: {pk.oferta.nome if pk.oferta else '—'} · "
                   f"Argumento: {pk.celula.argumento or '—'}")
     hip = c.hipoteses_da(pk.codigo)
-    if hip:
-        linhas.append("Hipóteses: " + "; ".join(f"{h.id} ({h.criterio_sucesso})" for h in hip))
+    em_teste = [h for h in hip if not h.decidida()]
+    if em_teste:
+        linhas.append("Hipóteses: " + "; ".join(f"{h.id} ({h.criterio_sucesso})" for h in em_teste))
     linhas.append("")
+    decididas = [h for h in c.hipoteses if h.decidida()]
+    if decididas or any(h.resultado == "rodando" for h in hip):
+        linhas += ["## O que os testes já disseram", ""]
+        simbolo = {"validada": "✓", "refutada": "✗", "inconclusiva": "·"}
+        for h in sorted(decididas, key=lambda h: pk.codigo not in h.codigos):
+            onde = "nesta célula" if pk.codigo in h.codigos else f"em {', '.join(h.codigos) or 'outra célula'}"
+            linhas.append(f"- {simbolo[h.resultado]} {h.resultado} {onde} ({h.id}): {h.aprendizado or h.hipotese}")
+        for h in hip:
+            if h.resultado == "rodando":
+                linhas.append(f"- em teste ({h.id}): não mude {h.variavel or 'a variável testada'} nas versões desta célula "
+                              "até decidir, senão o teste não diz nada")
+        linhas.append("")
     for p in ("Pessoas", "Posicionamento", "Promessa", "Prova", "Prioridade", "Processo"):
         linhas += [f"## {p}", ""]
         linhas += [f"- {x}" for x in pk.secoes.get(p, [])] or ["- —"]

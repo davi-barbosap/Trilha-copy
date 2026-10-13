@@ -56,7 +56,15 @@ A mesma peça aparece em uma linha por conjunto em que a célula está no plano,
 
 `versao` (1, 2, 3…) numera as peças da mesma célula na mesma plataforma. O `nova` dá o próximo número sozinho, e o `validar` recusa duas peças com o mesmo, porque os anúncios teriam o mesmo nome.
 
-**`roteiros/<peca>.md`**, um por roteiro aprovado: tabela de cenas (tempo, fala, visual, texto na tela), chamada e o código para a UTM.
+**`criativos/<peca>.md`**, um por anúncio do Meta aprovado: o briefing do criativo para a equipe de criação. Traz:
+- para que serve a peça e o que varia no teste;
+- para quem, a ideia e as provas;
+- o que não pode e o que é obrigatório;
+- o que a arte mostra, o texto na arte e as medidas;
+- a identidade da marca (`identidade_visual` do contrato);
+- os textos que acompanham a arte.
+
+**`roteiros/<peca>.md`**, um por roteiro aprovado, com o mesmo cabeçalho do briefing do criativo. Traz a tabela de cenas (tempo, parte do modelo, fala, visual, texto na tela), o que cada parte faz, a chamada e o código para a UTM.
 
 ## Mudou algo?
 

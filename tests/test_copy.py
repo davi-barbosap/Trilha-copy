@@ -47,10 +47,11 @@ def peca(caminho=PT01, mudar=None) -> Peca:
 
 
 def meta(*textos, estado="refinado", **campos) -> Peca:
-    """PT01 com outros textos principais, fora de 'aprovado' para a aprovação não interferir."""
+    """PT01 com outros textos principais, fora de 'aprovado' para a aprovação não interferir, e sem a arte."""
     def mudar(d):
         d["estado"] = estado
         d.pop("aprovacao")
+        d["meta"].pop("arte", None)
         d["meta"]["textos_principais"] = list(textos)
         d.update(campos)
     return peca(PT01, mudar)
@@ -218,7 +219,7 @@ class TestRevisao(unittest.TestCase):
 
     def test_prova_inexistente_bloqueia_e_de_outra_persona_alerta(self):
         self.assertTrue(contem(avisos(meta("Agende hoje.", provas=["inventada"]), nivel="bloqueia"),
-                               "prova 'inventada' não está no contrato"))
+                               'a prova "inventada" não é utilizável'))
         c = contrato(lambda d: d["provas"][3].update(personas=["viajante"]))
         self.assertTrue(contem(avisos(meta("Agende hoje.", provas=["renata"]), c, nivel="atencao"), "de outra persona"))
 
@@ -240,7 +241,7 @@ class TestRevisao(unittest.TestCase):
         p = meta("A melhor escola com qualidade de verdade. Venha conhecer.")
         s = avisos(p, nivel="sugestao")
         self.assertTrue(contem(s, "adjetivo sem fato"))
-        self.assertTrue(contem(s, "chamada sem 'quando'"))
+        self.assertTrue(contem(s, 'chamada sem "quando"'))
         self.assertTrue(contem(s, "frases literais da persona"))
 
     def test_leitura_dificil_e_ritmo(self):
@@ -256,7 +257,7 @@ class TestRevisao(unittest.TestCase):
                  "e a frase fica guardada de novo."
         p = meta(gancho + " Agende hoje.")
         a = avisos(p, nivel="atencao")
-        self.assertTrue(contem(a, "a primeira frase tem"))
+        self.assertTrue(contem(a, "(primeira frase) com"))
         p = peca(PT01, lambda d: (d.pop("aprovacao"), d.update(estado="refinado"),
                                   d["meta"].update(titulos=["Um título longo demais para caber inteiro no feed"],
                                                    cta_botao="")))
@@ -276,7 +277,7 @@ class TestRevisao(unittest.TestCase):
         self.assertTrue(contem(s, "com 10 ou mais"))
         self.assertTrue(contem(s, "nenhum título repete uma palavra-chave"))
         poucos = peca(GB01, lambda d: d["google"].update(titulos=["Inglês para Adultos"]))
-        self.assertTrue(contem(avisos(poucos, nivel="bloqueia"), "o mínimo é 3"))
+        self.assertTrue(contem(avisos(poucos, nivel="bloqueia"), "a plataforma pede de 3 a 15"))
 
     def test_roteiro(self):
         def mudar(d):
@@ -288,7 +289,7 @@ class TestRevisao(unittest.TestCase):
                 cena["texto_tela"] = ""
         a = avisos(peca(PT02, mudar))
         for trecho in ("o gancho precisa resolver nos primeiros 3s", "as cenas somam 30s, mas a duração diz 45s",
-                       "a fala da cena 3-12 tem 40 palavras", "roteiro sem chamada", "roteiro sem texto na tela"):
+                       "a fala da cena 3-8 tem 40 palavras", "roteiro sem chamada", "roteiro sem texto na tela"):
             self.assertTrue(contem(a, trecho), trecho)
         torto = peca(PT02, lambda d: d["roteiro"]["cenas"][0].update(tempo="início"))
         self.assertTrue(contem(avisos(torto), "use o tempo das cenas"))
@@ -410,7 +411,8 @@ class TestExportar(Base):
         escritos, recusadas, avisos = exportar(self.pasta, contrato(), self.tmp / "dist")
         self.assertEqual(recusadas, [])
         self.assertEqual(avisos, [])
-        self.assertEqual([e.name for e in escritos], ["anuncios.csv", "subida.csv"])
+        self.assertEqual([e.name for e in escritos], ["anuncios.csv", "subida.csv", "pt01-meta-feed.md"])
+        self.assertEqual(escritos[2].parent.name, "criativos")
         with open(escritos[0], encoding="utf-8") as f:
             linhas = list(csv.DictReader(f))
         self.assertEqual({(x["peca"], x["utm_content"]) for x in linhas}, {("pt01-meta-feed", "PT01")})
@@ -436,8 +438,292 @@ class TestExportar(Base):
         escritos, _, _ = exportar(self.pasta, c, self.tmp / "dist", codigo="PT02")
         self.assertEqual([e.name for e in escritos], ["pt02-roteiro-video.md"])
         md = escritos[0].read_text(encoding="utf-8")
-        self.assertIn("| 0-3 | Entende tudo, mas a frase não sai?", md)
+        self.assertIn("| 0-3 | gancho | Entende tudo, mas a frase não sai?", md)
         self.assertIn("`PT02`", md)
+
+
+class TestPadraoDeTexto(Base):
+    """As regras do padrão (regras/padrao.yaml) que vieram das três ferramentas ou são novas."""
+
+    def test_arquivo_canonico_e_consistente(self):
+        from trilha_copy import padrao as pd
+        p = pd.carregar()
+        self.assertEqual(len({r.id for r in p.regras}), len(p.regras))
+        usadas = {r.id for r in p.regras}
+        # toda regra de anúncio, roteiro ou página tem quem a aplique aqui
+        import inspect
+        from trilha_copy import revisao
+        fonte = inspect.getsource(revisao)
+        for r in p.regras:
+            if set(r.aplica_a) & {"anuncio", "roteiro", "pagina"}:
+                self.assertIn(f'"{r.id}"', fonte, r.id)
+        self.assertIn("garantia_de_resultado", usadas)
+
+    def test_termo_inteiro_nao_pega_pedaco_de_palavra(self):
+        from trilha_copy import padrao as pd
+        self.assertEqual(pd.achar("urgencia", "Caso ocorra algum atraso, isso até muda"), [])
+        self.assertEqual(pd.achar("atributo_pessoal", "Responda depressa, com a gravidade que o caso pede"), [])
+        self.assertEqual(pd.achar("urgencia", "Corra: só até sexta"), ["so ate", "corra"])
+        self.assertEqual(pd.achar("preco_valor", "por R$ 450"), ["r$ 4"])
+        self.assertEqual(pd.achar("forma_parcela", "20 xícaras"), [])
+
+    def test_garantia_de_resultado(self):
+        a = avisos(meta("Fluência em inglês garantida em 6 meses. Agende hoje."), nivel="bloqueia")
+        self.assertTrue(contem(a, "garante um resultado que não depende só da empresa"))
+        self.assertFalse(contem(avisos(meta("Garanta sua vaga na turma de até 6. Agende hoje.")), "garante um resultado"))
+
+    def test_exclusao_de_publico(self):
+        a = avisos(meta("Curso só para mulheres que querem falar inglês. Agende hoje."), nivel="atencao")
+        self.assertTrue(contem(a, "o texto restringe o público"))
+
+    def test_concretude(self):
+        vago = peca(PT01, lambda d: (d.pop("aprovacao"), d.update(estado="refinado", provas=[]), d["meta"].pop("arte"),
+                                     d["meta"].update(textos_principais=["Aprenda a falar com confiança. Agende hoje."],
+                                                      titulos=["Fale com confiança"], descricoes=[])))
+        self.assertTrue(contem(avisos(vago, nivel="atencao"), "não tem nenhum número, nome próprio ou prova"))
+        self.assertFalse(contem(avisos(meta("Turma de até 6 alunos. Agende hoje.")), "não tem nenhum número"))
+
+    def test_preco_conforme_a_regra_do_canal(self):
+        nunca = contrato(lambda d: d.update(preco={"anuncio": "nunca"}))
+        self.assertEqual(contrato().preco["anuncio"], "nunca")  # o exemplo combinou não mostrar preço no anúncio
+        self.assertTrue(contem(avisos(meta("Mensalidade por R$ 460. Agende hoje."), nunca, nivel="bloqueia"),
+                               "a regra comercial do cliente para anuncio é não mostrar preço"))
+        partir = contrato(lambda d: d.update(preco={"anuncio": "a_partir_de"}))
+        self.assertTrue(contem(avisos(meta("Mensalidade por R$ 460. Agende hoje."), partir), "preço fora da forma combinada"))
+        self.assertFalse(contem(avisos(meta("Mensalidade a partir de R$ 460. Agende hoje."), partir), "forma combinada"))
+        # número de prova em reais não é preço
+        self.assertFalse(contem(avisos(meta("R$ 2 milhões em bolsas concedidas. Agende hoje."), nunca), "mostrar preço"))
+        # sem regra do cliente, o segmento manda: imobiliário mostra parcela no anúncio
+        imob = contrato(lambda d: (d["cliente"].update(playbook="imobiliario"), d.update(preco={})))
+        self.assertTrue(contem(avisos(meta("Apartamento por R$ 450 mil. Agende hoje."), imob), "(parcela)"))
+
+    def test_registro_profissional(self):
+        c = contrato(lambda d: d["compliance"].update(registros_profissionais=["CRO-PR 12345"]))
+        self.assertTrue(contem(avisos(meta("Turma de até 6. Agende hoje."), c, nivel="atencao"),
+                               "falta o registro profissional (CRO-PR 12345)"))
+        self.assertFalse(contem(avisos(meta("Turma de até 6. CRO-PR 12345. Agende hoje."), c), "registro profissional"))
+        # registro na arte conta
+        na_arte = peca(PT01, lambda d: (d.pop("aprovacao"), d.update(estado="refinado"),
+                                        d["meta"]["arte"].update(registro_na_arte=True)))
+        self.assertFalse(contem(avisos(na_arte, c), "registro profissional"))
+
+    def test_saude_antes_e_depois(self):
+        c = contrato(lambda d: d["compliance"].update(registros_profissionais=["CRO-PR 12345"],
+                                                      regras_legais=["CFO: sem antes e depois"]))
+        a = avisos(meta("Veja o antes e depois. CRO-PR 12345. Agende hoje."), c, nivel="atencao")
+        self.assertTrue(contem(a, "antes e depois ou prazo de resultado em saúde"))
+        self.assertTrue(contem(a, "CFO: sem antes e depois"))
+
+    def test_promessa_de_ganho_com_ressalva_passa(self):
+        self.assertTrue(contem(avisos(meta("Ganhe R$ 5.000 a mais por mês. Agende hoje.")), "promessa de ganho"))
+        self.assertFalse(contem(avisos(meta("Ganhe R$ 5.000 a mais por mês. Resultados variam. Agende hoje.")),
+                                "promessa de ganho"))
+        self.assertFalse(contem(avisos(meta("Ganhe 2 aulas extras. Agende hoje.")), "promessa de ganho"))
+
+    def test_urgencia_precisa_de_motivo(self):
+        sem_motivo = contrato(lambda d: next(o for o in d["ofertas"] if o["id"] == "conversacao-adultos")["urgencia"]
+                              .update(motivo=""))
+        texto = "Últimos dias para entrar na turma de novembro. Agende hoje."
+        p = meta(texto, oferta="conversacao-adultos")
+        self.assertFalse(contem(avisos(p), "não tem urgência ou escassez reais"))  # escassez real com evidência basta
+        sem_nada = contrato(lambda d: next(o for o in d["ofertas"] if o["id"] == "conversacao-adultos").update(escassez=None))
+        sem_nada_e_sem_motivo = contrato(lambda d: (
+            next(o for o in d["ofertas"] if o["id"] == "conversacao-adultos").update(escassez=None),
+            next(o for o in d["ofertas"] if o["id"] == "conversacao-adultos")["urgencia"].update(motivo="")))
+        self.assertFalse(contem(avisos(p, sem_nada), "não tem urgência ou escassez reais"))
+        self.assertTrue(contem(avisos(p, sem_nada_e_sem_motivo, nivel="bloqueia"), "não tem urgência ou escassez reais"))
+        del sem_motivo
+
+    def test_gravidade_desligada(self):
+        from trilha_copy import padrao as pd
+        r = pd.carregar().regra("ritmo_monotono")
+        antiga = r.gravidade
+        try:
+            r.gravidade = "desligada"
+            monotono = " ".join(["Você fala na aula toda semana."] * 6)
+            self.assertFalse(contem(avisos(meta(monotono)), "mesmo tamanho"))
+        finally:
+            r.gravidade = antiga
+
+
+class TestCaminhoDeVolta(Base):
+    """O que o teste ensinou volta pela copy: no pacote da célula e como referência da peça vencedora."""
+
+    def decidida(self, d, resultado="validada"):
+        h = next(x for x in d["hipoteses"] if x["id"] == "h01-gancho-travar")
+        h.update(resultado=resultado, aprendizado="O gancho da frase que não sai trouxe lead 23% mais barato",
+                 conversoes_obtidas=52, fim="2026-11-20")
+
+    def test_pacote_mostra_o_que_os_testes_disseram(self):
+        pk = montar(contrato(self.decidida), "PT01")
+        md = em_markdown(pk, contrato(self.decidida), "meta_feed")
+        self.assertIn("## O que os testes já disseram", md)
+        self.assertIn("✓ validada nesta célula (h01-gancho-travar): O gancho da frase que não sai", md)
+        md3 = em_markdown(montar(contrato(self.decidida), "PT03"), contrato(self.decidida))
+        self.assertIn("✓ validada em PT01, PT02 (h01-gancho-travar)", md3)  # aprendizado vale para as outras células
+
+    def test_teste_rodando_avisa_para_nao_mudar_a_variavel(self):
+        def rodando(d):
+            next(x for x in d["hipoteses"] if x["id"] == "h01-gancho-travar")["resultado"] = "rodando"
+        md = em_markdown(montar(contrato(rodando), "PT01"), contrato(rodando))
+        self.assertIn("em teste (h01-gancho-travar): não mude criativo", md)
+
+    def test_vencedora_vira_referencia(self):
+        caminho = self.pasta / "copy.yaml"
+        dados = yaml.safe_load(caminho.read_text(encoding="utf-8"))
+        self.decidida(dados)
+        caminho.write_text(yaml.safe_dump(dados, allow_unicode=True), encoding="utf-8")
+        rc, saida = rodar("vencedora", self.arquivo("PT01", "pt01-meta-feed"), "--hipotese", "h01-gancho-travar")
+        self.assertEqual(rc, 0, saida)
+        refs, erros = carregar_referencias(self.pasta / "referencias")
+        self.assertEqual(erros, {})
+        [r] = refs
+        self.assertEqual((r.id, r.formato), ("pt01-meta-feed", "meta"))
+        self.assertIn("23% mais barato", r.por_que_funciona)
+        self.assertIn("hipótese h01-gancho-travar validada em 20/11/2026", r.fonte)
+        self.assertTrue(r.decupagem)  # do subtexto da peça
+
+    def test_vencedora_so_com_teste_validado_e_peca_aprovada(self):
+        caminho = self.pasta / "copy.yaml"
+        dados = yaml.safe_load(caminho.read_text(encoding="utf-8"))
+        self.decidida(dados, "refutada")
+        caminho.write_text(yaml.safe_dump(dados, allow_unicode=True), encoding="utf-8")
+        rc, saida = rodar("vencedora", self.arquivo("PT01", "pt01-meta-feed"), "--hipotese", "h01-gancho-travar")
+        self.assertEqual(rc, 1)
+        self.assertIn("está 'refutada'", saida)
+        rc, saida = rodar("vencedora", self.arquivo("PT02", "pt02-roteiro-video"), "--hipotese", "h01-gancho-travar")
+        self.assertIn("só peça aprovada", saida)
+
+
+class TestRevisarPagina(Base):
+    """A página da Trilha-LP revisada com as mesmas regras de texto."""
+
+    def pagina(self, mudar=None):
+        dados = {
+            "pagina": {"id": "x", "cliente": "_exemplo", "oferta": "conversacao-adultos", "segmento": "escola",
+                       "origem": "meta", "titulo_seo": "Inglês para adultos", "descricao_seo": "Turma de até 6 alunos"},
+            "marca": {"nome": "Escola", "registro_profissional": ""},
+            "contato": {"mensagem_whatsapp": "Oi! Vim pela página (PT01)"},
+            "topo": {"titulo": "Fale inglês na reunião em turmas de até 6", "subtitulo": "Você treina conversa desde a "
+                     "primeira aula, no seu nível, com situações do seu trabalho.", "provas": ["Turma de até 6 alunos"],
+                     "cta": {"texto": "Agendar aula experimental"}},
+            "beneficios": {"titulo": "Você fala desde a primeira aula", "itens": [
+                {"titulo": "Turma de até 6", "texto": "Você fala a maior parte da aula."}]},
+            "como_funciona": {"titulo": "Como funciona a aula experimental", "passos": []},
+            "objecoes": {"titulo": "Dúvidas antes de começar", "itens": [
+                {"pergunta": "E se eu não gostar?", "resposta": "Você cancela no primeiro mês, sem multa."}]},
+            "fechamento": {"titulo": "Sua vaga na turma de novembro", "subtitulo": "", "lista": []},
+            "formulario": {"botao": "Quero minha aula experimental"},
+        }
+        if mudar:
+            mudar(dados)
+        return dados
+
+    def test_pagina_boa_passa(self):
+        from trilha_copy.revisao import revisar_pagina
+        self.assertEqual([a.texto for a in revisar_pagina(self.pagina(), contrato()) if a.nivel == "bloqueia"], [])
+
+    def test_regras_de_pagina(self):
+        from trilha_copy.revisao import revisar_pagina
+        def mudar(d):
+            d["beneficios"]["titulo"] = "Benefícios"
+            d["formulario"]["botao"] = "Enviar"
+            d["objecoes"]["itens"][0]["resposta"] = "Entre em contato."
+            d["topo"]["titulo"] = ("Fluência garantida em poucos meses para quem trava no inglês do trabalho e quer "
+                                   "falar nas reuniões")
+        a = [x.texto for x in revisar_pagina(self.pagina(mudar), contrato())]
+        for trecho in ('beneficios.titulo: título genérico ("Benefícios")', 'formulario.botao: botão genérico ("Enviar")',
+                       "objecoes.itens[0]: objeção sem resposta", 'termo proibido — "fluência garantida"',
+                       "topo.titulo com 98 caracteres"):
+            self.assertTrue(contem(a, trecho), trecho)
+
+    def test_linha_de_comando(self):
+        caminho = self.tmp / "pagina.yaml"
+        caminho.write_text(yaml.safe_dump(self.pagina(), allow_unicode=True), encoding="utf-8")
+        rc, saida = rodar("revisar-pagina", caminho, "--contrato", self.pasta)
+        self.assertEqual(rc, 0, saida)
+        ruim = self.pagina(lambda d: d["topo"].update(titulo="Imperdível: fale inglês"))
+        caminho.write_text(yaml.safe_dump(ruim, allow_unicode=True), encoding="utf-8")
+        self.assertEqual(rodar("revisar-pagina", caminho, "--contrato", self.pasta)[0], 1)
+
+
+class TestRoteirosECriativo(Base):
+    """Modelos de corpo para roteiro (editáveis) e o briefing do criativo para a equipe de criação."""
+
+    def test_modelos_carregam_e_conferem_a_ordem(self):
+        from trilha_copy.roteiros import modelos
+        m = modelos()
+        self.assertEqual(set(m), {"educativo", "historia", "oferta_direta"})
+        h = m["historia"]
+        self.assertEqual(h.conferir(["gancho", "situacao", "mas", "entao", "mas", "entao", "resultado", "cta"]), [])
+        problemas = h.conferir(["gancho", "mas", "situacao", "", "xx", "cta", "resultado"])
+        for trecho in ("cena(s) 4 sem `parte`", "partes que o modelo não tem: xx", "faltam as partes: entao",
+                       "'situacao' vem depois de 'mas'", "a cena da chamada (cta) fica no fim"):
+            self.assertTrue(contem(problemas, trecho), trecho)
+        self.assertEqual(m["oferta_direta"].conferir(["gancho", "promessa", "prova", "processo"]), [])  # prioridade é opcional
+
+    def test_modelo_que_nao_existe_nao_valida(self):
+        with self.assertRaises(ValidationError):
+            peca(PT02, lambda d: d["roteiro"].update(modelo="novela"))
+
+    def test_revisao_confere_o_modelo(self):
+        trocado = peca(PT02, lambda d: d["roteiro"]["cenas"][2].update(parte="como"))
+        self.assertTrue(contem(avisos(trocado, nivel="atencao"), "faltam as partes: por_que"))
+        sem_modelo = peca(PT02, lambda d: d["roteiro"].update(modelo=None))
+        self.assertTrue(contem(avisos(sem_modelo, nivel="sugestao"), "roteiro sem modelo de corpo"))
+        self.assertEqual(avisos(carregar_peca(PT02)), [])
+
+    def test_fluxo_pede_modelo_e_briefing_do_criativo(self):
+        rascunho = peca(PT02, lambda d: (d.update(estado="rascunho"), d["roteiro"].update(modelo=None)))
+        self.assertTrue(contem(pendencias(rascunho, contrato()), "modelo de corpo do roteiro"))
+        sem_arte = peca(PT01, lambda d: (d.pop("aprovacao"), d.update(estado="refinado"), d["meta"].pop("arte")))
+        self.assertTrue(contem(pendencias(sem_arte, contrato()), "briefing do criativo (meta.arte.mostrar)"))
+
+    def test_assinatura_antiga_continua_valendo(self):
+        # Campos novos vazios não mudam a assinatura: peça aprovada antes deles segue aprovada.
+        p = peca(PT02)
+        sem_campos_novos = Peca.model_validate(
+            {**ler(PT02), "roteiro": {k: v for k, v in ler(PT02)["roteiro"].items() if k != "modelo"}})
+        self.assertNotEqual(p.assinatura_conteudo(), sem_campos_novos.assinatura_conteudo())  # modelo preenchido pesa
+        limpa = peca(PT02, lambda d: (d["roteiro"].update(modelo=None), [c.pop("parte") for c in d["roteiro"]["cenas"]]))
+        crua = peca(PT02, lambda d: (d["roteiro"].pop("modelo"), [c.pop("parte") for c in d["roteiro"]["cenas"]]))
+        self.assertEqual(limpa.assinatura_conteudo(), crua.assinatura_conteudo())
+
+    def test_texto_na_arte_passa_pela_revisao(self):
+        p = peca(PT01, lambda d: (d.pop("aprovacao"), d.update(estado="refinado"),
+                                  d["meta"]["arte"].update(texto_na_arte=["Aula imperdível"])))
+        self.assertTrue(contem(avisos(p, nivel="bloqueia"), "meta.arte.texto_na_arte[0]"))
+
+    def test_briefing_do_criativo(self):
+        escritos, _, _ = exportar(self.pasta, contrato(), self.tmp / "dist", codigo="PT01")
+        md = next(e for e in escritos if e.parent.name == "criativos").read_text(encoding="utf-8")
+        for trecho in ("# Briefing do criativo — PT01 v1 (pt01-meta-feed)",
+                       "Anúncio: **PT01 | v1** (campanha _exemplo | meta-profissional, conjunto amplo)",
+                       "## Para quem", "## O que a arte precisa mostrar", "Adulto em reunião por vídeo",
+                       "- A frase não sai?", "Evitar: Bandeiras", "1080×1350 (4:5)", "Botão: Agendar", "`PT01`",
+                       "## Identidade da marca", "Tipografia: titulos Poppins", "Estilo de imagem: alunos reais"):
+            self.assertIn(trecho, md)
+
+    def test_roteiro_com_partes_no_markdown(self):
+        from trilha_copy.exportar import roteiro_md
+        md = roteiro_md(carregar_peca(PT02), contrato())
+        self.assertIn("Modelo: Educativo: o quê → por quê → como", md)
+        self.assertIn("| 3-8 | o_que | Isso não é falta de vocabulário.", md)
+        self.assertIn("- **por_que**: por que isso importa", md)
+        self.assertIn("## Para quem", md)
+
+    def test_nova_com_modelo(self):
+        rc, saida = rodar("nova", self.pasta, "VA01", "--formato", "roteiro_video", "--modelo", "historia")
+        self.assertEqual(rc, 0, saida)
+        p = carregar_peca(self.arquivo("VA01", "va01-roteiro-video"))
+        self.assertEqual(p.roteiro.modelo, "historia")
+        self.assertEqual([c.parte for c in p.roteiro.cenas], ["gancho", "situacao", "mas", "entao", "resultado", "cta"])
+        self.assertEqual(p.roteiro.cenas[0].tempo, "0-3")
+        self.assertEqual(p.roteiro.cenas[-1].tempo.split("-")[1], "30")
+        self.assertEqual(rodar("nova", self.pasta, "VA01", "--formato", "meta_feed", "--modelo", "historia")[0], 1)
+        rc, saida = rodar("roteiros")
+        self.assertEqual(rc, 0)
+        self.assertIn("oferta_direta", saida)
 
 
 class TestSubida(Base):

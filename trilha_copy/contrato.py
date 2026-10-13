@@ -166,8 +166,9 @@ class Oferta(_Base):
     cta: str = ""
 
     def urgencia_valida(self) -> bool:
+        """Real, com motivo e dentro do prazo (padrão de texto: urgencia_ou_escassez_sem_lastro)."""
         u = self.urgencia
-        return bool(u and u.real and (u.data is None or u.data >= date.today()))
+        return bool(u and u.real and u.motivo.strip() and (u.data is None or u.data >= date.today()))
 
     def escassez_valida(self) -> bool:
         return bool(self.escassez and self.escassez.real and self.escassez.evidencia)
@@ -215,7 +216,23 @@ class Hipotese(_Base):
     variavel: str = ""
     codigos: list[str] = Field(default_factory=list)
     criterio_sucesso: str = ""
-    resultado: str = "planejada"
+    resultado: str = "planejada"  # planejada, rodando, validada, refutada, inconclusiva
+    conversoes_obtidas: int | None = None
+    fim: date | None = None
+    aprendizado: str = ""  # o que o teste ensinou, registrado no briefing (decidir)
+
+    def decidida(self) -> bool:
+        return self.resultado in ("validada", "refutada", "inconclusiva")
+
+
+class IdentidadeVisual(_Base):
+    cores: dict[str, Any] = Field(default_factory=dict)  # primaria, secundaria, fundo, texto (#RRGGBB), apoio
+    tipografia: dict[str, str] = Field(default_factory=dict)  # titulos, texto
+    logo: str = ""
+    estilo_imagem: str = ""
+
+    def vazia(self) -> bool:
+        return not (self.cores or self.tipografia or self.logo or self.estilo_imagem)
 
 
 class Local(_Base):
@@ -239,6 +256,7 @@ class Cliente(_Base):
     id: str
     nome: str
     segmento: str = ""
+    playbook: str = ""  # padrao, imobiliario…: liga as regras de segmento do padrão de texto
     whatsapp: str = ""
     area: str = ""
 
@@ -249,6 +267,7 @@ class Contrato(_Base):
     cliente: Cliente
     voz: Voz = Field(default_factory=Voz)
     posicionamento: dict[str, Any] = Field(default_factory=dict)
+    identidade_visual: IdentidadeVisual = Field(default_factory=IdentidadeVisual)
     compliance: Compliance = Field(default_factory=Compliance)
     unicidade: str = ""
     concorrentes: list[str] = Field(default_factory=list)
@@ -262,6 +281,7 @@ class Contrato(_Base):
     metrica_principal: str = ""
     evento_otimizacao: str = ""
     veiculacao: list[Local] = Field(default_factory=list)  # vazio quando o briefing ainda não tem plano de campanhas
+    preco: dict[str, str] = Field(default_factory=dict)  # anuncio | whatsapp | landing → nunca, a_partir_de, parcela, valor_cheio
 
     @model_validator(mode="after")
     def _versao(self) -> Contrato:
