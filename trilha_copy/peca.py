@@ -36,6 +36,7 @@ class Arte(_Base):
     texto_na_arte: list[str] = Field(default_factory=list)  # o texto por cima da imagem; curto, revisado como o resto
     evitar: str = ""  # o que não pode aparecer (além do compliance do briefing, que vai junto)
     referencias: list[str] = Field(default_factory=list)  # links ou ids do banco de referências
+    registro_na_arte: bool = False  # o registro profissional (CRECI, CRO…) está na imagem, não no texto
 
 
 class Meta(_Base):
@@ -184,7 +185,8 @@ class ErroPeca(Exception):
 
 
 def _sem_campos_novos_vazios(dados: dict) -> dict:
-    """Campos que entraram depois da 0.1.3 (arte, modelo, parte) só pesam na assinatura quando preenchidos.
+    """Campos que entraram depois da 0.1.3 (arte, modelo, parte, registro_na_arte) só pesam na assinatura quando
+    preenchidos.
 
     Assim uma peça aprovada antes deles continua aprovada; preencher depois exige aprovar de novo, como qualquer
     mudança no conteúdo.
@@ -193,6 +195,8 @@ def _sem_campos_novos_vazios(dados: dict) -> dict:
     for chave in ("arte", "modelo"):
         if dados.get(chave) is None:
             dados.pop(chave, None)
+    if isinstance(dados.get("arte"), dict) and not dados["arte"].get("registro_na_arte"):
+        dados["arte"] = {k: v for k, v in dados["arte"].items() if k != "registro_na_arte"}
     if "cenas" in dados:
         dados["cenas"] = [{k: v for k, v in cena.items() if not (k == "parte" and not v)} for cena in dados["cenas"]]
     return dados

@@ -1,7 +1,7 @@
 # Contrato com o Trilha-copy, gerado pelo Trilha-briefing a partir do cliente _exemplo.
 # Edite lá, não aqui. Importe com: python -m trilha_copy importar <este arquivo>
 contrato: 1
-gerado_em: '2026-10-05'
+gerado_em: '2026-10-06'
 cliente:
   id: _exemplo
   nome: Escola Exemplo de Inglês
@@ -59,6 +59,10 @@ identidade_visual:
     texto: Inter
   logo: assets/logo.svg
   estilo_imagem: alunos reais em aula, sem banco de imagem
+preco:
+  anuncio: nunca
+  whatsapp: valor_cheio
+  landing: a_partir_de
 compliance:
   termos_proibidos:
   - imperdível

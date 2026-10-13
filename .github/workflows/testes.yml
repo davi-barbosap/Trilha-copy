@@ -21,7 +21,12 @@ jobs:
       - run: python -m trilha_copy exportar clientes/_exemplo
       - run: python -m trilha_copy referencias
       - run: python -m trilha_copy roteiros
+      - run: python -m trilha_copy padrao
+      - name: A página do exemplo do briefing passa no padrão de texto
+        run: |
+          python -m trilha_briefing exportar ../Trilha-briefing/clientes/_exemplo --para lp --oferta conversacao-adultos --saida /tmp/lp
+          for f in /tmp/lp/*/pagina.yaml; do python -m trilha_copy revisar-pagina "$f" --contrato clientes/_exemplo; done
       - name: O pacote instalado leva os modelos de roteiro
         run: |
           pip install --no-deps --target /tmp/instalado .
-          cd /tmp && PYTHONPATH=/tmp/instalado python -c "import trilha_copy.roteiros as r; assert '/tmp/instalado' in r.__file__, r.__file__; assert r.modelos()"
+          cd /tmp && PYTHONPATH=/tmp/instalado python -c "import trilha_copy.roteiros as r; assert '/tmp/instalado' in r.__file__, r.__file__; assert r.modelos(); import trilha_copy.padrao as p; p.carregar()"

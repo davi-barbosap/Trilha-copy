@@ -1,5 +1,37 @@
 # Mudanças
 
+## 0.3.0 — caminho de volta dos testes (out/2026)
+
+- **Pacote da célula: "O que os testes já disseram".** Mostra as hipóteses decididas no briefing (validada, refutada, inconclusiva), com o aprendizado. Primeiro vêm as da célula, depois as das outras. Teste rodando na célula vira aviso para não mudar a variável testada nas versões novas.
+- **`vencedora <peca> --hipotese H`:** a peça aprovada de uma hipótese validada vira referência do cliente em `copy/<id>/referencias/`. A decupagem vem do subtexto, o porquê do aprendizado, e a fonte cita a hipótese e a data.
+- **Contrato:** lê de cada hipótese o aprendizado, a data de fim e as conversões obtidas. Elas vêm do briefing, que as registra com `registrar-resultados` e `decidir`.
+
+## 0.2.0 — padrão de texto da Trilha (out/2026)
+
+### Novo
+- **`trilha_copy/regras/padrao.yaml`:** o padrão de texto num arquivo só.
+  - **Conteúdo:** 15 princípios, 25 vocabulários, parâmetros e 48 regras, cada uma com gravidade, mensagem, fonte e exemplos.
+  - **Alcance:** vale para anúncio, roteiro, página e briefing. Antes, as regras estavam espalhadas em três ferramentas, com listas e gravidades diferentes.
+  - **Edição:** gravidade (inclusive `desligada`), mensagem, vocabulários e parâmetros são editáveis, e a gravidade pode mudar por contexto (`gravidade_por_contexto`).
+  - **Documentação:** [docs/padrao-de-texto.md](docs/padrao-de-texto.md).
+- **`revisar-pagina <pagina.yaml>`:** o texto de uma página da Trilha-LP pelo mesmo padrão, com o contrato do cliente.
+- **`padrao`:** lista os princípios e as regras por superfície.
+- **Regras novas:**
+  - garantia de resultado, em qualquer segmento (bloqueia);
+  - exclusão de público no texto;
+  - peça sem nenhum dado concreto;
+  - preço conforme a regra comercial do canal, que bloqueia quando o cliente não mostra preço;
+  - registro profissional ausente (`arte.registro_na_arte` quando ele está na imagem);
+  - antes e depois em saúde;
+  - na página: título de bloco genérico, botão genérico, objeção sem resposta, título do topo e descrição de SEO longos.
+
+### Mudou
+- **Termos casam como palavra inteira** (`radical*` e `re:` quando a lista quer variações). "corra" não pega mais "ocorra", nem "gravida" pega "gravidade".
+- **Urgência válida agora exige motivo** (real, com motivo e no prazo). Escassez continua exigindo evidência.
+- **Promessa de ganho:** com ressalva ("resultados variam" ou um aviso legal do cliente), não avisa. "Ganhe 2 aulas" não conta como promessa de renda.
+- **Mensagens:** as mensagens da revisão vêm do padrão. Algumas mudaram de texto.
+- **Contrato:** lê `cliente.playbook` (liga as regras de segmento) e `preco` (regra comercial por canal), vindos do briefing. Sem eles, o segmento é deduzido dos registros profissionais (CRO → saúde) e o preço fica livre.
+
 ## 0.1.4 — roteiros com modelo de corpo e briefing do criativo (out/2026)
 
 - **Modelos de corpo para roteiro** em `trilha_copy/regras/roteiros.yaml` (editável):
