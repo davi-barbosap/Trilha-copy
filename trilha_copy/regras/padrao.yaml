@@ -30,7 +30,7 @@ principios:
     ("exija", "evite imitações") e título que apresenta a empresa afastam quem lê.'
   fonte: 'aulas-copy-1-e-2.txt, Aula 1 (Hopkins: "Advertising is multiplied salesmanship"; "The best ads ask no one to buy";
     "The greatest two faults in advertising lie in boasts and in selfishness"); aula-landing-page.txt (o título não explica
-    quem a empresa é); trilha-copywritter/docs/metodo.md §2 e §3.'
+    quem a empresa é); Trilha-copy/docs/metodo.md §2 e §3.'
   regras:
   - fala_de_si
   - frase_egoista
@@ -38,7 +38,7 @@ principios:
   principio: 'Concretude obrigatória: número, nome próprio ou detalhe no lugar do adjetivo.'
   explicacao: '"Barbear em 78 segundos" e não "barbear rápido"; "a 500 m do Shopping Pátio" e não "perto de tudo". Se você
     só pudesse apontar, para o que apontaria?'
-  fonte: 'Trilha/docs/arquitetura/nucleo.md §1, princípio 6 ("Copy sem número, fato ou nome próprio é barrada"); beatriz-moraes082/briefing-trilha/skills/fluxos-imobiliarios/SKILL.md
+  fonte: 'Trilha-ads/docs/arquitetura/nucleo.md §1, princípio 6 ("Copy sem número, fato ou nome próprio é barrada"); briefing-trilha/skills/fluxos-imobiliarios/SKILL.md
     ("Apelos comerciais reais do produto — indispensável"); aulas-copy-1-e-2.txt, Aula 1 (Hopkins: 78 segundos, lucro de 3%);
     aula-copy-3.txt (Concrete; teste do surdo-mudo); trilha-briefing/docs/metodo.md, princípio 4.'
   regras:
@@ -49,7 +49,7 @@ principios:
   principio: 'Tudo o que a peça afirma vem do briefing: número, prova, promessa, urgência.'
   explicacao: Faltou algo, volta ao briefing; não se inventa na peça. Prova só entra com fonte (número) ou autorização (depoimento),
     e convence mais quando se parece com quem lê.
-  fonte: trilha_copy/contrato.py ("A copy não inventa nada sobre o cliente"); trilha-copywritter/docs/metodo.md §1; aula-copy-3.txt
+  fonte: trilha_copy/contrato.py ("A copy não inventa nada sobre o cliente"); Trilha-copy/docs/metodo.md §1; aula-copy-3.txt
     ("Trust is belief with evidence"; "proof is relative"); curso-marketing.txt ("Para cada promessa, uma prova").
   regras:
   - numero_sem_lastro
@@ -72,7 +72,7 @@ principios:
   principio: Urgência e escassez só quando são reais, específicas e com motivo.
   explicacao: Prazo inventado é publicidade enganosa e queima a confiança. Sem urgência real, use o custo de não agir.
   fonte: 'aulas-copy-1-e-2.txt, Aula 2, módulo de urgência e escassez ("It must be real… combine with a reason why… don''t
-    do fake scarcity"); aula-copy-3.txt (priority: escassez, urgência e custo de não agir); trilha-copywritter/docs/metodo.md
+    do fake scarcity"); aula-copy-3.txt (priority: escassez, urgência e custo de não agir); Trilha-copy/docs/metodo.md
     §5 ("Urgência falsa não é técnica, é publicidade enganosa").'
   regras:
   - urgencia_ou_escassez_sem_lastro
@@ -82,7 +82,7 @@ principios:
   explicacao: 'Termos e promessas proibidos, atributos pessoais, registro profissional, regra de preço por canal. A ferramenta
     serve para qualquer segmento: a regra do imobiliário ou da saúde só vale quando o cliente declara o segmento, e mora em
     dados (playbook, briefing), nunca no código.'
-  fonte: Trilha/docs/arquitetura/nucleo.md §1, princípios 1 e 10; trilha-lp/README.md ("as regras de um segmento só valem
+  fonte: Trilha-ads/docs/arquitetura/nucleo.md §1, princípios 1 e 10; trilha-lp/README.md ("as regras de um segmento só valem
     quando a página declara esse segmento"); Trilha/playbooks/imobiliario/playbook.yaml (compliance, regras_comerciais_padrao);
     decisão atual em trilha_copy/revisao.py::_compliance.
   regras:
@@ -131,7 +131,7 @@ principios:
     a maioria.'
   fonte: 'aulas-copy-1-e-2.txt, Aula 1 (Hopkins: "The purpose of a headline is to pick out people you could interest"; "Your
     main appeal should lie in your headline"); aula-landing-page.txt ("real people, real results… horrible headline"; ler
-    só os títulos); trilha-copywritter/docs/metodo.md §2 (10 rascunhos).'
+    só os títulos); Trilha-copy/docs/metodo.md §2 (10 rascunhos).'
   regras:
   - titulo_de_bloco_generico
   - titulo_sem_palavra_chave
@@ -141,8 +141,8 @@ principios:
   explicacao: O termostato de 1 (sóbrio) a 5 (euforia de lançamento) limita exclamação, CAIXA ALTA e palavra de euforia. A
     assinatura (marca, pessoa, marca e pessoa) define se o texto diz "nós" ou "eu".
   fonte: aulas-copy-1-e-2.txt, Aula 2 ("If you push on these emotions too hard, your copy might come off as very salesy… unbelievable");
-    trilha_briefing/esquema.py (Voz.intensidade); Trilha/docs/arquitetura/nucleo.md §5.1 (assinatura define a pessoa gramatical);
-    beatriz-moraes082/briefing-trilha/README.md (como o contexto muda a copy).
+    trilha_briefing/esquema.py (Voz.intensidade); Trilha-ads/docs/arquitetura/nucleo.md §5.1 (assinatura define a pessoa gramatical);
+    briefing-trilha/README.md (como o contexto muda a copy).
   regras:
   - intensidade_acima_da_combinada
   - termo_ou_promessa_proibida
@@ -152,7 +152,7 @@ principios:
   explicacao: Gancho que dá clique de curioso sem perfil derruba o funil. Curiosidade presa à dor ou ao desejo da persona;
     a peça também filtra quem não é cliente.
   fonte: mensagens-internas-trilha.txt ("custo por lead baixo com lead que não fecha é prejuízo disfarçado de eficiência");
-    aulas-copy-1-e-2.txt, Aula 2 (micro-ação sem comprometer a macro); trilha-copywritter/docs/metodo.md §2 e §5; trilha-lp/docs/estrutura.md,
+    aulas-copy-1-e-2.txt, Aula 2 (micro-ação sem comprometer a macro); Trilha-copy/docs/metodo.md §2 e §5; trilha-lp/docs/estrutura.md,
     princípio 4.
   regras:
   - promessa_de_ganho
@@ -161,7 +161,7 @@ principios:
   principio: Anúncio, página e WhatsApp dizem a mesma coisa, ligados pelo código da célula.
   explicacao: A primeira dobra da página continua a promessa do anúncio que trouxe a pessoa; o código da célula vai no utm_content
     e na mensagem do WhatsApp.
-  fonte: Trilha/docs/arquitetura/nucleo.md §1, princípio 7, e §5.4; curso-marketing.txt (a primeira sessão "tem que estar
+  fonte: Trilha-ads/docs/arquitetura/nucleo.md §1, princípio 7, e §5.4; curso-marketing.txt (a primeira sessão "tem que estar
     conectada com o anúncio que ele viu"); trilha-lp/README.md.
   regras:
   - celula_inexistente
@@ -170,7 +170,7 @@ principios:
   principio: 'Não somos genéricos: cada peça trata uma objeção real, com a resposta que o time usa ao vivo.'
   explicacao: No imobiliário, os três eixos (preço, produto, localização) são obrigatórios na régua. Produto difícil de vender
     no presencial pede contorno de objeção já no criativo.
-  fonte: beatriz-moraes082/briefing-trilha/skills/fluxos-imobiliarios/SKILL.md e references/objecoes_e_apelos.md; mensagens-internas-trilha.txt
+  fonte: briefing-trilha/skills/fluxos-imobiliarios/SKILL.md e references/objecoes_e_apelos.md; mensagens-internas-trilha.txt
     ("argumentação de contorno de objeção já no criativo"); curso-marketing.txt ("para cada aumento de consciência, uma quebra
     de objeção"); trilha-lp/docs/estrutura.md §5.
   regras:
@@ -181,7 +181,7 @@ principios:
   explicacao: O que dá para conferir virou regra; o que depende de julgamento virou pergunta ou campo da peça (teste do vendedor,
     dormir sobre a peça). Ângulo positivo ou negativo é variável de teste, não regra; anúncio que funciona não se troca por
     cansaço de quem o vê todo dia.
-  fonte: 'trilha-copywritter/docs/metodo.md (abertura, §2 e §5); Trilha/docs/arquitetura/nucleo.md §1, princípio 11; aulas-copy-1-e-2.txt,
+  fonte: 'Trilha-copy/docs/metodo.md (abertura, §2 e §5); Trilha-ads/docs/arquitetura/nucleo.md §1, princípio 11; aulas-copy-1-e-2.txt,
     Aula 1 (Hopkins: "We must submit all things in advertising to the court of public opinion"; não trocar o anúncio que funciona).'
   regras:
   - aprovacao_invalidada
@@ -737,7 +737,7 @@ regras:
   - promessa_proibida_imobiliario
   - promessa_proibida_saude
   fonte: 'decisão atual em trilha_copy/revisao.py::_compliance, trilha_briefing/revisao.py::_copy e trilha_lp/revisao.py::revisar;
-    listas do segmento: Trilha/docs/arquitetura/nucleo.md §5.1 (regras_comerciais.promessas_proibidas) e trilha-lp/docs/estrutura.md
+    listas do segmento: Trilha-ads/docs/arquitetura/nucleo.md §5.1 (regras_comerciais.promessas_proibidas) e trilha-lp/docs/estrutura.md
     (Regras do imobiliário).'
   mensagem: '{onde}: {motivo} — "{termo}". Não vai ao ar assim: troque o termo. Se a regra mudou, mude a lista no briefing
     e exporte de novo, não aqui.'
@@ -790,7 +790,7 @@ regras:
   - pronomes_leitor
   - atributo_pessoal
   fonte: decisão atual em trilha_copy/revisao.py::_compliance (ATRIBUTOS_PESSOAIS, bloqueia no Meta e alerta nos outros);
-    política de atributos pessoais do Meta citada em trilha-copywritter/docs/metodo.md §5.
+    política de atributos pessoais do Meta citada em Trilha-copy/docs/metodo.md §5.
   mensagem: '{onde}: possível afirmação sobre atributo pessoal de quem lê ("{frase}"): o Meta reprova; fale do desejo ou da
     situação, não de quem a pessoa é.'
   exemplo_ruim: Você está endividado e com o nome sujo?
@@ -812,7 +812,7 @@ regras:
   segmento: geral
   usa:
   - exclusao_de_publico
-  fonte: 'trilha-copywritter/docs/metodo.md §5 ("Ganchos de identidade e promessa de renda (\"só para mulheres\"…) são pontos
+  fonte: 'Trilha-copy/docs/metodo.md §5 ("Ganchos de identidade e promessa de renda (\"só para mulheres\"…) são pontos
     de reprovação no Meta. Anúncio de oportunidade de trabalho pode cair em categoria especial"); Trilha/playbooks/imobiliario/playbook.yaml
     (categoria_especial_anuncio: verificar); aula-copy-3.txt (o anúncio-exemplo "It''s only for women" é o tipo que reprova
     aqui).'
@@ -837,7 +837,7 @@ regras:
   - promessa_de_ganho
   - ressalva_de_resultado
   fonte: decisão atual em trilha_copy/revisao.py::_compliance (PROMESSA_DE_GANHO); curso-marketing.txt (promessa de ganho
-    bloqueada no Meta e no Google); trilha-copywritter/docs/metodo.md §5.
+    bloqueada no Meta e no Google); Trilha-copy/docs/metodo.md §5.
   mensagem: '{onde}: promessa de ganho com número ("{frase}"): diga de quem é o resultado e que não é o típico (CDC e políticas
     do Meta). Promessa de renda sem ressalva é motivo comum de reprovação.'
   exemplo_ruim: Fature R$ 10 mil por mês revendendo nossos kits.
@@ -853,7 +853,7 @@ regras:
   - pagina
   segmento: geral
   usa: []
-  fonte: decisão atual em trilha_copy/revisao.py::_compliance; trilha-copywritter/docs/metodo.md §3 (CONAR).
+  fonte: decisão atual em trilha_copy/revisao.py::_compliance; Trilha-copy/docs/metodo.md §3 (CONAR).
   mensagem: 'cita o concorrente "{nome}": publicidade comparativa tem regras (CONAR); confirme com o cliente.'
   exemplo_ruim: Mais barato que a Inglês Já e sem taxa de matrícula.
   exemplo_bom: 'Sem taxa de matrícula: você paga só as aulas que faz.'
@@ -910,7 +910,7 @@ regras:
   - pagina
   segmento: geral
   usa: []
-  fonte: decisão atual em trilha_copy/revisao.py::_lastro; trilha-copywritter/docs/metodo.md §3 ("Todo número tem lastro");
+  fonte: decisão atual em trilha_copy/revisao.py::_lastro; Trilha-copy/docs/metodo.md §3 ("Todo número tem lastro");
     curso-marketing.txt ("Para cada promessa, uma prova").
   mensagem: 'número(s) sem lastro no briefing ({numeros}): todo número precisa vir de uma prova, da oferta ou da promessa
     aprovada. Se o número é verdadeiro, registre no briefing com a fonte e exporte de novo.'
@@ -935,7 +935,7 @@ regras:
   segmento: geral
   usa: []
   fonte: decisão atual em trilha_copy/revisao.py::_lastro e trilha_briefing/revisao.py::_provas (esquema.py::Provas.utilizaveis);
-    trilha-copywritter/docs/metodo.md §5 (autoridade por associação sem autorização esbarra no CONAR e no direito de imagem).
+    Trilha-copy/docs/metodo.md §5 (autoridade por associação sem autorização esbarra no CONAR e no direito de imagem).
   mensagem: '{onde}: a prova "{prova}" não é utilizável: {motivo}. Número precisa de fonte; depoimento e case precisam de
     autorização de nome e imagem. Sem isso ela fica fora de anúncios e páginas (CONAR e direito de imagem).'
   exemplo_ruim: '"Melhor escola da cidade!" — Dra. Paula, médica (sem autorização registrada)'
@@ -1017,7 +1017,7 @@ regras:
   - pagina
   segmento: geral
   usa: []
-  fonte: decisão atual em trilha_briefing/revisao.py::_copy; trilha-lp/docs/estrutura.md §5; beatriz-moraes082/ briefing-trilha/skills/fluxos-imobiliarios/SKILL.md
+  fonte: decisão atual em trilha_briefing/revisao.py::_copy; trilha-lp/docs/estrutura.md §5; briefing-trilha/skills/fluxos-imobiliarios/SKILL.md
     ("Mensagens tipo 'estamos aqui para tirar suas dúvidas' sozinhas são proibidas"); curso-marketing.txt ("exterminador de
     objeção").
   mensagem: '{onde}: objeção sem resposta — "{objecao}". Objeção que aparece e fica sem resposta derruba a decisão; traga
@@ -1081,7 +1081,7 @@ regras:
   - prova_vaga
   fonte: 'decisão atual em trilha_copy/revisao.py::_hopkins (ADJETIVO_VAGO) e trilha_briefing/revisao.py::_copy (PALAVRAS_VAGAS);
     aulas-copy-1-e-2.txt, Aula 1 (Hopkins: "Platitudes and generalities roll off… like water from a duck"); aula-copy-3.txt
-    (teste do surdo-mudo); beatriz-moraes082/briefing-trilha/assets/ briefing_empreendimento.md ("Ruim: ótima estrutura, excelente
+    (teste do surdo-mudo); briefing-trilha/assets/ briefing_empreendimento.md ("Ruim: ótima estrutura, excelente
     lazer, padrão superior").'
   mensagem: '{onde}: adjetivo sem fato ("{trecho}"): troque por número, nome ou detalhe. Se você só pudesse apontar, para
     o que apontaria?'
@@ -1099,8 +1099,8 @@ regras:
   - pagina
   segmento: geral
   usa: []
-  fonte: 'Trilha/docs/arquitetura/nucleo.md §1, princípio 6 ("Concretude obrigatória. Copy sem número, fato ou nome próprio
-    é barrada"); beatriz-moraes082/briefing-trilha/skills/fluxos-imobiliarios/SKILL.md ("Cada disparo tem que usar pelo menos
+  fonte: 'Trilha-ads/docs/arquitetura/nucleo.md §1, princípio 6 ("Concretude obrigatória. Copy sem número, fato ou nome próprio
+    é barrada"); briefing-trilha/skills/fluxos-imobiliarios/SKILL.md ("Cada disparo tem que usar pelo menos
     um dado concreto"); aula-copy-3.txt (Concrete: "We took a roofing company from 14 leads a month to 70").'
   mensagem: 'a peça não tem nenhum número, nome próprio ou prova: copy sem fato soa como a de qualquer concorrente e a pessoa
     passa reto. Ponha ao menos um dado do briefing (número, prazo, nome, marco).'
@@ -1437,8 +1437,8 @@ regras:
   usa:
   - preco_valor
   - preco_contexto
-  fonte: 'trilha_briefing/esquema.py (Plataforma.preco: nunca, a_partir_de, parcela, valor_cheio); Trilha/docs/arquitetura/nucleo.md
-    §5.1 (regras_comerciais.preco por canal); Trilha/playbooks/imobiliario/ playbook.yaml (regras_comerciais_padrao); beatriz-moraes082/briefing-trilha/skills/fluxos-imobiliarios/
+  fonte: 'trilha_briefing/esquema.py (Plataforma.preco: nunca, a_partir_de, parcela, valor_cheio); Trilha-ads/docs/arquitetura/nucleo.md
+    §5.1 (regras_comerciais.preco por canal); Trilha/playbooks/imobiliario/ playbook.yaml (regras_comerciais_padrao); briefing-trilha/skills/fluxos-imobiliarios/
     references/anatomia_nutricao.md ("Regra do preço — crítica").'
   mensagem: '{onde}: mostra preço ("{trecho}"), mas a regra comercial do cliente para {canal} é não mostrar preço. Preço fora
     da regra atrai quem só compara valor e tira do time a conversa de simulação: tire o valor e chame para a simulação ou
@@ -1463,7 +1463,7 @@ regras:
   - forma_a_partir_de
   - forma_parcela
   fonte: 'decisão atual em trilha_lp/revisao.py (imobiliário: preço sem "a partir de"), generalizada; trilha-lp/docs/estrutura.md
-    ("Preço só como ''a partir de'', amarrado à visita ou à simulação"); beatriz-moraes082/briefing-trilha/skills/fluxos-imobiliarios/references/objecoes_e_apelos.md
+    ("Preço só como ''a partir de'', amarrado à visita ou à simulação"); briefing-trilha/skills/fluxos-imobiliarios/references/objecoes_e_apelos.md
     ("valores a partir de R$ [PRECO_MIN]" amarrado ao convite de visita).'
   mensagem: '{onde}: preço fora da forma combinada para {canal} ({regra}): "{trecho}". Mostre só o valor de entrada ou a parcela,
     amarrado à visita ou à simulação; o valor fechado fica com o time comercial.'
@@ -1490,7 +1490,7 @@ regras:
   - juridico
   usa: []
   fonte: 'decisão atual em trilha_lp/esquema.py (Lp._segundo_bloco: "segmento imobiliario exige marca.registro_profissional
-    (CRECI)"); Trilha/playbooks/imobiliario/playbook.yaml (registros_profissionais: [CRECI]); Trilha/docs/arquitetura/nucleo.md
+    (CRECI)"); Trilha/playbooks/imobiliario/playbook.yaml (registros_profissionais: [CRECI]); Trilha-ads/docs/arquitetura/nucleo.md
     §5.1 ("CRECI, CRM, OAB — com número e onde exibir"); trilha-lp/docs/checklist-publicacao.md.'
   mensagem: '{onde}: falta o registro profissional ({registro}) que o segmento exige em toda publicidade. Na página ele vai
     no rodapé; no anúncio, no texto ou na arte (marque registro_na_arte se estiver na imagem).'
@@ -1542,7 +1542,7 @@ regras:
   - roteiro
   segmento: geral
   usa: []
-  fonte: decisão atual em trilha_copy/revisao.py::_integridade; Trilha/docs/arquitetura/nucleo.md §5.4.
+  fonte: decisão atual em trilha_copy/revisao.py::_integridade; Trilha-ads/docs/arquitetura/nucleo.md §5.4.
   mensagem: 'célula {codigo} não existe na grade do briefing: sem ela o raio-x não liga o anúncio aos leads.'
   exemplo_ruim: 'codigo: PT09 (a grade vai até PT04)'
   exemplo_bom: 'codigo: PT01'
