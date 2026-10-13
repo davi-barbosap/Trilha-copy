@@ -1,5 +1,11 @@
 # Mudanças
 
+## 0.3.0 — caminho de volta dos testes (out/2026)
+
+- **Pacote da célula: "O que os testes já disseram".** Mostra as hipóteses decididas no briefing (validada, refutada, inconclusiva), com o aprendizado. Primeiro vêm as da célula, depois as das outras. Teste rodando na célula vira aviso para não mudar a variável testada nas versões novas.
+- **`vencedora <peca> --hipotese H`:** a peça aprovada de uma hipótese validada vira referência do cliente em `copy/<id>/referencias/`. A decupagem vem do subtexto, o porquê do aprendizado, e a fonte cita a hipótese e a data.
+- **Contrato:** lê de cada hipótese o aprendizado, a data de fim e as conversões obtidas. Elas vêm do briefing, que as registra com `registrar-resultados` e `decidir`.
+
 ## 0.2.0 — padrão de texto da Trilha (out/2026)
 
 ### Novo

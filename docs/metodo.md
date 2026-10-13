@@ -86,10 +86,16 @@ Além do texto, a revisão da peça confere o modelo de corpo do roteiro (seçã
 
 O texto na arte passa pela mesma revisão do resto, porque é texto que o público lê. A arte entra na assinatura da aprovação: mudou a arte, aprove de novo.
 
-## 7. O que ficou de fora nesta versão
+## 7. O caminho de volta
+
+O que o teste ensinou volta para quem escreve. Ninguém começa uma peça sem saber o que já se aprendeu com aquele público.
+- **No pacote da célula:** "O que os testes já disseram" mostra as hipóteses decididas no briefing, com o aprendizado. Primeiro vêm as da célula, depois as das outras. Se há teste rodando na célula, o pacote avisa para não mudar a variável testada nas versões novas.
+- **Na referência:** `vencedora` transforma a peça aprovada de uma hipótese validada em referência do cliente (`copy/<id>/referencias/`), decupada pelo próprio subtexto.
+- **Ponto crítico:** um teste validado vale para aquele público, naquela época e com aquela oferta. A referência registra a fonte e a data para ninguém tratar o resultado como lei. Ângulo e gancho continuam sendo variáveis de teste.
+
+## 8. O que ficou de fora nesta versão
 
 - **Uma ideia grande por peça:** conferir que não há duas promessas exige ler o sentido. Ficou como campo (`ideia`), não como regra.
 - **Nada inacreditável:** comparar a promessa com a sofisticação do público. O pacote mostra a sofisticação; a revisão não julga.
 - **Lista de jargões por público:** depende do segmento. Hoje entra pelos termos proibidos do briefing.
 - **Chamada única,** **superlativo sem prova** e **coerência anúncio → página:** estão entre as lacunas do padrão de texto, em ordem de valor.
-- **Aprendizados dos testes voltando como referência:** quando o Trilha-ads tiver o vencedor de uma hipótese, a peça pode virar referência decupada.
